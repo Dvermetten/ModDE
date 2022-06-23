@@ -94,6 +94,8 @@ class Parameters(AnnotatedStruct):
         "Shade",
         "lpsr",
     )
+    lb: np.ndarray = None
+    ub: np.ndarray = None
 
     def __init__(self, *args, **kwargs) -> None:
         """Intialize parameters. Calls sub constructors for different parameter types."""
