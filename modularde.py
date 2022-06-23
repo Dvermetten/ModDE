@@ -275,12 +275,15 @@ class ModularDE:
             base_x = (self.parameters.population.x - self.parameters.lb) / (self.parameters.ub - self.parameters.lb)
         else:
             base_x = None
+        # if self.parameters.bound_correction == 'expc_center' or self.parameters.track_CS:
+        #     x_corr = np.array([perform_correction((x[:,idx] - self.parameters.lb.flatten()) / (self.parameters.ub.flatten() - self.parameters.lb.flatten()), out_of_bounds[:,idx], 'expc_center', base_x) for idx in range(x.shape[1])]).transpose()
+        # else:
         x_corr = perform_correction((x - self.parameters.lb) / (self.parameters.ub - self.parameters.lb), out_of_bounds, self.parameters.bound_correction, base_x)
+
         return self.parameters.lb + (self.parameters.ub - self.parameters.lb) * x_corr
     
     
 def perform_correction(x_transformed, oob_idx, method, base_vector=None):
-#     print(oob_idx)
     x_pre = copy(x_transformed)
     y = x_transformed[oob_idx]
     if method == "mirror":
@@ -303,7 +306,8 @@ def perform_correction(x_transformed, oob_idx, method, base_vector=None):
     elif method == "expc_target":
         x_transformed[oob_idx] = np.abs(2*(y>0) - ((y>0)-np.log(1+np.random.uniform(size=np.sum(oob_idx))*(np.exp(-1*np.abs((y>0) - base_vector[oob_idx]))-1))))
     elif method == "expc_center":
-        base_vector = np.array(len(x_transformed)*[0.5])
+        # base_vector = np.array(len(x_transformed)*[0.5])
+        base_vector = np.ones(x_transformed.shape) * 0.5
         x_transformed[oob_idx] = np.abs(2*(y>0) - ((y>0)-np.log(1+np.random.uniform(size=np.sum(oob_idx))*(np.exp(-1*np.abs((y>0) - base_vector[oob_idx]))-1))))
     elif method == "exps":
         x_transformed[oob_idx] = np.abs(2*(y>0) - ((y>0)-np.log(1+np.random.uniform(size=np.sum(oob_idx))*(np.exp(-1)-1))))
