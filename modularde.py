@@ -10,7 +10,6 @@ from copy import copy
 
 from parameters import Parameters
 from population import Population
-# from .utils import timeit, ert
 
 
 class ModularDE:
@@ -109,8 +108,9 @@ class ModularDE:
         """
         x_sel = np.where(self.parameters.population.f < self.parameters.offspring.f, self.parameters.population.x, self.parameters.offspring.x)
         f_sel = np.where(self.parameters.population.f < self.parameters.offspring.f, self.parameters.population.f, self.parameters.offspring.f)
+        self.parameters.old_population = self.parameters.population
         self.parameters.population = Population(x_sel, f_sel)
-        self.parameters.improved_individuals_idx = np.where(self.parameters.population.f < self.parameters.offspring.f)[0]
+        self.parameters.improved_individuals_idx = np.where(self.parameters.population.f < self.parameters.old_population.f)[0]
 
     def crossover(self) -> None:
         """
@@ -130,11 +130,6 @@ class ModularDE:
                     if np.random.uniform() > self.parameters.CR[ind_idx]:
                         break
             self.parameters.crossed = crossed
-            
-#         f = np.empty(self.parameters.lambda_, object)
-#         for i in range(self.parameters.lambda_):
-#             f[i] = self._fitness_func(crossed[:, i])
-#         self.parameters.offspring = Population(crossed, f)
 
     def step(self) -> bool:
         """The step method runs one iteration of the optimization process.
@@ -177,7 +172,6 @@ class ModularDE:
 
         """
         return [
-            # self.parameters.target >= self.parameters.fopt,
             self._fitness_func.state.evaluations >= self.parameters.budget,
             self._fitness_func.state.optimum_found
         ]
@@ -201,14 +195,31 @@ class ModularDE:
 
         """
         self.parameters.used_budget += 1
+        if self.parameters.init_stats:
+            idx = self.parameters.stats.curr_idx
+            self.parameters.stats.corrected = np.max(self.parameters.out_of_bounds[:,idx])
+            self.parameters.stats.curr_F = self.parameters.F[idx]
+            self.parameters.stats.curr_CR = self.parameters.CR[idx]
+            if self.parameters.stats.corrected:
+                self.parameters.stats.corr_so_far += 1
+                x_transformed = ((x - self.parameters.lb) / (self.parameters.ub - self.parameters.lb)).flatten()
+                x_pre = ((self.parameters.crossed[:,idx] - self.parameters.lb) / (self.parameters.ub - self.parameters.lb)).flatten()
+                self.parameters.stats.CS = float(1 - spatial.distance.cosine(x_transformed,x_pre))
+                self.parameters.stats.ED = float(np.linalg.norm(x_transformed-x_pre))
+            else:
+                self.parameters.stats.CS = 0.0
+                self.parameters.stats.ED = 0.0
+            self.parameters.stats.curr_idx += 1
+            if self.parameters.stats.curr_idx >= self.parameters.lambda_:
+                self.parameters.stats.curr_idx = 0
         return self._fitness_func(x.flatten())
 
     def __repr__(self):
-        """Representation of ModularCMA-ES."""
+        """Representation of ModularDE."""
         return f"<{self.__class__.__qualname__}: {self._fitness_func}>"
 
     def __str__(self):
-        """String representation of ModularCMA-ES."""
+        """String representation of ModularDE."""
         return repr(self)
 
     
@@ -259,8 +270,8 @@ class ModularDE:
         """
         x = self.parameters.crossed
         
-        out_of_bounds = np.logical_or(x > self.parameters.ub, x < self.parameters.lb)
-        n_out_of_bounds = out_of_bounds.max(axis=0).sum()
+        self.parameters.out_of_bounds = np.logical_or(x > self.parameters.ub, x < self.parameters.lb)
+        n_out_of_bounds = self.parameters.out_of_bounds.max(axis=0).sum()
         if n_out_of_bounds == 0 or self.parameters.bound_correction is None:
             return x
 
@@ -269,16 +280,12 @@ class ModularDE:
         except ValueError:
             n = 1
             
-#         ub, lb = np.tile(self.parameters.ub, n)[out_of_bounds], np.tile(self.parameters.lb, n)[out_of_bounds]
-        #TODO: fix base vector
+
         if self.parameters.bound_correction in ['hvb', 'expc_target']:
             base_x = (self.parameters.population.x - self.parameters.lb) / (self.parameters.ub - self.parameters.lb)
         else:
             base_x = None
-        # if self.parameters.bound_correction == 'expc_center' or self.parameters.track_CS:
-        #     x_corr = np.array([perform_correction((x[:,idx] - self.parameters.lb.flatten()) / (self.parameters.ub.flatten() - self.parameters.lb.flatten()), out_of_bounds[:,idx], 'expc_center', base_x) for idx in range(x.shape[1])]).transpose()
-        # else:
-        x_corr = perform_correction((x - self.parameters.lb) / (self.parameters.ub - self.parameters.lb), out_of_bounds, self.parameters.bound_correction, base_x)
+        x_corr = perform_correction((x - self.parameters.lb) / (self.parameters.ub - self.parameters.lb), self.parameters.out_of_bounds, self.parameters.bound_correction, base_x)
 
         return self.parameters.lb + (self.parameters.ub - self.parameters.lb) * x_corr
     

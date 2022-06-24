@@ -13,16 +13,46 @@ from scipy import linalg, stats
 from utils import AnnotatedStruct
 from sampling import (
     gaussian_sampling,
-    # orthogonal_sampling,
-    # mirrored_sampling,
     sobol_sampling,
     halton_sampling,
     uniform_sampling,
 )
 
+class TrackedStats(AnnotatedStruct):
+    """Object for keeping track of parameters we might want to track during the optimization process
+    
+    Attributes
+    ----------
+    curr_idx: int = 0
+        Index of the current individual (for internal consistency)
+    corrected: bool = False
+        Wheter bound correction was applied to the current individual
+    CS: float = 0
+        If corrected, the cosine similarity between corrected and target points
+    ED: float = 0
+        If corrected, the euclidian distance between corrected and target points
+    corr_so_far: int = 0
+        Cumulative amount of corrections applied so far
+    curr_F: float = 0
+        F value used to get the current individual
+    curr_CR: float = 0
+        CR value used to get the current individual
+    """
+    curr_idx: int = 0
+    corrected: bool = False
+    CS: float = 0.0
+    ED: float = 0.0
+    corr_so_far: int = 0
+    curr_F: float = 0.0
+    curr_CR: float = 0.0
+    
+    def __init__(self, *args, **kwargs) -> None:
+        """Intialize parameters."""
+        super().__init__(*args, **kwargs)
+    
 
 class Parameters(AnnotatedStruct):
-    """AnnotatedStruct object for holding the parameters for the ModularCMAES.
+    """AnnotatedStruct object for holding the parameters for the ModularDE.
 
     Attributes
     ----------
@@ -62,6 +92,8 @@ class Parameters(AnnotatedStruct):
         set using `archive_size`. Note: archive use is only supported in `target_pbest/1` mutation.
     archive_size: int = None
         Size of the population archive when `use_archive` is True
+    init_stats: bool = False
+        Wheter to initialize per-individual stats (to be tracked with IOHexperimenter)
     """
 
     d: int
@@ -96,6 +128,8 @@ class Parameters(AnnotatedStruct):
     )
     lb: np.ndarray = None
     ub: np.ndarray = None
+    
+    init_stats: bool = False
 
     def __init__(self, *args, **kwargs) -> None:
         """Intialize parameters. Calls sub constructors for different parameter types."""
@@ -105,7 +139,8 @@ class Parameters(AnnotatedStruct):
         self.init_dynamic_parameters()
         if self.shade:
             self.init_memory()
-#         self.init_population()
+        if self.init_stats:
+            self.stats = TrackedStats()
 
     def get_sampler(self) -> Generator:
         """Function to return a sampler generator based on the values of other parameters.
@@ -158,19 +193,7 @@ class Parameters(AnnotatedStruct):
         if self.shade:
             self.memory_size = self.memory_size or 100
         if self.use_archive:
-            self.archive_size = self.lambda_ * 2
-
-#     def init_population(self) -> None:
-#         """Initialization function for parameters for self-adaptive processes.
-
-#         Examples are recombination weights and learning rates for the covariance
-#         matrix adapation.
-#         """
-#         x = np.hstack(tuple(islice(self.sampler, self.lambda_)))
-#         f = np.empty(self.lambda_, object)
-#         for i in range(self.lambda_):
-#             f[i] = self.fitness_func(x[:, i])
-#         self.population = Population(x, f)
+            self.archive_size = self.lambda_ * 2 #TODO: make archive size ratio a parameter
 
     def init_dynamic_parameters(self) -> None:
         """Initialization function of parameters that represent the dynamic state of the DE.
@@ -199,10 +222,7 @@ class Parameters(AnnotatedStruct):
         
         if self.use_archive:
             if len(self.improved_individuals_idx) > 0:
-                # if self.archive is None:
-                #     self.archive = self.population[self.improved_individuals_idx.tolist()]
-                # else:
-                self.archive += self.population[self.improved_individuals_idx.tolist()]
+                self.archive += self.old_population[self.improved_individuals_idx.tolist()] #Msetting the elements which have been replaced to archive
                 if self.archive.n > self.archive_size:
                     #TODO: replace all np.random with a generator object for better reproducibility
                     idxs = np.random.choice(self.archive.n, self.archive_size, False)
@@ -210,16 +230,10 @@ class Parameters(AnnotatedStruct):
                     
         if self.shade:
             if len(self.improved_individuals_idx) > 0:
-                weights = np.abs(self.population[self.improved_individuals_idx.tolist()].f - self.offspring[self.improved_individuals_idx.tolist()].f)
+                weights = np.abs(self.old_population[self.improved_individuals_idx.tolist()].f - self.population[self.improved_individuals_idx.tolist()].f)
                 weights /= np.sum(weights)
                 self.CR_memory[self.memory_idx] = np.sum(weights * self.CR[self.improved_individuals_idx.tolist()])
-                # if max(self.CR) != 0:
-                #     self.CR_memory[self.memory_idx] = np.sum(weights * self.CR[self.improved_individuals_idx.tolist()])
-                # else:
-                #     self.CR_memory[self.memory_idx] = 1
-
                 self.F_memory[self.memory_idx] = np.sum(weights * self.F[self.improved_individuals_idx.tolist()])
-                # self.F_memory[self.memory_idx] = np.sum(self.population[self.improved_individuals_idx.tolist()].f**2)/np.sum(self.population[self.improved_individuals_idx.tolist()].f)
 
                 self.memory_idx += 1
                 if self.memory_idx == self.memory_size:
@@ -228,22 +242,18 @@ class Parameters(AnnotatedStruct):
             r = np.random.choice(self.memory_size, self.lambda_, replace=True)
             cr = np.random.normal(self.CR_memory[r], 0.1, self.lambda_)
             cr = np.clip(cr, 0, 1)
-            # cr[cr == 1] = 0 #check what is the problem of cr 0
-            # f = stats.cauchy.rvs(loc=self.F_memory[r], scale=0.1, size=self.lambda_)
             f = np.random.standard_cauchy(size=self.lambda_)*0.1+self.F_memory[r] #Faster than equivalent scipy code
-            # f[f > 1] = 1
 
             #TODO: check if oversampling cauchy would save some time over this while loop
             while sum(f <= 0) != 0:
                 r = np.random.choice(self.memory_size, sum(f <= 0), replace=True)
-                # f[f <= 0] = stats.cauchy.rvs(loc=self.F_memory[r], scale=0.1, size=sum(f <= 0))
                 f[f <= 0] = np.random.standard_cauchy(size=sum(f <= 0))*0.1+self.F_memory[r] #Faster than equivalent scipy code
 
             f[f > 1] = 1
 
             self.CR = np.array(cr)
             self.F = np.array(f)
-        
+            
         if self.lpsr:
             lambda_pre = self.lambda_
             self.lambda_ = int(np.round((4 - self.initial_lambda_)/self.budget * self.used_budget + self.initial_lambda_))
@@ -260,39 +270,6 @@ class Parameters(AnnotatedStruct):
                         idxs = np.random.choice(self.archive.n, self.archive_size, False)
                         self.archive = self.archive[idxs.tolist()]
 
-
-#     @staticmethod
-#     def from_config_array(d: int, config_array: list) -> "Parameters":
-#         """Instantiate a Parameters object from a configuration array.
-
-#         Parameters
-#         ----------
-#         d: int
-#             The dimensionality of the problem
-
-#         config_array: list
-#             A list of length len(Parameters.__modules__),
-#                 containing ints from 0 to 2
-
-#         Returns
-#         -------
-#         A new Parameters instance
-
-#         """
-#         if not len(config_array) == len(Parameters.__modules__):
-#             raise AttributeError(
-#                 "config_array must be of length " + str(len(Parameters.__modules__))
-#             )
-#         parameters = dict()
-#         for name, cidx in zip(Parameters.__modules__, config_array):
-#             options = getattr(getattr(Parameters, name), "options", [False, True])
-#             if not len(options) > cidx:
-#                 raise AttributeError(
-#                     f"id: {cidx} is invalid for {name} "
-#                     f"with options {', '.join(map(str, options))}"
-#                 )
-#             parameters[name] = options[cidx]
-#         return Parameters(d, **parameters)
 
     @staticmethod
     def load(filename: str) -> "Parameters":
