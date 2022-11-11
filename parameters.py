@@ -16,6 +16,7 @@ from sampling import (
     sobol_sampling,
     halton_sampling,
     uniform_sampling,
+    mirrored_sampling
 )
 
 class TrackedStats(AnnotatedStruct):
@@ -60,71 +61,107 @@ class Parameters(AnnotatedStruct):
         Dimensionality of the search-space
     budget: int = None 
         Total budget of the optimzation procedure
-    initial_lambda_: int = None
-        Initial population size, used only when `lspr` is active
     lambda_: int = None
-        Population size at the current moment. When `lspr` is active, use `initial_lambda_` instead
+        Population size at the current moment. When `lspr` is active, this corresponds to the initial population size and is adapted during the search
     F: np.ndarray = None
         The F-values to use. Should be the same size as the population size (lambda_)
     CR: np.ndarray = None
         The crossover rates to use. Should be the same size as the population size (lambda_)
-    bound_correction = str (
+    bound_correction: str (
         None, "saturate", "unif_resample", "COTN", "toroidal", "mirror", 
         "hvb", "expc_target", "expc_center", "exps") = None
         How to deal with the box-constraints
-    base_sampler = str (
+    base_sampler: str (
         'gaussian', 'sobol', 'halton', 'uniform') = 'gaussian'
         Sampling method used for initialization. 
-    mutation = str (
-        'rand/1', 'rand/2', 'best/1', 'target_pbest/1', 'target_best/2', 'target_rand/1', '2_opt/1') = 'rand/1'
-        Mutation strategy to use. Note: target_pbest is the same as curr_pbest
+    mutation_base: str ('rand', 'best', 'target') = 'rand'
+        Which vector to use as the base element for the mutation. Best is best individual in the population, target 
+        is also often refered to as current (so each element is used exaclty once as the base for mutation)
+    mutation_reference: str (None, 'pbest', 'best', 'rand') = None
+        This corresponds to the classical -to-X DE variants. The current X is subtracted from the selected reference as an initial
+        difference. Note that this is not counted as a difference component in the mutation_n_comps parameter.
+    mutation_n_comps: int (1, 2) = 1
+        The number of difference components to use. 
+    mutation_use_weighted_F: bool = False
+        Decreases the effecive F values at the start of the search, increases them afterwards. Doesn't impact the F value adaptation
     crossover: (
         'bin', 'exp') = 'bin'   
         Crossover operator to use
-    shade: bool = False
-        Whether to use adaptive versions of F and CR as done in the SHADE algorithm
+    eigenvalue_crossover: bool = False
+        When enabled, crossover occurs based on the eigenvectors of the individuals rather than their current representation
+    adaptation_method: (
+        None, 'shade', 'jDE') = None
+        Whether to use adaptive versions of F and CR as done in the SHADE or jDE algorithms
+    use_jso_caps: bool = False
+        Whether to cap F and CR in the begining parts of the search (based on provided budget)
     lpsr: bool = False
         Whether to use linear population size reduction
-    memory_size: int = None
-        Size of the memory when shade-adaptation is used
     use_archive: bool = False
         Whether to incorporate an archive in the mutation step. Size of the archive is
-        set using `archive_size`. Note: archive use is only supported in `target_pbest/1` mutation.
+        set using `archive_size`. Using the archive is counted as a difference vector for mutation_n_comps parameter
+    oppositional_initialization: bool = False
+        Whether to use oppositional sampling (mirroring) in the initialization
+    oversampling_factor: float = 0.0
+        Fraction of additional individuals to sample during initialization. When this is e.g. 1.0, we would sample 2*lambda individuals and select the best lambda as the initial population
+    memory_size: int = None
+        Size of the memory when shade-adaptation is used
     archive_size: int = None
         Size of the population archive when `use_archive` is True
+    oppositional_generation_probability: float = 0.0
+        The probability to add a step of generating individuals based on the oppositional (mirroring) method. Occurs between selection and adaptation.
     init_stats: bool = False
         Wheter to initialize per-individual stats (to be tracked with IOHexperimenter)
     """
 
     d: int
     budget: int = None
-    initial_lambda_: int = None
     lambda_: int = None
     F: np.ndarray = None
     CR: np.ndarray = None
     bound_correction: (
         None, "saturate", "unif_resample", "COTN", "toroidal", "mirror", 
-        "hvb", "expc_target", "expc_center", "exps") = None
+        "hvb", "expc_target", "expc_center", "exps") = "saturate"
     base_sampler: (
-        'gaussian', 'sobol', 'halton', 'uniform') = 'gaussian'
-    mutation: (
-        'rand/1', 'rand/2', 'best/1', 'target_pbest/1', 'target_best/2', 'target_rand/1', '2_opt/1') = 'rand/1'
+        'gaussian', 'sobol', 'halton', 'uniform') = 'uniform'
+    mutation_base: (
+        'rand', 'best', 'target') = 'rand'
+    mutation_reference: (
+        None, 'pbest', 'best', 'rand') = None
+    mutation_n_comps: (1, 2) = 1
+    mutation_use_weighted_F: bool = False
+    # mutation: (
+        # 'rand/1', 'rand/2', 'best/1', 'target_pbest/1', 'target_best/2', 'target_rand/1', '2_opt/1', 'curr_to_best/1') = 'rand/1'
     crossover: (
-        'bin', 'exp') = 'bin'   
-    shade: bool = False
+        'bin', 'exp') = 'bin'  
+    eigenvalue_crossover: bool = False
+    adaptation_method: (
+        None, 'shade', 'jDE') = None   
+    use_jso_caps: bool = False
     lpsr: bool = False
+    use_archive: bool = False
+    oppositional_initialization: bool = False
+    oversampling_factor: float = 0.0
     memory_size: int = None
     archive_size: int = None
+    oppositional_generation_probability: float = 0.0
     population: TypeVar("Population") = None
     offspring: TypeVar("Population") = None
-    use_archive: bool = False
     __modules__ = (
         "bound_correction",
         "base_sampler",
-        "mutation",
-        "crossover",
-        "Shade",
-        "lpsr",
+        "mutation_base", #3
+        "mutation_reference", #3
+        "mutation_n_comps", #2
+        "mutation_use_weighted_F",
+        "use_archive", #2
+        "crossover", #2
+        "eigenvalue_crossover",
+        "adaptation_method", #3
+        "use_jso_caps",
+        "oppositional_initialization",
+        "oversampling_factor",
+        "oppositional_generation_probability",
+        "lpsr", #2 
     )
     lb: np.ndarray = None
     ub: np.ndarray = None
@@ -137,7 +174,7 @@ class Parameters(AnnotatedStruct):
         self.init_selection_parameters()
         self.init_fixed_parameters()
         self.init_dynamic_parameters()
-        if self.shade:
+        if self.adaptation_method is not None:
             self.init_memory()
         if self.init_stats:
             self.stats = TrackedStats()
@@ -157,7 +194,10 @@ class Parameters(AnnotatedStruct):
             "halton": halton_sampling,
             "uniform": uniform_sampling,
         }.get(self.base_sampler, gaussian_sampling)(self.d)
-
+        
+        if self.oppositional_initialization:
+            sampler = mirrored_sampling(sampler)
+        
         return sampler
 
     def init_fixed_parameters(self) -> None:
@@ -172,25 +212,25 @@ class Parameters(AnnotatedStruct):
     def init_selection_parameters(self) -> None:
         """Initialization function for parameters that influence in selection."""
         if self.lpsr:
-            self.lambda_ = self.initial_lambda_ or 100 #TODO: set defaults
+            self.lambda_ = self.lambda_ or 100 #TODO: set defaults
         else:
             self.lambda_ = self.lambda_ or (4 + np.floor(3 * np.log(self.d))).astype(int)
         self.initial_lambda_ = self.lambda_
-        
         if self.F is None:
             self.F = np.array([0.5] * self.lambda_)
         elif len(self.F) == 1:
-            self.F = np.array(self.F * self.lambda_)
+            self.F = np.array(list(self.F) * self.lambda_)
         if self.CR is None:
             self.CR = np.array([0.5] * self.lambda_)
         elif len(self.CR) == 1:
-            self.CR = np.array(self.CR * self.lambda_)
-        
+            self.CR = np.array(list(self.CR) * self.lambda_)
         self.sampler = self.get_sampler()
         self.set_default("ub", np.ones((self.d, 1)) * 5)
         self.set_default("lb", np.ones((self.d, 1)) * -5)
         
-        if self.shade:
+        self.min_lambda = 2 * self.mutation_n_comps + int(self.mutation_base == 'rand') + int(self.mutation_reference == 'rand') + int(self.use_archive)
+        
+        if self.adaptation_method == 'shade':
             self.memory_size = self.memory_size or 100
         if self.use_archive:
             self.archive_size = self.lambda_ * 2 #TODO: make archive size ratio a parameter
@@ -207,9 +247,14 @@ class Parameters(AnnotatedStruct):
         
     def init_memory(self) -> None:
         """ Initialize the memory when using SHADE-adaptation"""
-        self.CR_memory = np.array([np.mean(self.CR)] * self.memory_size)
-        self.F_memory = np.array([np.mean(self.F)] * self.memory_size)
-        self.memory_idx = 0
+        if self.adaptation_method == 'shade':
+            self.CR_memory = np.array([np.mean(self.CR)] * self.memory_size)
+            self.F_memory = np.array([np.mean(self.F)] * self.memory_size)
+            self.memory_idx = 0
+        else:
+            self.F_memory = np.mean(self.F)
+            self.F_update_strenght = 0.1
+            self.tau_F = self.tau_CR = 0.1
         
         
 
@@ -228,7 +273,7 @@ class Parameters(AnnotatedStruct):
                     idxs = np.random.choice(self.archive.n, self.archive_size, False)
                     self.archive = self.archive[idxs.tolist()]
                     
-        if self.shade:
+        if self.adaptation_method == 'shade':
             if len(self.improved_individuals_idx) > 0:
                 weights = np.abs(self.old_population[self.improved_individuals_idx.tolist()].f - self.population[self.improved_individuals_idx.tolist()].f)
                 weights /= np.sum(weights)
@@ -245,31 +290,47 @@ class Parameters(AnnotatedStruct):
             f = np.random.standard_cauchy(size=self.lambda_)*0.1+self.F_memory[r] #Faster than equivalent scipy code
 
             #TODO: check if oversampling cauchy would save some time over this while loop
-            while sum(f <= 0) != 0:
-                r = np.random.choice(self.memory_size, sum(f <= 0), replace=True)
-                f[f <= 0] = np.random.standard_cauchy(size=sum(f <= 0))*0.1+self.F_memory[r] #Faster than equivalent scipy code
+            n_missing = np.sum(f <= 0)
+            while n_missing > 0: #can do this nicer with walrus operator, but that is python 3.8 specific, so won't go for that here
+                r = np.random.choice(self.memory_size, n_missing, replace=True)
+                f[f <= 0] = np.random.standard_cauchy(size=n_missing)*0.1+self.F_memory[r] #Faster than equivalent scipy code
+                n_missing = np.sum(f <= 0)
 
             f[f > 1] = 1
 
             self.CR = np.array(cr)
             self.F = np.array(f)
+        
+        elif self.adaptation_method == 'jDE':
+            f_rand = np.random.uniform(size=self.F.shape)
+            cr_rand = np.random.uniform(size=self.F.shape)
+            self.CR[cr_rand > self.tau_CR] = np.random.uniform(size=self.CR[cr_rand > self.tau_CR].shape)
+            self.F[f_rand > self.tau_F] = self.F_memory + self.F_update_strenght * np.random.uniform(size=self.F[f_rand > self.tau_F].shape)
             
         if self.lpsr:
             lambda_pre = self.lambda_
-            self.lambda_ = int(np.round((4 - self.initial_lambda_)/self.budget * self.used_budget + self.initial_lambda_))
+            self.lambda_ = int(np.round((self.min_lambda - self.initial_lambda_)/self.budget * self.used_budget + self.initial_lambda_))
             if self.lambda_ < lambda_pre:
                 # arg_remove = np.argmax(self.population.f)
-                idxs_keep = [i for i in range(self.population.n) if i!=np.argmax(self.population.f)]
+                idxs_keep = [i for i in range(self.population.n) if i not in np.argsort(self.population.f)[(self.lambda_ - lambda_pre):]]
+                # idxs_keep = [i for i in range(self.population.n) if i!=np.argmax(self.population.f)]
                 self.population = self.population[idxs_keep]
                 self.CR = self.CR[idxs_keep]
                 self.F = self.F[idxs_keep]
-                
+
                 if self.use_archive:
                     self.archive_size = self.lambda_ * 2
                     if self.archive.n > self.archive_size:
                         idxs = np.random.choice(self.archive.n, self.archive_size, False)
                         self.archive = self.archive[idxs.tolist()]
-
+                        
+        if self.use_jso_caps:
+            if self.used_budget < 0.25 * self.budget:
+                self.CR[self.CR > 0.7] = 0.7
+            if self.used_budget < 0.5 * self.budget:
+                self.CR[self.CR > 0.6] = 0.6            
+            if self.used_budget < 0.6 * self.budget:
+                self.F[self.F > 0.7] = 0.7
 
     @staticmethod
     def load(filename: str) -> "Parameters":

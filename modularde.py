@@ -1,4 +1,4 @@
-"""Main implementation of Modular CMA-ES."""
+"""Main implementation of Modular DE."""
 import os
 from itertools import islice
 from typing import List, Callable
@@ -48,12 +48,18 @@ class ModularDE:
         self.initialize_population()
 
     def initialize_population(self) -> None:
-        x = np.hstack(tuple(islice(self.parameters.sampler, self.parameters.lambda_)))
+        n_individuals = self.parameters.lambda_
+        if self.parameters.oversampling_factor > 0:
+            n_individuals = int(n_individuals * (1 + self.parameters.oversampling_factor))
+        x = np.hstack(tuple(islice(self.parameters.sampler, n_individuals)))
         x = self.parameters.lb + x * (self.parameters.ub - self.parameters.lb )
         f = np.empty(self.parameters.lambda_, object)
         for i in range(self.parameters.lambda_):
             f[i] = self._fitness_func(x[:, i])
-        self.parameters.population = Population(x, f)
+        idxs_best = np.argsort(f)[:self.parameters.lambda_]    
+        
+        self.parameters.population = Population(x[:,idxs_best], f[idxs_best])
+                
         if self.parameters.use_archive:
             self.parameters.archive = self.parameters.population
     
@@ -62,44 +68,49 @@ class ModularDE:
 
         
         """
-
-            
-        if self.parameters.mutation == 'rand/1':
-            parent_idxs = get_parent_idxs(self.parameters.population.n, 3)
-            mutated = self.parameters.F * (self.parameters.population[parent_idxs[:, 1].tolist()].x - self.parameters.population[parent_idxs[:, 2].tolist()].x)
-            self.parameters.mutated = mutated + self.parameters.population[parent_idxs[:, 0].tolist()].x
-        elif self.parameters.mutation == 'rand/2':
-            parent_idxs = get_parent_idxs(self.parameters.population.n, 5)
-            mutated = self.parameters.F * (self.parameters.population[parent_idxs[:, 1].tolist()].x - self.parameters.population[parent_idxs[:, 2].tolist()].x)
-            mutated += self.parameters.F * (self.parameters.population[parent_idxs[:, 3].tolist()].x - self.parameters.population[parent_idxs[:, 4].tolist()].x)
-            self.parameters.mutated = mutated + self.parameters.population[parent_idxs[:, 0].tolist()].x
-        elif self.parameters.mutation == 'best/1':
-            parent_idxs = get_parent_idxs(self.parameters.population.n, 2)
-            mutated = self.parameters.F * (self.parameters.population[parent_idxs[:, 0].tolist()].x - self.parameters.population[parent_idxs[:, 1].tolist()].x)
-            self.parameters.mutated = mutated + self.parameters.population[int(np.argmin(self.parameters.population.f))].x
-        elif self.parameters.mutation == 'target_pbest/1':
-            parent_idxs = get_parent_idxs(self.parameters.population.n, 2)
-            if self.parameters.use_archive and self.parameters.archive is not None:
-                archive_idxs = np.random.randint(self.parameters.archive.n, size= self.parameters.population.n) 
-                mutated = self.parameters.F * (self.parameters.population[parent_idxs[:, 0].tolist()].x - self.parameters.archive[archive_idxs.tolist()].x)
+        curr_parent_idx = 0
+        parent_idxs = get_parent_idxs(self.parameters.population.n, self.parameters.min_lambda)
+        mutated = np.zeros(self.parameters.population.x.shape)
+        if self.parameters.mutation_base == 'rand':
+            mutated += self.parameters.population[parent_idxs[:, curr_parent_idx].tolist()].x
+            curr_parent_idx += 1
+        elif self.parameters.mutation_base == 'target': #current and target are equivalent
+            mutated += self.parameters.population.x
+        elif self.parameters.mutation_base == 'best':
+            mutated += self.parameters.population[int(np.argmin(self.parameters.population.f))].x
+        n_comps_to_add = self.parameters.mutation_n_comps
+        
+        
+        F = self.parameters.F
+        if self.parameters.mutation_use_weighted_F:
+            if self.parameters.used_budget < 0.2 * self.parameters.budget:
+                F = F * 0.7
+            elif self.parameters.used_budget < 0.4 * self.parameters.budget:
+                F = F * 0.8
             else:
-                mutated = self.parameters.F * (self.parameters.population[parent_idxs[:, 0].tolist()].x - self.parameters.population[parent_idxs[:, 1].tolist()].x)
+                F = F * 1.2
+        
+        # if self.parameters.mutation_reference is not None:
+            
+        if self.parameters.mutation_reference == 'pbest':
             idxs_pbest = np.argsort(self.parameters.population.f)[np.random.randint(np.clip(self.parameters.population.n*np.random.uniform(2/self.parameters.population.n, 0.2, size = self.parameters.population.n), 1, self.parameters.population.n))]
-            mutated += self.parameters.F * (self.parameters.population[idxs_pbest.tolist()].x - self.parameters.population.x)
-            self.parameters.mutated = mutated + self.parameters.population.x
-        elif self.parameters.mutation == 'target_best/2':
-            parent_idxs = get_parent_idxs(self.parameters.population.n, 4)
-            mutated = self.parameters.F * (self.parameters.population[parent_idxs[:, 0].tolist()].x - self.parameters.population[parent_idxs[:, 1].tolist()].x)
-            mutated += self.parameters.F * (self.parameters.population[parent_idxs[:, 2].tolist()].x - self.parameters.population[parent_idxs[:, 3].tolist()].x)
-            mutated += mutated + self.parameters.F * (self.parameters.population[int(np.argmin(self.parameters.population.f))].x - self.parameters.population.x)
-            self.parameters.mutated = mutated + self.parameters.population.x
-        elif self.parameters.mutation == 'target_rand/1':
-            parent_idxs = get_parent_idxs(self.parameters.population.n, 3)
-            mutated = self.parameters.F * (self.parameters.population[parent_idxs[:, 0].tolist()].x - self.parameters.population[parent_idxs[:, 1].tolist()].x)
-            mutated += mutated + self.parameters.F * (self.parameters.population[parent_idxs[:, 2].tolist()].x - self.parameters.population.x)
-            self.parameters.mutated = mutated + self.parameters.population.x     
-        elif self.parameters.mutation == '2_opt/1':
-            raise NotImplemented
+            mutated += F * (self.parameters.population[idxs_pbest.tolist()].x - self.parameters.population.x)
+        elif self.parameters.mutation_reference == 'best':
+            mutated += F * (self.parameters.population[int(np.argmin(self.parameters.population.f))].x - self.parameters.population.x)
+        elif self.parameters.mutation_reference == 'rand':
+            mutated += F * (self.parameters.population[parent_idxs[:, curr_parent_idx].tolist()].x - self.parameters.population.x)
+            curr_parent_idx += 1
+            
+        if self.parameters.use_archive  and self.parameters.archive is not None:
+            archive_idxs = np.random.randint(self.parameters.archive.n, size= self.parameters.population.n) 
+            mutated += F * (self.parameters.population[parent_idxs[:, curr_parent_idx].tolist()].x - self.parameters.archive[archive_idxs.tolist()].x)
+            curr_parent_idx += 1
+            n_comps_to_add -= 1
+            
+        for mut_idx in range(n_comps_to_add):
+            mutated += F * (self.parameters.population[parent_idxs[:, curr_parent_idx].tolist()].x - self.parameters.population[parent_idxs[:, curr_parent_idx+1].tolist()].x)
+        self.parameters.mutated = mutated
+        curr_parent_idx += 2
             
     def select(self) -> None:
         """Selection of best individuals in the population.
@@ -115,21 +126,37 @@ class ModularDE:
     def crossover(self) -> None:
         """
         """
+        mutated = self.parameters.mutated
+        parent_x = self.parameters.population.x
+        if self.parameters.eigenvalue_crossover:
+            C = np.cov(self.parameters.population.x)
+            _, B = np.linalg.eigh(C)
+            mutated = np.dot(B, mutated)
+            parent_x = np.dot(B, parent_x)
+            
+            
         if self.parameters.crossover == "bin":
             chosen = np.random.rand(*self.parameters.population.x.shape)
             j_rand = np.random.randint(0, self.parameters.population.x.shape[0], size=self.parameters.population.x.shape[1])
             chosen[j_rand.reshape(-1,1),np.arange(self.parameters.population.x.shape[1])[:,None]] = 0
-            self.parameters.crossed = np.where(chosen <= self.parameters.CR, self.parameters.mutated, self.parameters.population.x)
+            crossed = np.where(chosen <= self.parameters.CR, mutated, parent_x)
         elif self.parameters.crossover == "exp":
-            crossed = copy(self.parameters.population.x)
+            crossed = copy(parent_x)
             for ind_idx in range(self.parameters.population.n):
                 k = np.random.randint(self.parameters.population.d)
                 offset = 0
                 while offset < self.parameters.population.d:
-                    crossed[k+offset % self.parameters.population.d, ind_idx] = self.parameters.mutated[k+offset % self.parameters.population.d, ind_idx]
+                    # print(crossed.shape)
+                    # print(self.parameters.population.d)
+                    # print((k+offset) % self.parameters.population.d)
+                    crossed[(k+offset) % self.parameters.population.d, ind_idx] = mutated[(k+offset) % self.parameters.population.d, ind_idx]
+                    offset += 1
                     if np.random.uniform() > self.parameters.CR[ind_idx]:
-                        break
-            self.parameters.crossed = crossed
+                        break #offset += self.parameters.population.d
+        # print('done')
+        if self.parameters.eigenvalue_crossover:
+            crossed = np.dot(B.T, crossed)
+        self.parameters.crossed = crossed
 
     def step(self) -> bool:
         """The step method runs one iteration of the optimization process.
@@ -143,13 +170,34 @@ class ModularDE:
             Denoting whether to keep running this step function.
 
         """
+        # print('mut')
         self.mutate()
+        # print('cros')
         self.crossover()
+        # print('bcor')
         self.bound_correction()
+        # print('sel')
         self.select()
+        if np.random.uniform() < self.parameters.oppositional_generation_probability:
+            # print('opp')
+            self.oppositional_generation()
+        # print('ada')
         self.parameters.adapt()
+        # print(self._fitness_func.state.evaluations)
         return not any(self.break_conditions)
 
+    def oppositional_generation(self):
+        lb = np.min(self.parameters.population.x, axis=0)
+        ub = np.max(self.parameters.population.x, axis=0)
+        opposition = lb + ub - self.parameters.population.x
+        f = np.empty(opposition.shape[1], object)
+        for i in range(opposition.shape[1]):
+            f[i] = self.fitness_func(opposition[:, i])
+        x_merged = np.append(self.parameters.population.x, opposition, axis=1)
+        f_merged = np.append(self.parameters.population.f, f)
+        idxs_keep = np.argsort(f_merged)[:self.parameters.lambda_]
+        self.parameters.population = Population(x_merged[:,idxs_keep], f_merged[idxs_keep])
+    
     def run(self):
         """Run the step method until step method retuns a falsy value.
 

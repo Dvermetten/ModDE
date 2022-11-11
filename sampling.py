@@ -95,7 +95,7 @@ def mirrored_sampling(sampler: Generator) -> Generator[np.ndarray, None, None]:
     """
     for sample in sampler:
         yield sample
-        yield sample * -1
+        yield 1-sample
 
 
 def orthogonal_sampling(
