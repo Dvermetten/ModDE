@@ -46,6 +46,7 @@ class TrackedStats(AnnotatedStruct):
     corr_so_far: int = 0
     curr_F: float = 0.0
     curr_CR: float = 0.0
+    F_Memory_mean: float = 0.0
     
     def __init__(self, *args, **kwargs) -> None:
         """Intialize parameters."""
@@ -134,8 +135,10 @@ class Parameters(AnnotatedStruct):
     crossover: (
         'bin', 'exp') = 'bin'  
     eigenvalue_crossover: bool = False
-    adaptation_method: (
-        None, 'shade', 'jDE') = None   
+    adaptation_method_F: (
+        None, 'shade', 'shade_modified', 'jDE') = None   
+    adaptation_method_CR: (
+        None, 'shade', 'jDE') = None      
     use_jso_caps: bool = False
     lpsr: bool = False
     use_archive: bool = False
@@ -174,7 +177,7 @@ class Parameters(AnnotatedStruct):
         self.init_selection_parameters()
         self.init_fixed_parameters()
         self.init_dynamic_parameters()
-        if self.adaptation_method is not None:
+        if self.adaptation_method_F is not None or self.adaptation_method_CR is not None:
             self.init_memory()
         if self.init_stats:
             self.stats = TrackedStats()
@@ -230,7 +233,7 @@ class Parameters(AnnotatedStruct):
         
         self.min_lambda = 2 * self.mutation_n_comps + int(self.mutation_base == 'rand') + int(self.mutation_reference == 'rand') + int(self.use_archive)
         
-        if self.adaptation_method == 'shade':
+        if self.adaptation_method_F in ['shade', 'shade_modified'] or self.adaptation_method_CR == 'shade':
             self.memory_size = self.memory_size or 100
         if self.use_archive:
             self.archive_size = self.lambda_ * 2 #TODO: make archive size ratio a parameter
@@ -247,14 +250,18 @@ class Parameters(AnnotatedStruct):
         
     def init_memory(self) -> None:
         """ Initialize the memory when using SHADE-adaptation"""
-        if self.adaptation_method == 'shade':
+        if self.adaptation_method_CR == 'shade':
             self.CR_memory = np.array([np.mean(self.CR)] * self.memory_size)
+            self.memory_idx = 0
+        if self.adaptation_method_F in ['shade', 'shade_modified']:
             self.F_memory = np.array([np.mean(self.F)] * self.memory_size)
             self.memory_idx = 0
-        else:
-            self.F_memory = np.mean(self.F)
-            self.F_update_strenght = 0.1
-            self.tau_F = self.tau_CR = 0.1
+        if self.adaptation_method_CR == 'jDE':
+            self.tau_CR = 0.1
+        if self.adaptation_method_F == 'jDE':
+            self.F_base = 0.1 #np.mean(self.F)
+            self.F_update_strenght = 0.9
+            self.tau_F = 0.1
         
         
 
@@ -273,20 +280,25 @@ class Parameters(AnnotatedStruct):
                     idxs = np.random.choice(self.archive.n, self.archive_size, False)
                     self.archive = self.archive[idxs.tolist()]
                     
-        if self.adaptation_method == 'shade':
+        if self.adaptation_method_F in ['shade', 'shade_modified'] or self.adaptation_method_CR == 'shade':
             if len(self.improved_individuals_idx) > 0:
                 weights = np.abs(self.old_population[self.improved_individuals_idx.tolist()].f - self.population[self.improved_individuals_idx.tolist()].f)
                 weights /= np.sum(weights)
-                self.CR_memory[self.memory_idx] = np.sum(weights * self.CR[self.improved_individuals_idx.tolist()])
-                self.F_memory[self.memory_idx] = np.sum(weights * self.F[self.improved_individuals_idx.tolist()])
+                if self.adaptation_method_CR == 'shade':
+                    self.CR_memory[self.memory_idx] = np.sum(weights * self.CR[self.improved_individuals_idx.tolist()])
+                if self.adaptation_method_F  in ['shade', 'shade_modified']:
+                    self.F_memory[self.memory_idx] = np.sum(weights * self.F[self.improved_individuals_idx.tolist()])
 
                 self.memory_idx += 1
                 if self.memory_idx == self.memory_size:
                     self.memory_idx = 0
             
             r = np.random.choice(self.memory_size, self.lambda_, replace=True)
+        if self.adaptation_method_CR == 'shade':
             cr = np.random.normal(self.CR_memory[r], 0.1, self.lambda_)
             cr = np.clip(cr, 0, 1)
+            self.CR = np.array(cr)
+        if self.adaptation_method_F == 'shade':
             f = np.random.standard_cauchy(size=self.lambda_)*0.1+self.F_memory[r] #Faster than equivalent scipy code
 
             #TODO: check if oversampling cauchy would save some time over this while loop
@@ -298,14 +310,33 @@ class Parameters(AnnotatedStruct):
 
             f[f > 1] = 1
 
-            self.CR = np.array(cr)
+            self.F = np.array(f)
+            
+        if self.adaptation_method_F == 'shade_modified':
+            F_Memory_mean = np.mean(self.F_memory)
+            if self.init_stats:
+                self.stats.F_Memory_mean = F_Memory_mean
+            f = np.random.standard_cauchy(size=self.lambda_)*0.1+F_Memory_mean #Faster than equivalent scipy code
+
+            #TODO: check if oversampling cauchy would save some time over this while loop
+            n_missing = np.sum(f <= 0)
+            while n_missing > 0: #can do this nicer with walrus operator, but that is python 3.8 specific, so won't go for that here
+                r = np.random.choice(self.memory_size, n_missing, replace=True)
+                f[f <= 0] = np.random.standard_cauchy(size=n_missing)*0.1+F_Memory_mean #Faster than equivalent scipy code
+                n_missing = np.sum(f <= 0)
+
+            f[f > 1] = 1
+
             self.F = np.array(f)
         
-        elif self.adaptation_method == 'jDE':
+        if self.adaptation_method_F == 'jDE':
             f_rand = np.random.uniform(size=self.F.shape)
+            self.F[f_rand > self.tau_F] = self.F_base + self.F_update_strenght * np.random.uniform(size=self.F[f_rand > self.tau_F].shape)
+            
+        if self.adaptation_method_CR == 'jDE':
             cr_rand = np.random.uniform(size=self.F.shape)
             self.CR[cr_rand > self.tau_CR] = np.random.uniform(size=self.CR[cr_rand > self.tau_CR].shape)
-            self.F[f_rand > self.tau_F] = self.F_memory + self.F_update_strenght * np.random.uniform(size=self.F[f_rand > self.tau_F].shape)
+
             
         if self.lpsr:
             lambda_pre = self.lambda_

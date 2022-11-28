@@ -329,8 +329,10 @@ class ModularDE:
             n = 1
             
 
-        if self.parameters.bound_correction in ['hvb', 'expc_target']:
+        if self.parameters.bound_correction in ['hvb', 'expc_target', 'vector_target']:
             base_x = (self.parameters.population.x - self.parameters.lb) / (self.parameters.ub - self.parameters.lb)
+        elif  self.parameters.bound_correction in ['vector_best']:
+            base_x = (self.parameters.population.x[np.argmin(self.parameters.population.f)] - self.parameters.lb) / (self.parameters.ub - self.parameters.lb)
         else:
             base_x = None
         x_corr = perform_correction((x - self.parameters.lb) / (self.parameters.ub - self.parameters.lb), self.parameters.out_of_bounds, self.parameters.bound_correction, base_x)
@@ -366,6 +368,9 @@ def perform_correction(x_transformed, oob_idx, method, base_vector=None):
         x_transformed[oob_idx] = np.abs(2*(y>0) - ((y>0)-np.log(1+np.random.uniform(size=np.sum(oob_idx))*(np.exp(-1*np.abs((y>0) - base_vector[oob_idx]))-1))))
     elif method == "exps":
         x_transformed[oob_idx] = np.abs(2*(y>0) - ((y>0)-np.log(1+np.random.uniform(size=np.sum(oob_idx))*(np.exp(-1)-1))))
+    # elif method == "vector_target":
+    #     alpha = y>0 ? base_vector / base_vector - y else -1*base_vector / y - base_vector
+    #     x_transformed[oob_idx] = alpha*(y>0) + (1-alpha)*base_vector[oob_idx]
     else:
         raise ValueError(f"Unknown argument: {method} for correction_method")
     return np.array(x_transformed)
