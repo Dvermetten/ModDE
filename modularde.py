@@ -252,7 +252,8 @@ class ModularDE:
                 self.parameters.stats.corr_so_far += 1
                 x_transformed = ((x - self.parameters.lb) / (self.parameters.ub - self.parameters.lb)).flatten()
                 x_pre = ((self.parameters.crossed[:,idx] - self.parameters.lb) / (self.parameters.ub - self.parameters.lb)).flatten()
-                self.parameters.stats.CS = float(1 - spatial.distance.cosine(x_transformed,x_pre))
+                x_target = ((self.parameters.population[:,idx] - self.parameters.lb) / (self.parameters.ub - self.parameters.lb)).flatten()
+                self.parameters.stats.CS = float(1 - spatial.distance.cosine((x_transformed - x_target), (x_pre - x_target)))
                 self.parameters.stats.ED = float(np.linalg.norm(x_transformed-x_pre))
             else:
                 self.parameters.stats.CS = 0.0
