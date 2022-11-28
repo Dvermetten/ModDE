@@ -12,7 +12,7 @@ import ioh
 import numpy as np
 
 f = ioh.get_problem(23, 1, 5)
-lshade = ModularDE(f, base_sampler='uniform', mutation='target_pbest/1', bound_correction='expc_center', crossover='bin', shade=True, lpsr=True, initial_lambda_ = 18*5, memory_size = 6, use_archive=True, init_stats=True)
+lshade = ModularDE(f, base_sampler='uniform', mutation_base='target', mutation_reference='pbest', bound_correction='expc_center', crossover='bin', shade=True, lpsr=True, initial_lambda_ = 18*5, memory_size = 6, use_archive=True, init_stats=True, adaptation_method_F='shade', adaptation_method_CR='shade')
 lshadede.run()
 ```
 
@@ -25,7 +25,7 @@ class LSHADE_interface():
         self.lshade = None
         
     def __call__(self, f):
-        self.lshade = ModularDE(f, base_sampler='uniform', mutation='target_pbest/1', bound_correction = self.bound_corr, crossover='bin', shade=True, lpsr=True, initial_lambda_ = 18*f.meta_data.n_variables, memory_size = 6, use_archive=True, init_stats = True)
+        self.lshade = ModularDE(f, base_sampler='uniform', mutation_base='target', mutation_reference='pbest', bound_correction = self.bound_corr, crossover='bin', shade=True, lpsr=True, initial_lambda_ = 18*f.meta_data.n_variables, memory_size = 6, use_archive=True, init_stats = True, adaptation_method_F='shade', adaptation_method_CR='shade')
         self.lshade.run()
         
     @property
