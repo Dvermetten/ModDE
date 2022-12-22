@@ -8,8 +8,8 @@ import ioh
 from scipy import spatial
 from copy import copy
 
-from parameters import Parameters
-from population import Population
+from .parameters import Parameters
+from .population import Population
 
 
 class ModularDE:

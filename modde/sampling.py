@@ -98,38 +98,6 @@ def mirrored_sampling(sampler: Generator) -> Generator[np.ndarray, None, None]:
         yield 1-sample
 
 
-def orthogonal_sampling(
-    sampler: Generator, n_samples: int
-) -> Generator[np.ndarray, None, None]:
-    """Generator yielding orthogonal samples.
-
-    This function orthogonalizes <n_samples>, and succesively yields each
-    of them. It uses the linalg.qr decomposition function of the numpy library.
-
-    Parameters
-    ----------
-    sampler: generator
-        A sample generator yielding numpy.ndarray
-    n_samples: int
-        An integer indicating the number of sample to be orthogonalized.
-
-    Yields
-    ------
-    numpy.ndarray
-
-    """
-    samples = []
-    for sample in sampler:
-        samples.append(sample)
-        if len(samples) == max(max(sample.shape), n_samples):
-            samples = np.hstack(samples)
-            L = np.linalg.norm(samples, axis=0)
-            Q, *_ = np.linalg.qr(samples.T)
-            samples = [s.reshape(-1, 1) for s in (Q.T * L).T]
-            for _ in range(n_samples):
-                yield samples.pop()
-
-
 class Halton(Iterator):
     """Iterator implementing Halton Quasi random sequences.
 
@@ -154,7 +122,7 @@ class Halton(Iterator):
     def get_primes(n: int) -> np.ndarray:
         """Return n primes, starting from 0."""
         def inner(n_):
-            sieve = np.ones(n_ // 3 + (n_ % 6 == 2), dtype=np.bool)
+            sieve = np.ones(n_ // 3 + (n_ % 6 == 2), dtype=bool)
             for i in range(1, int(n_ ** 0.5) // 3 + 1):
                 if sieve[i]:
                     k = 3 * i + 1 | 1
@@ -255,7 +223,7 @@ class Sobol(Iterator):
         for i in range(2, self.d + 1):
             j = poly[i - 1]
             m = int(np.log2(j))
-            includ = np.fromiter(format(j, "b")[1:], dtype=np.int)
+            includ = np.fromiter(format(j, "b")[1:], dtype=int)
             powers = 2 ** np.arange(1, m + 1)
 
             for j in range(m + 1, maxcol + 1):
