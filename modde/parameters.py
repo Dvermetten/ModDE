@@ -10,8 +10,8 @@ from copy import copy
 import numpy as np
 from scipy import linalg, stats
 
-from utils import AnnotatedStruct
-from sampling import (
+from .utils import AnnotatedStruct
+from .sampling import (
     gaussian_sampling,
     sobol_sampling,
     halton_sampling,
@@ -159,11 +159,10 @@ class Parameters(AnnotatedStruct):
         "use_archive", #2
         "crossover", #2
         "eigenvalue_crossover",
-        "adaptation_method", #3
+        "adaptation_method_F", #3
+        "adaptation_method_CR", #3
         "use_jso_caps",
         "oppositional_initialization",
-        "oversampling_factor",
-        "oppositional_generation_probability",
         "lpsr", #2 
     )
     lb: np.ndarray = None

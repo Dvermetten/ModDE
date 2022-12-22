@@ -76,3 +76,5 @@ exp = ioh.Experiment(algorithm = obj, #Set the optimization algorithm
 
 exp()
 ```
+
+The design of this package is heavily based on the Modular CMA-ES package: https://github.com/IOHprofiler/ModularCMAES
