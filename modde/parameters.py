@@ -171,6 +171,7 @@ class Parameters(AnnotatedStruct):
     ub: np.ndarray = None
     
     init_stats: bool = False
+    inialize_custom_pop: bool = False
 
     def __init__(self, *args, **kwargs) -> None:
         """Intialize parameters. Calls sub constructors for different parameter types."""

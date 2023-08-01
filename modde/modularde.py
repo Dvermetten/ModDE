@@ -45,7 +45,7 @@ class ModularDE:
             if isinstance(parameters, Parameters)
             else Parameters(fitness_func.meta_data.n_variables, *args, **kwargs)
         )
-        if !self.parameters.inialize_custom_pop:
+        if not self.parameters.inialize_custom_pop:
             self.initialize_population()
 
     def initialize_population(self) -> None:
@@ -64,7 +64,7 @@ class ModularDE:
         if self.parameters.use_archive:
             self.parameters.archive = self.parameters.population
     
-    def initialize_custom_population(self, X, f = None) -> None:
+    def initialize_custom_population(self, x, f = None) -> None:
         if f is None:
             f = np.empty(self.parameters.lambda_, object)
             for i in range(self.parameters.lambda_):
