@@ -45,7 +45,8 @@ class ModularDE:
             if isinstance(parameters, Parameters)
             else Parameters(fitness_func.meta_data.n_variables, *args, **kwargs)
         )
-        self.initialize_population()
+        if !self.parameters.inialize_custom_pop:
+            self.initialize_population()
 
     def initialize_population(self) -> None:
         n_individuals = self.parameters.lambda_
@@ -63,11 +64,25 @@ class ModularDE:
         if self.parameters.use_archive:
             self.parameters.archive = self.parameters.population
     
+    def initialize_custom_population(self, X, f = None) -> None:
+        if f is None:
+            f = np.empty(self.parameters.lambda_, object)
+            for i in range(self.parameters.lambda_):
+                f[i] = self._fitness_func(x[:, i])
+        idxs_best = np.argsort(f)[:self.parameters.lambda_]    
+        
+        self.parameters.population = Population(x[:,idxs_best], f[idxs_best])
+                
+        if self.parameters.use_archive:
+            self.parameters.archive = self.parameters.population
+    
     def mutate(self) -> None:
         """Apply mutation operation.
 
         
         """
+        if self.parameters.population is None:
+            raise UserError("Population is not yet initialized")
         curr_parent_idx = 0
         parent_idxs = get_parent_idxs(self.parameters.population.n, self.parameters.min_lambda)
         mutated = np.zeros(self.parameters.population.x.shape)

@@ -112,6 +112,8 @@ class Parameters(AnnotatedStruct):
         The probability to add a step of generating individuals based on the oppositional (mirroring) method. Occurs between selection and adaptation.
     init_stats: bool = False
         Wheter to initialize per-individual stats (to be tracked with IOHexperimenter)
+    inialize_custom_pop: bool = False
+        If True, population is not initialized by default, but can instead be initialized using `initialize_custom_population`
     """
 
     d: int
