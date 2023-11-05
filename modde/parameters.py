@@ -19,9 +19,10 @@ from .sampling import (
     mirrored_sampling
 )
 
+
 class TrackedStats(AnnotatedStruct):
     """Object for keeping track of parameters we might want to track during the optimization process
-    
+
     Attributes
     ----------
     curr_idx: int = 0
@@ -47,11 +48,11 @@ class TrackedStats(AnnotatedStruct):
     curr_F: float = 0.0
     curr_CR: float = 0.0
     F_Memory_mean: float = 0.0
-    
+
     def __init__(self, *args, **kwargs) -> None:
         """Intialize parameters."""
         super().__init__(*args, **kwargs)
-    
+
 
 class Parameters(AnnotatedStruct):
     """AnnotatedStruct object for holding the parameters for the ModularDE.
@@ -122,7 +123,7 @@ class Parameters(AnnotatedStruct):
     F: np.ndarray = None
     CR: np.ndarray = None
     bound_correction: (
-        None, "saturate", "unif_resample", "COTN", "toroidal", "mirror", 
+        None, "saturate", "unif_resample", "COTN", "toroidal", "mirror",
         "hvb", "expc_target", "expc_center", "exps") = "saturate"
     base_sampler: (
         'gaussian', 'sobol', 'halton', 'uniform') = 'uniform'
@@ -130,17 +131,16 @@ class Parameters(AnnotatedStruct):
         'rand', 'best', 'target') = 'rand'
     mutation_reference: (
         None, 'pbest', 'best', 'rand') = None
+    pbest_value: float = None
     mutation_n_comps: (1, 2) = 1
     mutation_use_weighted_F: bool = False
-    # mutation: (
-        # 'rand/1', 'rand/2', 'best/1', 'target_pbest/1', 'target_best/2', 'target_rand/1', '2_opt/1', 'curr_to_best/1') = 'rand/1'
     crossover: (
-        'bin', 'exp') = 'bin'  
+        'bin', 'exp') = 'bin'
     eigenvalue_crossover: bool = False
     adaptation_method_F: (
-        None, 'shade', 'shade_modified', 'jDE') = None   
+        None, 'shade', 'shade_modified', 'jDE') = None
     adaptation_method_CR: (
-        None, 'shade', 'jDE') = None      
+        None, 'shade', 'jDE') = None
     use_jso_caps: bool = False
     lpsr: bool = False
     use_archive: bool = False
@@ -154,22 +154,22 @@ class Parameters(AnnotatedStruct):
     __modules__ = (
         "bound_correction",
         "base_sampler",
-        "mutation_base", #3
-        "mutation_reference", #3
-        "mutation_n_comps", #2
+        "mutation_base",  
+        "mutation_reference",  
+        "mutation_n_comps",  
         "mutation_use_weighted_F",
-        "use_archive", #2
-        "crossover", #2
+        "use_archive",  
+        "crossover",  
         "eigenvalue_crossover",
-        "adaptation_method_F", #3
-        "adaptation_method_CR", #3
+        "adaptation_method_F",  
+        "adaptation_method_CR",  
         "use_jso_caps",
         "oppositional_initialization",
-        "lpsr", #2 
+        "lpsr",  
     )
     lb: np.ndarray = None
     ub: np.ndarray = None
-    
+
     init_stats: bool = False
     inialize_custom_pop: bool = False
 
@@ -199,10 +199,10 @@ class Parameters(AnnotatedStruct):
             "halton": halton_sampling,
             "uniform": uniform_sampling,
         }.get(self.base_sampler, gaussian_sampling)(self.d)
-        
+
         if self.oppositional_initialization:
             sampler = mirrored_sampling(sampler)
-        
+
         return sampler
 
     def init_fixed_parameters(self) -> None:
@@ -217,9 +217,9 @@ class Parameters(AnnotatedStruct):
     def init_selection_parameters(self) -> None:
         """Initialization function for parameters that influence in selection."""
         if self.lpsr:
-            self.lambda_ = self.lambda_ or 100 #TODO: set defaults
+            self.lambda_ = self.lambda_ or 18 * self.d  # defaults based on LSHADE
         else:
-            self.lambda_ = self.lambda_ or (4 + np.floor(3 * np.log(self.d))).astype(int)
+            self.lambda_ = self.lambda_ or 10 * self.d
         self.initial_lambda_ = self.lambda_
         if self.F is None:
             self.F = np.array([0.5] * self.lambda_)
@@ -233,12 +233,15 @@ class Parameters(AnnotatedStruct):
         self.set_default("ub", np.ones((self.d, 1)) * 5)
         self.set_default("lb", np.ones((self.d, 1)) * -5)
         
-        self.min_lambda = 2 * self.mutation_n_comps + int(self.mutation_base == 'rand') + int(self.mutation_reference == 'rand') + int(self.use_archive)
-        
+        self.min_lambda = 2 * self.mutation_n_comps + \
+            int(self.mutation_base == 'rand') + \
+            int(self.mutation_reference == 'rand') + int(self.use_archive)
+
         if self.adaptation_method_F in ['shade', 'shade_modified'] or self.adaptation_method_CR == 'shade':
             self.memory_size = self.memory_size or 100
         if self.use_archive:
-            self.archive_size = self.lambda_ * 2 #TODO: make archive size ratio a parameter
+            # TODO: make archive size ratio a parameter
+            self.archive_size = self.lambda_ * 2
 
     def init_dynamic_parameters(self) -> None:
         """Initialization function of parameters that represent the dynamic state of the DE.
@@ -248,8 +251,7 @@ class Parameters(AnnotatedStruct):
         self.crossed = None
         self.improved_individuals_idx = []
         self.archive = None
-            
-        
+
     def init_memory(self) -> None:
         """ Initialize the memory when using SHADE-adaptation"""
         if self.adaptation_method_CR == 'shade':
@@ -261,91 +263,103 @@ class Parameters(AnnotatedStruct):
         if self.adaptation_method_CR == 'jDE':
             self.tau_CR = 0.1
         if self.adaptation_method_F == 'jDE':
-            self.F_base = 0.1 #np.mean(self.F)
+            self.F_base = 0.1  # np.mean(self.F)
             self.F_update_strenght = 0.9
             self.tau_F = 0.1
-        
-        
-
 
     def adapt(self) -> None:
         """Method for adapting the internal state parameters.
         This takes care of updating archive and memory, and adapting strategy parameters if required.
         """
         self.generation_counter += 1
-        
+
         if self.use_archive:
             if len(self.improved_individuals_idx) > 0:
-                self.archive += self.old_population[self.improved_individuals_idx.tolist()] #Msetting the elements which have been replaced to archive
+                # Msetting the elements which have been replaced to archive
+                self.archive += self.old_population[self.improved_individuals_idx.tolist()]
                 if self.archive.n > self.archive_size:
-                    #TODO: replace all np.random with a generator object for better reproducibility
-                    idxs = np.random.choice(self.archive.n, self.archive_size, False)
+                    # TODO: replace all np.random with a generator object for better reproducibility
+                    idxs = np.random.choice(
+                        self.archive.n, self.archive_size, False)
                     self.archive = self.archive[idxs.tolist()]
-                    
+
         if self.adaptation_method_F in ['shade', 'shade_modified'] or self.adaptation_method_CR == 'shade':
             if len(self.improved_individuals_idx) > 0:
-                weights = np.abs(self.old_population[self.improved_individuals_idx.tolist()].f - self.population[self.improved_individuals_idx.tolist()].f)
+                weights = np.abs(self.old_population[self.improved_individuals_idx.tolist(
+                )].f - self.population[self.improved_individuals_idx.tolist()].f)
                 weights /= np.sum(weights)
                 if self.adaptation_method_CR == 'shade':
-                    self.CR_memory[self.memory_idx] = np.sum(weights * self.CR[self.improved_individuals_idx.tolist()])
-                if self.adaptation_method_F  in ['shade', 'shade_modified']:
-                    self.F_memory[self.memory_idx] = np.sum(weights * self.F[self.improved_individuals_idx.tolist()])
+                    self.CR_memory[self.memory_idx] = np.sum(
+                        weights * self.CR[self.improved_individuals_idx.tolist()])
+                if self.adaptation_method_F in ['shade', 'shade_modified']:
+                    self.F_memory[self.memory_idx] = np.sum(
+                        weights * self.F[self.improved_individuals_idx.tolist()])
 
                 self.memory_idx += 1
                 if self.memory_idx == self.memory_size:
                     self.memory_idx = 0
-            
+
             r = np.random.choice(self.memory_size, self.lambda_, replace=True)
         if self.adaptation_method_CR == 'shade':
             cr = np.random.normal(self.CR_memory[r], 0.1, self.lambda_)
             cr = np.clip(cr, 0, 1)
             self.CR = np.array(cr)
         if self.adaptation_method_F == 'shade':
-            f = np.random.standard_cauchy(size=self.lambda_)*0.1+self.F_memory[r] #Faster than equivalent scipy code
+            # Faster than equivalent scipy code
+            f = np.random.standard_cauchy(
+                size=self.lambda_)*0.1+self.F_memory[r]
 
-            #TODO: check if oversampling cauchy would save some time over this while loop
+            # TODO: check if oversampling cauchy would save some time over this while loop
             n_missing = np.sum(f <= 0)
-            while n_missing > 0: #can do this nicer with walrus operator, but that is python 3.8 specific, so won't go for that here
+            while n_missing > 0:  # can do this nicer with walrus operator, but that is python 3.8 specific, so won't go for that here
                 r = np.random.choice(self.memory_size, n_missing, replace=True)
-                f[f <= 0] = np.random.standard_cauchy(size=n_missing)*0.1+self.F_memory[r] #Faster than equivalent scipy code
+                # Faster than equivalent scipy code
+                f[f <= 0] = np.random.standard_cauchy(
+                    size=n_missing)*0.1+self.F_memory[r]
                 n_missing = np.sum(f <= 0)
 
             f[f > 1] = 1
 
             self.F = np.array(f)
-            
+
         if self.adaptation_method_F == 'shade_modified':
             F_Memory_mean = np.mean(self.F_memory)
             if self.init_stats:
                 self.stats.F_Memory_mean = F_Memory_mean
-            f = np.random.standard_cauchy(size=self.lambda_)*0.1+F_Memory_mean #Faster than equivalent scipy code
+            # Faster than equivalent scipy code
+            f = np.random.standard_cauchy(size=self.lambda_)*0.1+F_Memory_mean
 
-            #TODO: check if oversampling cauchy would save some time over this while loop
+            # TODO: check if oversampling cauchy would save some time over this while loop
             n_missing = np.sum(f <= 0)
-            while n_missing > 0: #can do this nicer with walrus operator, but that is python 3.8 specific, so won't go for that here
+            while n_missing > 0:  # can do this nicer with walrus operator, but that is python 3.8 specific, so won't go for that here
                 r = np.random.choice(self.memory_size, n_missing, replace=True)
-                f[f <= 0] = np.random.standard_cauchy(size=n_missing)*0.1+F_Memory_mean #Faster than equivalent scipy code
+                # Faster than equivalent scipy code
+                f[f <= 0] = np.random.standard_cauchy(
+                    size=n_missing)*0.1+F_Memory_mean
                 n_missing = np.sum(f <= 0)
 
             f[f > 1] = 1
 
             self.F = np.array(f)
-        
+
         if self.adaptation_method_F == 'jDE':
             f_rand = np.random.uniform(size=self.F.shape)
-            self.F[f_rand > self.tau_F] = self.F_base + self.F_update_strenght * np.random.uniform(size=self.F[f_rand > self.tau_F].shape)
-            
+            self.F[f_rand > self.tau_F] = self.F_base + self.F_update_strenght * \
+                np.random.uniform(size=self.F[f_rand > self.tau_F].shape)
+
         if self.adaptation_method_CR == 'jDE':
             cr_rand = np.random.uniform(size=self.F.shape)
-            self.CR[cr_rand > self.tau_CR] = np.random.uniform(size=self.CR[cr_rand > self.tau_CR].shape)
+            self.CR[cr_rand > self.tau_CR] = np.random.uniform(
+                size=self.CR[cr_rand > self.tau_CR].shape)
 
-            
         if self.lpsr:
             lambda_pre = self.lambda_
-            self.lambda_ = int(np.round((self.min_lambda - self.initial_lambda_)/self.budget * self.used_budget + self.initial_lambda_))
+            self.lambda_ = int(np.round((self.min_lambda - self.initial_lambda_) /
+                               self.budget * self.used_budget + self.initial_lambda_))
             if self.lambda_ < lambda_pre:
                 # arg_remove = np.argmax(self.population.f)
-                idxs_keep = [i for i in range(self.population.n) if i not in np.argsort(self.population.f)[(self.lambda_ - lambda_pre):]]
+                idxs_keep = [i for i in range(self.population.n) if i not in np.argsort(
+                    self.population.f)[(self.lambda_ - lambda_pre):]]
                 # idxs_keep = [i for i in range(self.population.n) if i!=np.argmax(self.population.f)]
                 self.population = self.population[idxs_keep]
                 self.CR = self.CR[idxs_keep]
@@ -354,14 +368,15 @@ class Parameters(AnnotatedStruct):
                 if self.use_archive:
                     self.archive_size = self.lambda_ * 2
                     if self.archive.n > self.archive_size:
-                        idxs = np.random.choice(self.archive.n, self.archive_size, False)
+                        idxs = np.random.choice(
+                            self.archive.n, self.archive_size, False)
                         self.archive = self.archive[idxs.tolist()]
-                        
+
         if self.use_jso_caps:
             if self.used_budget < 0.25 * self.budget:
                 self.CR[self.CR > 0.7] = 0.7
             if self.used_budget < 0.5 * self.budget:
-                self.CR[self.CR > 0.6] = 0.6            
+                self.CR[self.CR > 0.6] = 0.6
             if self.used_budget < 0.6 * self.budget:
                 self.F[self.F > 0.7] = 0.7
 
@@ -406,39 +421,3 @@ class Parameters(AnnotatedStruct):
 
     def record_statistics(self) -> None:
         """Method for recording metadata."""
-        
-
-#     def update(self, parameters: dict, reset_default_modules=False):
-#         """Method to update the values of self based on a given dict of new parameters.
-
-#         Note that some updated parameters might be overridden by:
-#             self.init_selection_parameters()
-#             self.init_adaptation_parameters()
-#             self.init_local_restart_parameters()
-#         which are called at the end of this function. Use with caution.
-
-
-#         Parameters
-#         ----------
-#         parameters: dict
-#             A dict with new parameter values
-
-#         reset_default_modules: bool = False
-#             Whether to reset the modules back to their default values.
-
-#         """
-#         if reset_default_modules:
-#             for name in Parameters.__modules__:
-#                 default_option, *_ = getattr(
-#                     getattr(Parameters, name), "options", [False, True]
-#                 )
-#                 setattr(self, name, default_option)
-
-#         for name, value in parameters.items():
-#             if not hasattr(self, name):
-#                 raise ValueError(f"The parameter {name} doesn't exist")
-#             setattr(self, name, value)
-
-#         self.init_selection_parameters()
-#         self.init_adaptation_parameters()
-#         self.init_local_restart_parameters()

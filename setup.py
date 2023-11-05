@@ -5,7 +5,7 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-__version__ = "0.0.2"
+__version__ = "0.0.3"
 
 setuptools.setup(
     name='modde',
