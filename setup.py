@@ -19,8 +19,7 @@ setuptools.setup(
     install_requires=[
         'numpy',
         'scipy',
-        'ioh',
-        'numba'
+        'ioh'
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
