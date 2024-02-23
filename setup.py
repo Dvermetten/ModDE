@@ -5,7 +5,7 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-__version__ = "0.0.2"
+__version__ = "0.0.4"
 
 setuptools.setup(
     name='modde',
@@ -19,8 +19,7 @@ setuptools.setup(
     install_requires=[
         'numpy',
         'scipy',
-        'ioh',
-        'numba'
+        'ioh'
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
