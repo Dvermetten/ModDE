@@ -28,9 +28,7 @@ class TestModularDEMeta(type):
 
         def make_test_option(module, value):
             return {
-                f"test_{module}_{value}": lambda self: self.run_module(
-                    module, value
-                )
+                f"test_{module}_{value}": lambda self: self.run_module(module, value)
             }
 
         for module in parameters.Parameters.__modules__:
@@ -65,17 +63,16 @@ class TestModularDE(unittest.TestCase, metaclass=TestModularDEMeta):
     def run_module(self, module, value):
         """Test a single run of the mechanism with a given module active."""
         self.p = parameters.Parameters(
-            self._dim, budget=self._budget, seed = 42, **{module: value}
+            self._dim, budget=self._budget, seed=42, **{module: value}
         )
-        self.c = ModularDE(ioh.get_problem(1, 1, self._dim),
-                           parameters=self.p).run()
+        self.c = ModularDE(ioh.get_problem(1, 1, self._dim), parameters=self.p).run()
 
     def run_bbob_function(self, module, value, fid):
         """Expects the output to be consistent with BBOB_2D_PER_MODULE_20_ITER."""
         np.random.seed(42)
         f = ioh.get_problem(fid, dimension=self._dim, instance=1)
         self.p = parameters.Parameters(
-            self._dim, budget=self._budget, seed = 42, **{module: value}
+            self._dim, budget=self._budget, seed=42, **{module: value}
         )
         self.c = ModularDE(f, parameters=self.p).run()
         expected = self.bbob2d_per_module[f"{module}_{value}"][fid - 1]

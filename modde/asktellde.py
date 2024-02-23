@@ -95,7 +95,7 @@ class AskTellDE(ModularDE):
         # x = np.hstack(tuple(islice(self.parameters.sampler, n_individuals)))
         # x = self.parameters.lb + x * (self.parameters.ub - self.parameters.lb)
         if self.parameters.oppositional_initialization:
-            x1 = self.parameters.sampler(int(np.ceil(n_individuals/2)))
+            x1 = self.parameters.sampler(int(np.ceil(n_individuals / 2)))
             x2 = self.parameters.lb.reshape(-1) + (self.parameters.ub.reshape(-1) - x1)
             x = np.hstack([x1, x2])[:n_individuals]
         else:
@@ -119,6 +119,8 @@ class AskTellDE(ModularDE):
 
         if self.parameters.use_archive:
             self.parameters.archive = self.parameters.population
+        if self.parameters.init_stats:
+            self.track_stats()
         self.pop_initialized = True
 
     def bound_correction(self):
@@ -218,6 +220,8 @@ class AskTellDE(ModularDE):
             len(self.ask_queue) == 0 and (self.parameters.population.f != None).all()
         ):  # noqa
             self.select()
+            if self.parameters.init_stats:
+                self.track_stats()
             self.parameters.adapt()
             self.mutate()
             self.crossover()

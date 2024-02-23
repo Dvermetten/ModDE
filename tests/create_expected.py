@@ -13,7 +13,7 @@ def run_bbob_function(module, value, fid):
     """Runs the specified version of ModularDE on the bbob-function."""
     np.random.seed(42)
     function = ioh.get_problem(fid, dimension=2, instance=1)
-    p = parameters.Parameters(2, budget=200, seed = 42, **{module: value})
+    p = parameters.Parameters(2, budget=200, seed=42, **{module: value})
     ModularDE(function, parameters=p).run()
     return function.state.current_best_internal.y
 
@@ -27,16 +27,16 @@ def create_expected_dict():
             for o in filter(None, m.options):
                 bbob_2d_per_module[f"{module}_{o}"] = [0] * 24
                 for fid in range(1, 25):
-                    bbob_2d_per_module[f"{module}_{o}"][
-                        fid - 1
-                    ] = run_bbob_function(module, o, fid)
+                    bbob_2d_per_module[f"{module}_{o}"][fid - 1] = run_bbob_function(
+                        module, o, fid
+                    )
 
         elif type(m) == utils.InstanceOf:
             bbob_2d_per_module[f"{module}_{True}"] = [0] * 24
             for fid in range(1, 25):
-                bbob_2d_per_module[f"{module}_{True}"][
-                    fid - 1
-                ] = run_bbob_function(module, True, fid)
+                bbob_2d_per_module[f"{module}_{True}"][fid - 1] = run_bbob_function(
+                    module, True, fid
+                )
     return bbob_2d_per_module
 
 

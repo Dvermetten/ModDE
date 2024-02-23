@@ -55,7 +55,7 @@ class ModularDE:
                 n_individuals * (1 + self.parameters.oversampling_factor)
             )
         if self.parameters.oppositional_initialization:
-            x1 = self.parameters.sampler(int(np.ceil(n_individuals/2)))
+            x1 = self.parameters.sampler(int(np.ceil(n_individuals / 2)))
             x2 = self.parameters.lb.reshape(-1) + (self.parameters.ub.reshape(-1) - x1)
             x = np.vstack([x1, x2])[:n_individuals]
         else:
@@ -96,7 +96,9 @@ class ModularDE:
             raise UserError("Population is not yet initialized")
         curr_parent_idx = 0
         parent_idxs = get_parent_idxs(
-            self.parameters.population.n, self.parameters.min_lambda, self.parameters.rng
+            self.parameters.population.n,
+            self.parameters.min_lambda,
+            self.parameters.rng,
         )
         mutated = np.zeros(self.parameters.population.x.shape)
         if self.parameters.mutation_base == "rand":
@@ -270,7 +272,10 @@ class ModularDE:
         self.select()
         if self.parameters.init_stats:
             self.track_stats()
-        if self.parameters.rng.uniform() < self.parameters.oppositional_generation_probability:
+        if (
+            self.parameters.rng.uniform()
+            < self.parameters.oppositional_generation_probability
+        ):
             # print('opp')
             self.oppositional_generation()
         # print('ada')

@@ -12,10 +12,7 @@ from scipy import linalg, stats
 from scipy.stats import qmc
 
 from .utils import AnnotatedStruct
-from .sampling import (
-    GaussianEngine,
-    UniformEngine
-)
+from .sampling import GaussianEngine, UniformEngine
 
 
 class TrackedStats(AnnotatedStruct):
@@ -213,12 +210,14 @@ class Parameters(AnnotatedStruct):
             "LHC": qmc.LatinHypercube,
             "halton": qmc.Halton,
             "uniform": UniformEngine,
-        }.get(self.base_sampler, qmc.Halton)(self.d, seed = self.seed, scramble = True)
+        }.get(self.base_sampler, qmc.Halton)(self.d, seed=self.seed, scramble=True)
 
         # if self.oppositional_initialization:
         #     sampler = mirrored_sampling(sampler)
-        
-        sampler = lambda x: self.lb.reshape(-1) + (base.random(x) * (self.ub.reshape(-1) - self.lb.reshape(-1)))
+
+        sampler = lambda x: self.lb.reshape(-1) + (
+            base.random(x) * (self.ub.reshape(-1) - self.lb.reshape(-1))
+        )
         return sampler
 
     def init_fixed_parameters(self) -> None:
@@ -416,9 +415,7 @@ class Parameters(AnnotatedStruct):
                 if self.use_archive:
                     self.archive_size = self.lambda_ * 2
                     if self.archive.n > self.archive_size:
-                        idxs = self.rng.choice(
-                            self.archive.n, self.archive_size, False
-                        )
+                        idxs = self.rng.choice(self.archive.n, self.archive_size, False)
                         self.archive = self.archive[idxs.tolist()]
 
         if self.use_jso_caps:
