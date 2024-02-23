@@ -47,6 +47,8 @@ class TrackedStats(AnnotatedStruct):
     curr_F: float = 0.0
     curr_CR: float = 0.0
     F_Memory_mean: float = 0.0
+    popmean: float = 0.0
+    popstd: float = 0.0
 
     def __init__(self, *args, **kwargs) -> None:
         """Intialize parameters."""

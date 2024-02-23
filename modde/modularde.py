@@ -73,6 +73,9 @@ class ModularDE:
         if self.parameters.use_archive:
             self.parameters.archive = self.parameters.population
 
+        if self.parameters.init_stats:
+            self.track_stats()
+
     def initialize_custom_population(self, x, f=None) -> None:
         if f is None:
             f = np.empty(self.parameters.lambda_, object)
@@ -84,6 +87,8 @@ class ModularDE:
 
         if self.parameters.use_archive:
             self.parameters.archive = self.parameters.population
+        if self.parameters.init_stats:
+            self.track_stats()
 
     def mutate(self) -> None:
         """Apply mutation operation."""
@@ -197,6 +202,10 @@ class ModularDE:
             self.parameters.population.f < self.parameters.old_population.f
         )[0]
 
+    def track_stats(self) -> None:
+        self.parameters.stats.popmean = np.mean(self.parameters.population.x)
+        self.parameters.stats.popstd = np.std(self.parameters.population.x)
+
     def crossover(self) -> None:
         """ """
         mutated = self.parameters.mutated
@@ -259,6 +268,8 @@ class ModularDE:
         self.bound_correction()
         # print('sel')
         self.select()
+        if self.parameters.init_stats:
+            self.track_stats()
         if self.parameters.rng.uniform() < self.parameters.oppositional_generation_probability:
             # print('opp')
             self.oppositional_generation()
