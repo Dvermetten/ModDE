@@ -76,5 +76,33 @@ exp = ioh.Experiment(algorithm = obj, #Set the optimization algorithm
 
 exp()
 ```
+## Note for version 0.0.4:
+With the latest update, the internal seeding has been updated. However, the halton sampler's output depends on the used scipy version. Version 1.11 is highly recommended, but 1.10 also works but leads to slightly different behaviour for this sampler only. 
 
-The design of this package is heavily based on the Modular CMA-ES package: https://github.com/IOHprofiler/ModularCMAES
+## Citation information
+
+If you use this package, please consider to cite this paper:
+
+```
+@inproceedings{DBLP:conf/gecco/VermettenCKB23,
+  author       = {Diederick Vermetten and
+                  Fabio Caraffini and
+                  Anna V. Kononova and
+                  Thomas B{\"{a}}ck},
+  editor       = {Sara Silva and
+                  Lu{\'{\i}}s Paquete},
+  title        = {Modular Differential Evolution},
+  booktitle    = {Proceedings of the Genetic and Evolutionary Computation Conference,
+                  {GECCO} 2023, Lisbon, Portugal, July 15-19, 2023},
+  pages        = {864--872},
+  publisher    = {{ACM}},
+  year         = {2023},
+  url          = {https://doi.org/10.1145/3583131.3590417},
+  doi          = {10.1145/3583131.3590417},
+  timestamp    = {Fri, 21 Jul 2023 22:25:47 +0200},
+  biburl       = {https://dblp.org/rec/conf/gecco/VermettenCKB23.bib},
+  bibsource    = {dblp computer science bibliography, https://dblp.org}
+}
+```
+
+The design of this package is heavily based on the Modular CMA-ES package, created by Jacob de Nobel: https://github.com/IOHprofiler/ModularCMAES
