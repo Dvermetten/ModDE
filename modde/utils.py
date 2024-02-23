@@ -37,11 +37,10 @@ class InstanceOf(Descriptor):
         Raises
         ------
         TypeError
-            If type of the argument does not match self.dtype      
+            If type of the argument does not match self.dtype
 
         """
         if type(value) != type(None):
-
             if (
                 type(value) != self.dtype
                 and not (
@@ -72,13 +71,14 @@ class AnyOf(Descriptor):
         Raises
         ------
         TypeError
-            If type of the argument does not match self.dtype        
+            If type of the argument does not match self.dtype
 
         """
         if value not in self.options:
             raise ValueError(
                 "{} should be any of [{}]. Got: {}".format(
-                    self.name, self.options, value)
+                    self.name, self.options, value
+                )
             )
         super().__set__(instance, value)
 

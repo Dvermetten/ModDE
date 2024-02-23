@@ -64,8 +64,8 @@ class Population:
             )
         if isinstance(key, slice):
             return Population(
-                self.x[:, key.start: key.stop: key.step],
-                self.f[key.start: key.stop: key.step],
+                self.x[:, key.start : key.stop : key.step],
+                self.f[key.start : key.stop : key.step],
             )
         if isinstance(key, list) and all(
             map(lambda x: isinstance(x, int) and x >= 0, key)

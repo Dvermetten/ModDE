@@ -1,4 +1,3 @@
-
 """Ask and tell interface to the Modular DE."""
 import warnings
 import typing
@@ -26,6 +25,7 @@ def check_break_conditions(f: typing.Callable) -> typing.Callable:
         When any(~AskTellDE.break_conditions) == True
 
     """
+
     @wraps(f)
     def inner(self, *args, **kwargs) -> typing.Any:
         if any(self.break_conditions):
@@ -89,20 +89,34 @@ class AskTellDE(ModularDE):
     def initialize_population(self) -> None:
         n_individuals = self.parameters.lambda_
         if self.parameters.oversampling_factor > 0:
-            n_individuals = int(n_individuals * (1 + self.parameters.oversampling_factor))
-        x = np.hstack(tuple(islice(self.parameters.sampler, n_individuals)))
-        x = self.parameters.lb + x * (self.parameters.ub - self.parameters.lb )
+            n_individuals = int(
+                n_individuals * (1 + self.parameters.oversampling_factor)
+            )
+        # x = np.hstack(tuple(islice(self.parameters.sampler, n_individuals)))
+        # x = self.parameters.lb + x * (self.parameters.ub - self.parameters.lb)
+        if self.parameters.oppositional_initialization:
+            x1 = self.parameters.sampler(int(np.ceil(n_individuals/2)))
+            x2 = self.parameters.lb.reshape(-1) + (self.parameters.ub.reshape(-1) - x1)
+            x = np.hstack([x1, x2])[:n_individuals]
+        else:
+            x = self.parameters.sampler(n_individuals)
+        x = np.transpose(x)
         f = np.empty(self.parameters.lambda_, object)
         for i in range(self.parameters.lambda_):
-            self.register_individual(x[:,i])
-        self.parameters.population = Population(x, np.array([None for _ in range(n_individuals)]))
+            self.register_individual(x[:, i])
+        self.parameters.population = Population(
+            x, np.array([None for _ in range(n_individuals)])
+        )
         self.pop_initialized = False
 
     def finalize_initialization(self) -> None:
-        idxs_best = np.argsort(self.parameters.population.f)[:self.parameters.lambda_]    
-        
-        self.parameters.population = Population(self.parameters.population.x[:,idxs_best], self.parameters.population.f[idxs_best])
-                
+        idxs_best = np.argsort(self.parameters.population.f)[: self.parameters.lambda_]
+
+        self.parameters.population = Population(
+            self.parameters.population.x[:, idxs_best],
+            self.parameters.population.f[idxs_best],
+        )
+
         if self.parameters.use_archive:
             self.parameters.archive = self.parameters.population
         self.pop_initialized = True
@@ -110,13 +124,14 @@ class AskTellDE(ModularDE):
     def bound_correction(self):
         new_x = self.correct_bounds()
         for i in range(new_x.shape[1]):
-            self.register_individual(new_x[:,i])
-#         print(new_x)
-        #f = np.empty(new_x.shape[1], object)
-        #for i in range(new_x.shape[1]):
+            self.register_individual(new_x[:, i])
+        #         print(new_x)
+        # f = np.empty(new_x.shape[1], object)
+        # for i in range(new_x.shape[1]):
         #    f[i] = self.fitness_func(new_x[:, i])
-        self.parameters.offspring = Population(new_x, np.array([None for _ in range(new_x.shape[1])]))
-
+        self.parameters.offspring = Population(
+            new_x, np.array([None for _ in range(new_x.shape[1])])
+        )
 
     @check_break_conditions
     def ask(self) -> np.ndarray:
@@ -161,17 +176,17 @@ class AskTellDE(ModularDE):
             When the same xi is provided more than once
 
         """
-        #pylint: disable=singleton-comparison
-        #if (not self.parameters.population) and (not self.parameters.offspring):
+        # pylint: disable=singleton-comparison
+        # if (not self.parameters.population) and (not self.parameters.offspring):
         #    raise RuntimeError("Call to tell without calling ask first is prohibited")
-        xi = xi.reshape((-1,1))
+        xi = xi.reshape((-1, 1))
         if self.pop_initialized:
             indices, *_ = np.where((self.parameters.offspring.x == xi).all(axis=0))
             if len(indices) == 0:
                 raise ValueError("Unkown xi provided")
 
             for index in indices:
-                if self.parameters.offspring.f[index] == None: # noqa
+                if self.parameters.offspring.f[index] == None:  # noqa
                     self.parameters.offspring.f[index] = fi
                     break
             else:
@@ -184,7 +199,7 @@ class AskTellDE(ModularDE):
                 raise ValueError("Unkown xi provided")
 
             for index in indices:
-                if self.parameters.population.f[index] == None: # noqa
+                if self.parameters.population.f[index] == None:  # noqa
                     self.parameters.population.f[index] = fi
                     break
             else:
@@ -199,7 +214,9 @@ class AskTellDE(ModularDE):
             self.crossover()
             self.bound_correction()
 
-        if len(self.ask_queue) == 0 and (self.parameters.population.f != None).all(): # noqa
+        if (
+            len(self.ask_queue) == 0 and (self.parameters.population.f != None).all()
+        ):  # noqa
             self.select()
             self.parameters.adapt()
             self.mutate()

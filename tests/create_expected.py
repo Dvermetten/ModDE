@@ -13,7 +13,7 @@ def run_bbob_function(module, value, fid):
     """Runs the specified version of ModularDE on the bbob-function."""
     np.random.seed(42)
     function = ioh.get_problem(fid, dimension=2, instance=1)
-    p = parameters.Parameters(2, budget=200, **{module: value})
+    p = parameters.Parameters(2, budget=200, seed = 42, **{module: value})
     ModularDE(function, parameters=p).run()
     return function.state.current_best_internal.y
 

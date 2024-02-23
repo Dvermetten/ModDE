@@ -65,7 +65,7 @@ class TestModularDE(unittest.TestCase, metaclass=TestModularDEMeta):
     def run_module(self, module, value):
         """Test a single run of the mechanism with a given module active."""
         self.p = parameters.Parameters(
-            self._dim, budget=self._budget, **{module: value}
+            self._dim, budget=self._budget, seed = 42, **{module: value}
         )
         self.c = ModularDE(ioh.get_problem(1, 1, self._dim),
                            parameters=self.p).run()
@@ -75,7 +75,7 @@ class TestModularDE(unittest.TestCase, metaclass=TestModularDEMeta):
         np.random.seed(42)
         f = ioh.get_problem(fid, dimension=self._dim, instance=1)
         self.p = parameters.Parameters(
-            self._dim, budget=self._budget, **{module: value}
+            self._dim, budget=self._budget, seed = 42, **{module: value}
         )
         self.c = ModularDE(f, parameters=self.p).run()
         expected = self.bbob2d_per_module[f"{module}_{value}"][fid - 1]
