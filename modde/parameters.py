@@ -220,6 +220,34 @@ class Parameters(AnnotatedStruct):
         )
         return sampler
 
+    def as_bound_vector(self, value, default: float) -> np.ndarray:
+        """Convert a bound to a column vector of shape (d, 1).
+
+        Parameters
+        ----------
+        value: np.ndarray or None
+            The bound, with shape (d,), (d, 1) or a single element which is
+            used for every dimension. None uses the default.
+        default: float
+            Value used for every dimension when value is None.
+
+        Returns
+        -------
+        np.ndarray
+            The bound with shape (d, 1)
+
+        """
+        if value is None:
+            value = default
+        value = np.asarray(value, dtype=float)
+        if value.size == 1:
+            return np.full((self.d, 1), value.item())
+        if value.size != self.d:
+            raise ValueError(
+                f"Bound has {value.size} elements, expected 1 or {self.d}"
+            )
+        return value.reshape(self.d, 1)
+
     def init_fixed_parameters(self) -> None:
         """Initialization function for parameters that are not restarted during a run."""
         self.used_budget = 0
@@ -245,8 +273,12 @@ class Parameters(AnnotatedStruct):
         elif len(self.CR) == 1:
             self.CR = np.array(list(self.CR) * self.lambda_)
         self.sampler = self.get_sampler()
-        self.set_default("ub", np.ones((self.d, 1)) * 5)
-        self.set_default("lb", np.ones((self.d, 1)) * -5)
+        # Remember which bounds were left at their default, so ModularDE can
+        # replace them with the bounds of the problem it is given.
+        self.lb_is_default = self.lb is None
+        self.ub_is_default = self.ub is None
+        self.lb = self.as_bound_vector(self.lb, -5.0)
+        self.ub = self.as_bound_vector(self.ub, 5.0)
 
         self.min_lambda = (
             2 * self.mutation_n_comps

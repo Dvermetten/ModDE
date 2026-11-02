@@ -45,8 +45,23 @@ class ModularDE:
             if isinstance(parameters, Parameters)
             else Parameters(fitness_func.meta_data.n_variables, *args, **kwargs)
         )
+        self.set_bounds_from_problem()
         if not self.parameters.inialize_custom_pop:
             self.initialize_population()
+
+    def set_bounds_from_problem(self) -> None:
+        """Use the bounds of the problem for every bound not set explicitly.
+
+        Bounds passed to Parameters take precedence. Problems without a
+        bounds attribute keep the default bounds of [-5, 5].
+        """
+        bounds = getattr(self._fitness_func, "bounds", None)
+        if bounds is None:
+            return
+        if self.parameters.lb_is_default:
+            self.parameters.lb = self.parameters.as_bound_vector(bounds.lb, -5.0)
+        if self.parameters.ub_is_default:
+            self.parameters.ub = self.parameters.as_bound_vector(bounds.ub, 5.0)
 
     def initialize_population(self) -> None:
         n_individuals = self.parameters.lambda_
@@ -272,30 +287,49 @@ class ModularDE:
         self.select()
         if self.parameters.init_stats:
             self.track_stats()
-        if (
+        do_opposition = (
             self.parameters.rng.uniform()
             < self.parameters.oppositional_generation_probability
-        ):
+        )
+        # print('ada')
+        # Adapt before the oppositional step: adapt() compares the population
+        # with old_population index by index, which only holds right after select().
+        self.parameters.adapt()
+        if do_opposition:
             # print('opp')
             self.oppositional_generation()
-        # print('ada')
-        self.parameters.adapt()
         # print(self._fitness_func.state.evaluations)
         return not any(self.break_conditions)
 
-    def oppositional_generation(self):
-        lb = np.min(self.parameters.population.x, axis=0)
-        ub = np.max(self.parameters.population.x, axis=0)
-        opposition = lb + ub - self.parameters.population.x
-        f = np.empty(opposition.shape[1], object)
-        for i in range(opposition.shape[1]):
+    def oppositional_generation(self) -> None:
+        """Generation jumping using dynamic opposition-based learning.
+
+        Each individual is mirrored within the per-dimension interval spanned
+        by the current population. The best lambda_ of the population and its
+        opposites are kept; opposites inherit F and CR from the individual
+        they were mirrored from. Only as many opposites are evaluated as the
+        remaining budget allows.
+        """
+        x = self.parameters.population.x
+        lb = np.min(x, axis=1, keepdims=True)
+        ub = np.max(x, axis=1, keepdims=True)
+        n_remaining = self.parameters.budget - self._fitness_func.state.evaluations
+        n_opposites = int(min(x.shape[1], max(n_remaining, 0)))
+        if n_opposites == 0:
+            return
+        opposition = (lb + ub - x)[:, :n_opposites]
+        f = np.empty(n_opposites, object)
+        for i in range(n_opposites):
             f[i] = self.fitness_func(opposition[:, i])
-        x_merged = np.append(self.parameters.population.x, opposition, axis=1)
+        x_merged = np.append(x, opposition, axis=1)
         f_merged = np.append(self.parameters.population.f, f)
         idxs_keep = np.argsort(f_merged)[: self.parameters.lambda_]
         self.parameters.population = Population(
             x_merged[:, idxs_keep], f_merged[idxs_keep]
         )
+        source_idx = np.append(np.arange(x.shape[1]), np.arange(n_opposites))
+        self.parameters.F = self.parameters.F[source_idx[idxs_keep]]
+        self.parameters.CR = self.parameters.CR[source_idx[idxs_keep]]
 
     def run(self):
         """Run the step method until step method retuns a falsy value.
