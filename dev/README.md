@@ -71,8 +71,9 @@ implemented in C++ against that spec, with tests derived from it.
 - [x] CI workflow (`.github/workflows/ci.yml`): Windows + Linux, Python 3.11. **Not yet run on GitHub** (branch not pushed).
 - [x] Wheel dry-run workflow (`.github/workflows/wheels.yml`, manual trigger, artifacts only): cibuildwheel for Windows x64 + Linux x86_64, plus an sdist check. The sdist (1 MB: Eigen headers + licences) was verified locally by building and installing from it (889 tests pass). **Not yet run on GitHub.**
 - [x] src layout: Python package in `src/modde/`. `dev/studies/` (raw data, reports) excluded from git and kept locally.
-- [ ] Push the branch and confirm both workflows pass on GitHub.
-- **M0:** an empty C++ extension builds, imports and produces wheels on Windows and Linux. *Locally verified on Windows; GitHub runs pending.*
+- [x] Branch pushed; **CI passes on GitHub for Windows and Linux** (2026-11-19). This also confirms the Linux build and the Eigen submodule checkout.
+- [ ] Run the manual "Wheels (dry run)" workflow once and check the wheel and sdist artifacts.
+- **M0:** an empty C++ extension builds, imports and produces wheels on Windows and Linux. *Build and tests confirmed in CI on both platforms; the wheel dry run is still to be run.*
 
 ### Phase 1: Spec and parameter registry (WS3, part 1)
 - [x] Triage [KNOWN_ISSUES.md](KNOWN_ISSUES.md): bugs fixed; paper deviations move to the paper version.

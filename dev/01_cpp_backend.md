@@ -120,7 +120,7 @@ Each operator should be callable from Python on its own, as in modcma.
 - [x] Decide the architecture decisions D-A1…D-A21.
 - [x] Move 0.0.4 code to `modde/legacy/` + `DeprecationWarning`.
 - [x] Scaffold: `pyproject.toml` (scikit-build-core, `requires-python >= 3.10`), `CMakeLists.txt` (C++17, opt-in `MODDE_NATIVE`), `include/modde/common.hpp`, `src/bindings.cpp`.
-- [x] CI + wheel dry-run workflows written; verified locally on Windows. GitHub runs pending a push.
+- [x] CI workflow passes on GitHub (Windows + Linux, Python 3.11). The wheel dry-run workflow is written; its first manual run is pending.
 - [x] Eigen 3.4.0 as a git submodule (`external/eigen`).
 
 - [x] Switch to a **src layout** (2026-11-19): the Python package lives in `src/modde/`, next to the C++ sources (`src/*.cpp`), as in nanobind's example project. Running `python` from the repo root can no longer import an uncompiled source tree. Tests always run against an installed build (`pip install .` or an editable install).
