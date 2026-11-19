@@ -26,9 +26,11 @@ classifiers = [
 
 [project.optional-dependencies]
 test = ["pytest>=7"]
+docs = ["mkdocs-material>=9.5", "mkdocs-jupyter>=0.24", "mkdocstrings[python]>=0.25", "ipykernel"]
 
 [project.urls]
 Repository = "https://github.com/Dvermetten/ModDE"
+Documentation = "https://dvermetten.github.io/ModDE/"
 
 [tool.scikit-build]
 minimum-version = "build-system.requires"

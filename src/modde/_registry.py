@@ -47,6 +47,7 @@ class Param:
     tune: ConfigSpace range ``(lo, hi)`` or ``callable(dim) -> (lo, hi)``;
         ``None`` = not tunable / not in the ConfigSpace
     log: sample on log scale in the ConfigSpace
+    tune_doc: human-readable tuning range when ``tune`` depends on ``dim``
     group: ConfigSpace group (see ``GROUPS``); ignored if ``tune`` is None and
         the parameter is not categorical/bool
     active_when: parameter is active if ANY condition holds (empty = always)
@@ -65,6 +66,7 @@ class Param:
     valid: Any = None
     tune: Any = None
     log: bool = False
+    tune_doc: str = ""
     group: str | None = None
     active_when: tuple[Condition, ...] = ()
     derived: bool = False
@@ -150,6 +152,7 @@ PARAMS: tuple[Param, ...] = (
           "Initial population size. A true parameter; no module changes its default (D-D6).",
           default=lambda d: 10 * d, default_doc="10·d",
           valid=(1, None), tune=lambda d: (7, max(200, 50 * d)), log=True, group="population",
+          tune_doc="[7, max(200, 50·d)], log scale",
           replaces="lambda_", references=("storn1997",)),
     Param("population_reduction", "population_size", "categorical",
           "Population size schedule during the run.",

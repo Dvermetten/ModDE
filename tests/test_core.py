@@ -40,13 +40,13 @@ def test_legacy_import_warns():
         importlib.import_module("modde.legacy")
 
 
-def test_top_level_legacy_name_warns_and_forwards():
-    with pytest.warns(DeprecationWarning, match="modde.legacy.ModularDE"):
-        cls = modde.ModularDE
+def test_top_level_names_are_the_new_api():
+    """Phase 3: top-level names point to the new API (D-A5); old ones to modde.legacy."""
+    assert modde.ModularDE.__module__ == "modde.optimizer"
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", DeprecationWarning)
-        from modde.legacy import ModularDE
-    assert cls is ModularDE
+        from modde.legacy import ModularDE as Legacy
+    assert modde.ModularDE is not Legacy
 
 
 def test_unknown_attribute_raises():

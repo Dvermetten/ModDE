@@ -25,3 +25,7 @@ Untitled*.ipynb
 # Supporting studies (raw data, reports, study scripts) are kept locally only,
 # not in the repository.
 dev/studies/
+
+# Documentation build output (docs/parameters.md is generated from the registry)
+site/
+docs/parameters.md

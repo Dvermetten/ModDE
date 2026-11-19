@@ -213,7 +213,7 @@ custom functions. Suites include BBOB, CEC2013, CEC2022, PBO, ….
 
 ### D-B8 🟠 Logging and analysis integration
 - **Decision:** ship a ready-made adapter (e.g. `modde.ioh.tracked(optimizer)`, or the optimizer exposing tracked properties directly) so `ioh.logger.Analyzer(...).watch(...)` / `ioh.Experiment(logged_attributes=...)` works without the 0.0.4 wrapper class.
-- **Status:** OPEN
+- **Status:** IMPLEMENTED AS RECOMMENDED (2026-11-19, Phase 3; please confirm): no separate adapter. `modde.ModularDE` exposes the tracked statistics (`curr_F`, `curr_CR`, `corrected`, `CS`, `ED`, `corr_so_far`, `popmean`, `popstd`, `F_memory_mean`, `generation`) as attributes, so `logger.watch(optimizer, [...])` works directly (tested with `ioh.logger.Analyzer`).
 
 ### D-B9 🟠 Benchmark suites for validation
 - **Context:** BBOB, CEC2013 and CEC2022 are available in ioh 0.3.22. CEC2014/2017, where the L-SHADE and jSO results were published, are **not**.
@@ -223,7 +223,7 @@ custom functions. Suites include BBOB, CEC2013, CEC2022, PBO, ….
 ### D-B10 🟢 Maximisation problems
 - **Context:** ioh problems carry `optimization_type`. 0.0.4 assumes minimisation.
 - **Recommendation:** sign-flip internally when `optimization_type == MAX`. Report values in the original sign.
-- **Status:** OPEN
+- **Status:** IMPLEMENTED AS RECOMMENDED (2026-11-19, Phase 3; please confirm): for ioh problems with `optimization_type == MAX`, modde minimises `-f` internally; `best_f` is reported in the original sign. Plain callables are minimised.
 
 ### D-B11 🟠 ioh as a hard or optional dependency
 - **Recommendation:** keep it as a hard dependency (it is light and the main use case), but the core never imports it, so it can become optional later.
@@ -249,7 +249,7 @@ add_sigma, add_learning_rates)`:
 ### D-C2 🟠 Scope of the generated space
 - **Options:** modules only; modules + numerics, toggled by flags (like modcma's `add_popsize`, …). Which numerics: `lambda0`, `F0`, `CR0`, `memory_size`, `archive_rate`, `p_best`, `lambda_min`, jDE τ's, SHADE scales, …?
 - **Recommendation:** flags per group (`add_popsize`, `add_initial_FCR`, `add_adaptation_params`, …). Each group generated from the registry.
-- **Status:** OPEN
+- **Status:** IMPLEMENTED AS RECOMMENDED (2026-11-19, Phase 3; please confirm): `get_configspace(dim, add_popsize=True, add_initial_FCR=True, add_module_params=True)`; modules are always included.
 
 ### D-C3 🟠 Source of truth for the space
 - **Options:** (a) introspect bound enums (modcma); (b) the parameter registry (WS3), which also carries ranges, distributions and active-when conditions; (c) hand-written.
@@ -281,7 +281,7 @@ add_sigma, add_learning_rates)`:
 
 ### D-C8 🟠 Round-trip API
 - **Decisions:** functions `get_configspace`, `settings_from_config(dim, config, **overrides)`, `settings_from_dict`, and **also** `config_from_settings` (missing in modcma; useful for warm-starting tuners from presets). How a configuration distinguishes "explicitly tuned" from "default": with provenance (D-D1), every configured value is `USER`.
-- **Status:** OPEN
+- **Status:** IMPLEMENTED AS RECOMMENDED (2026-11-19, Phase 3; please confirm): `get_configspace`, `settings_from_config(dim, config, **overrides)`, `settings_from_dict`, `settings_to_dict`, `config_from_settings`, plus `get_presets(dim)` / `preset_settings(name, dim)`. Round trip is tested.
 
 ### D-C9 🟠 ConfigSpace as a hard or optional dependency
 - **Context:** modcma makes it a hard dependency.
@@ -292,7 +292,7 @@ add_sigma, add_learning_rates)`:
 ### D-C10 🟢 Other tuners and formats
 - **Decision:** support irace's parameter-file format (not provided by ConfigSpace), and Optuna/Hyperopt adapters?
 - **Recommendation:** an irace exporter, if the group uses irace. Otherwise ConfigSpace only.
-- **Status:** OPEN
+- **Status:** IMPLEMENTED AS RECOMMENDED (2026-11-19, Phase 3; please confirm): ConfigSpace only; no irace/Optuna exporters for now.
 
 ### D-C11 🟠 Default configuration of the space
 - **Decision:** which algorithm the space's default represents (classic DE/rand/1/bin? L-SHADE-like?). Tied to D-D2.
@@ -357,7 +357,7 @@ add_sigma, add_learning_rates)`:
 
 ### D-D12 🟠 Ask-tell parity
 - **Decision:** must ask-tell produce **identical** trajectories to `run()` for the same seed? Recommended: yes, as a tested invariant.
-- **Status:** OPEN
+- **Status:** IMPLEMENTED AS RECOMMENDED (2026-11-19, Phase 3; please confirm): yes. Ask-tell and `run()` share the same core building blocks and give identical trajectories for the same seed (tested on five configurations, batch and one-by-one).
 
 ### D-D13 🟠 Reproducibility guarantee
 - See D-A13. Also: what changes count as "behaviour-changing" and need a changelog entry and a new regression snapshot.
@@ -374,15 +374,15 @@ add_sigma, add_learning_rates)`:
 ### D-E1 🟠 Documentation tooling
 - **Options:** Sphinx (+ autodoc/napoleon, `myst-nb` for notebooks; modcma uses Read the Docs) vs MkDocs Material (+ `mkdocstrings`, `mkdocs-jupyter`).
 - **Constraint:** the API docs must come from nanobind stubs and docstrings. Both handle `.pyi` with some setup.
-- **Status:** OPEN
+- **Status:** IMPLEMENTED AS RECOMMENDED (2026-11-19, Phase 3; please confirm): **MkDocs Material** + `mkdocs-jupyter` (renders and executes the notebooks) + `mkdocstrings` (API reference from docstrings). Chosen for simplicity (Markdown everywhere, one config file); Sphinx + myst-nb would also work if preferred.
 
 ### D-E2 🟢 Hosting
 - **Options:** Read the Docs vs GitHub Pages.
-- **Status:** OPEN
+- **Status:** DECIDED (2026-11-19): **GitHub Pages**, deployed by `.github/workflows/docs.yml` (strict build on pull requests, publish from `master`). Repository setting needed once: Settings → Pages → Source: *GitHub Actions*.
 
 ### D-E3 🟠 Tutorial format
 - **Options:** Jupyter notebooks (rendered, executed in CI) vs plain scripts (+ literalinclude).
-- **Status:** OPEN
+- **Status:** DECIDED (2026-11-19): **Jupyter notebooks** as the getting-started material (`docs/notebooks/`, executed on every docs build). The docs must have a clear section listing **all tunable parameters with references to the relevant papers**: `docs/parameters.md`, generated from the registry at build time.
 
 ### D-E4 🟠 Versioning and naming
 - **Options:** `1.0.0` (signals the rewrite and the breaking API) vs `0.1.0`. Same PyPI name `modde`.
@@ -402,7 +402,7 @@ add_sigma, add_learning_rates)`:
 ### D-E7 🟢 Docstring source for C++ objects
 - **Options:** docstrings written in `bindings.cpp` (single place, appears in stubs) vs Doxygen in headers + Breathe.
 - **Recommendation:** in `bindings.cpp`, generated from the registry where possible.
-- **Status:** OPEN
+- **Status:** IMPLEMENTED AS RECOMMENDED (2026-11-19, Phase 3; please confirm): C++ objects are documented by docstrings in `src/bindings.cpp`, which nanobind turns into the generated stub `modde/_core.pyi` (shipped with `py.typed`). Python API docstrings use the numpy style.
 
 ### D-E8 🟢 Test framework
 - **Options:** Python-only tests (pytest via the bindings) vs also C++ unit tests (Catch2/GoogleTest).
@@ -449,3 +449,5 @@ add_sigma, add_learning_rates)`:
 | 2026-11-19 | Problem with existing evaluations at start: warn, don't fail; budget applies to the problem's total count (`evaluations ≤ budget`). | D-B3 |
 | 2026-11-19 | Implement quasi-oppositional initialisation using `oppositional_initialization_factor` (KI-37): `oppositional_initialization ∈ {NONE, OPPOSITE, QUASI_OPPOSITE}`, factor scales the opposite point toward the centre. | D-D10, KI-37 |
 | 2026-11-19 | Phase 1 spec review: renamed settings, fixed constant schedules, F0/CR0 as SHADE memory init, and the eigen-crossover note accepted. Bound-correction references taken from the ModDE paper; preset verification deferred. M1 reached. | spec/README.md |
+| 2026-11-19 | Docs hosted on GitHub Pages; Jupyter notebooks as getting-started material; a generated page listing all tunable parameters with paper references. | D-E2, D-E3 |
+| 2026-11-19 | Phase 3 implemented the recommendations of D-E1 (MkDocs Material), D-C2, D-C8, D-C10, D-B8, D-B10, D-D12 and D-E7; awaiting confirmation. | Phase 3 |

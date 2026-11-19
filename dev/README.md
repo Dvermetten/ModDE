@@ -93,13 +93,16 @@ implemented in C++ against that spec, with tests derived from it.
 - **M2:** `ModularDE(settings).run(f)` in C++ reproduces the spec on all modules. ✅ (Python front end: Phase 3.)
 
 ### Phase 3: Python API and integrations (WS1)
-- [ ] nanobind bindings + generated `.pyi` stubs.
-- [ ] High-level `fmin`, `settings_from_dict`, named presets (L-SHADE, …).
-- [ ] ioh integration (bounds/target/budget from the problem, logging of internal state).
-- [ ] ConfigSpace generation from the registry, `settings_from_config`.
-- [ ] Ask-tell interface (scope per D-A12).
-- [ ] Docs skeleton and API reference wired up (WS2).
-- **M3:** the full public API is usable. Alpha release on TestPyPI.
+- [x] nanobind bindings + generated `_core.pyi` stub and `py.typed` (built by CMake, shipped in the wheel).
+- [x] High-level `fmin` (returns `FminResult`), `ModularDE` (bound to a problem), `settings_from_dict` / `settings_to_dict`, named presets (`preset=` / `get_presets(dim)` / `preset_settings`).
+- [x] ioh integration: plain callables wrapped with ioh by default (`wrap_problem`); bounds, final target and budget from the problem; warning for problems that already have evaluations; maximisation; tracked attributes watchable by ioh loggers.
+- [x] ConfigSpace: `get_configspace` (group flags), `settings_from_config`, `config_from_settings` (round trip tested).
+- [x] Ask-tell (D-A12): `AskTellDE` with batch `ask`/`tell` and `ask_one`/`tell_one`; identical trajectories to `run()` (D-D12). Core split into produce/accept halves for initialisation, trials and oppositional jumps.
+- [x] Top-level names now point to the new API; removed 0.0.4 names give a pointer to `modde.legacy`.
+- [x] Docs skeleton (WS2): MkDocs Material site with three executed getting-started notebooks, concepts, a **generated parameter reference with paper references**, API reference, reproducibility and migration pages; GitHub Pages workflow. Strict local build passes.
+- [ ] Alpha release on TestPyPI (needs the author's go-ahead and credentials).
+- [ ] Enable GitHub Pages (Settings → Pages → Source: GitHub Actions) and check the first deployment after merging to `master`.
+- **M3:** the full public API is usable. ✅ (release pending)
 
 ### Phase 4: Validation campaign (WS3, part 2)
 - [ ] Property-based invariant tests over random configurations.

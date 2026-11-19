@@ -224,6 +224,21 @@ NB_MODULE(_core, m)
              { Objective o = make_objective(f, vectorized); return de.step(o); }, "f"_a, "vectorized"_a = false)
         .def("run", with_objective(&DE::run), "f"_a, "vectorized"_a = false)
         .def("break_conditions", &DE::break_conditions)
+        // ask-tell building blocks (D-A12); n x d at the boundary
+        .def("initial_candidates", [](DE &de) { return to_rows(de.initial_candidates()); },
+             "Initial candidates (m x d) to evaluate; consumes the RNG like initialize().")
+        .def("finish_initialization", [](DE &de, const RowMatrix &C, const Vector &f)
+             { de.finish_initialization(C.transpose(), f); }, "candidates"_a, "f"_a,
+             "Keep the best lambda0 candidates; f = +inf for unevaluated ones.")
+        .def("evaluable", &DE::evaluable, "n"_a, "How many of the next n points the remaining budget allows.")
+        .def("record_evaluations", [](DE &de, const RowMatrix &X, const Vector &f)
+             { de.record_evaluations(X.transpose(), f); }, "X"_a, "f"_a,
+             "Count evaluations of the rows of X and update the best solution.")
+        .def("tell_trials", &DE::tell_trials, "f"_a, "Fitness of the first len(f) corrected trials.")
+        .def("draw_opposition", &DE::draw_opposition, "Draw the jump decision; True if `opposites` must be evaluated.")
+        .def_prop_ro("opposites", [](const DE &de) { return to_rows(de.p.opposites); })
+        .def("finish_opposition", &DE::finish_opposition, "f"_a, "Merge the first len(f) evaluated opposite points.")
+        .def("update_stats", &DE::update_stats)
         // state (n x d views are copies)
         .def_prop_ro("settings", [](const DE &de) { return de.p.settings; })
         .def_prop_ro("stats", [](DE &de) -> Stats & { return de.p.stats; }, nb::rv_policy::reference_internal)

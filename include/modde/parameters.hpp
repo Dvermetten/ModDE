@@ -70,6 +70,7 @@ namespace modde
         std::vector<bool> corrected; //!< per trial: any coordinate corrected
         Vector CS, ED;               //!< per trial correction statistics
         std::vector<Indices> last_parents; //!< population parents used per donor (testing/analysis)
+        Matrix opposites;                  //!< points of a pending oppositional jump, d x lambda
 
         Archive archive;
         Memory memory;

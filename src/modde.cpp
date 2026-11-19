@@ -1,5 +1,8 @@
 // Generation loop: dev/spec/README.md, initialization.md, selection_archive.md,
 // population_size.md, oppositional_generation.md, settings.md §2-4.
+//
+// Every evaluation is split into "produce points" and "accept fitness" halves
+// so that run()/step() and the ask-tell interface share one code path (D-A12).
 
 #include <cmath>
 #include <stdexcept>
@@ -40,6 +43,24 @@ namespace modde
     {
     }
 
+    // ------------------------------------------------------------------ evaluation
+
+    Index ModularDE::evaluable(Index n) const
+    {
+        return std::min<Index>(n, static_cast<Index>(p.remaining_budget()));
+    }
+
+    void ModularDE::record_evaluations(const Matrix &X, const Vector &f)
+    {
+        p.stats.evaluations += static_cast<std::size_t>(f.size());
+        for (Index i = 0; i < f.size(); ++i)
+            if (f(i) < p.stats.best_f)
+            {
+                p.stats.best_f = f(i);
+                p.stats.best_x = X.col(i);
+            }
+    }
+
     Vector ModularDE::evaluate_points(const Matrix &X, Objective &objective,
                                       const std::function<void(Index)> &before)
     {
@@ -47,7 +68,7 @@ namespace modde
             throw std::invalid_argument("objective has no callable");
         const Index n = X.cols();
         Vector f = Vector::Constant(n, INF);
-        const Index count = std::min<Index>(n, static_cast<Index>(p.remaining_budget()));
+        const Index count = evaluable(n);
         if (count == 0)
             return f;
 
@@ -57,7 +78,12 @@ namespace modde
             {
                 before(i);
                 f(i) = objective.single ? objective.single(X.col(i)) : objective.batch(X.col(i))(0);
-                ++p.stats.evaluations;
+                ++p.stats.evaluations; // counted one by one: per-evaluation statistics stay in sync
+                if (f(i) < p.stats.best_f)
+                {
+                    p.stats.best_f = f(i);
+                    p.stats.best_x = X.col(i);
+                }
             }
         }
         else
@@ -67,90 +93,98 @@ namespace modde
                 throw std::runtime_error("vectorised objective returned " + std::to_string(fb.size()) +
                                          " values for " + std::to_string(count) + " points");
             f.head(count) = fb;
-            p.stats.evaluations += static_cast<std::size_t>(count);
+            record_evaluations(X.leftCols(count), fb);
         }
-
-        for (Index i = 0; i < count; ++i)
-            if (f(i) < p.stats.best_f)
-            {
-                p.stats.best_f = f(i);
-                p.stats.best_x = X.col(i);
-            }
         return f;
     }
 
-    void ModularDE::initialize(Objective &objective)
+    // ------------------------------------------------------------------ initialisation
+
+    Matrix ModularDE::initial_candidates()
     {
         const auto &s = p.settings;
         const auto &m = p.modules;
+        if (s.initial_population)
+            return s.initial_population->transpose();
+
         const Vector &lb = *s.lb;
         const Vector range = *s.ub - lb;
-        const Index lambda0 = static_cast<Index>(*s.lambda0);
+        const auto lambda0 = static_cast<Float>(*s.lambda0);
+        const auto m_total = static_cast<Index>(std::ceil(lambda0 * (1.0 + *s.oversampling_factor)));
+        const bool opposition = m.oppositional_initialization != OppositionalInitialization::NONE;
+        const Index m_base = opposition ? (m_total + 1) / 2 : m_total;
 
-        Matrix candidates;
-        Vector f;
-        auto init_tracking = [&](Index)
+        const Matrix Z = p.sampler->sample(p.d, m_base, p.rng);
+        const Matrix base = (Z.array().colwise() * range.array()).colwise() + lb.array();
+        Matrix candidates(p.d, m_total);
+        candidates.leftCols(m_base) = base;
+        if (opposition)
         {
-            p.stats.curr_F = *s.F0;
-            p.stats.curr_CR = *s.CR0;
-            p.stats.corrected = false;
-            p.stats.CS = p.stats.ED = 0;
-        };
-
-        if (s.initial_population)
-        {
-            candidates = s.initial_population->transpose();
-            f = s.initial_fitness ? *s.initial_fitness : evaluate_points(candidates, objective, init_tracking);
-            if (s.initial_fitness)
-                for (Index i = 0; i < f.size(); ++i)
-                    if (f(i) < p.stats.best_f)
-                    {
-                        p.stats.best_f = f(i);
-                        p.stats.best_x = candidates.col(i);
-                    }
-        }
-        else
-        {
-            const auto m_total = static_cast<Index>(std::ceil(static_cast<Float>(lambda0) * (1.0 + *s.oversampling_factor)));
-            const bool opposition = m.oppositional_initialization != OppositionalInitialization::NONE;
-            const Index m_base = opposition ? (m_total + 1) / 2 : m_total;
-
-            const Matrix Z = p.sampler->sample(p.d, m_base, p.rng);
-            const Matrix base = (Z.array().colwise() * range.array()).colwise() + lb.array();
-            candidates.resize(p.d, m_total);
-            candidates.leftCols(m_base) = base;
-            if (opposition)
+            const Vector c = (lb + *s.ub) / 2.0;
+            const Float phi = *s.oppositional_initialization_factor;
+            for (Index i = 0; m_base + i < m_total; ++i)
             {
-                const Vector c = (lb + *s.ub) / 2.0;
-                const Float phi = *s.oppositional_initialization_factor;
-                for (Index i = 0; m_base + i < m_total; ++i)
-                {
-                    const Vector opposite = lb + *s.ub - base.col(i);
-                    Vector x = c + phi * (opposite - c);
-                    if (m.oppositional_initialization == OppositionalInitialization::QUASI_OPPOSITE)
-                        for (Index j = 0; j < p.d; ++j)
-                            x(j) = c(j) + p.rng.uniform() * (x(j) - c(j));
-                    candidates.col(m_base + i) = x;
-                }
+                const Vector opposite = lb + *s.ub - base.col(i);
+                Vector x = c + phi * (opposite - c);
+                if (m.oppositional_initialization == OppositionalInitialization::QUASI_OPPOSITE)
+                    for (Index j = 0; j < p.d; ++j)
+                        x(j) = c(j) + p.rng.uniform() * (x(j) - c(j));
+                candidates.col(m_base + i) = x;
             }
-            f = evaluate_points(candidates, objective, init_tracking);
         }
+        return candidates;
+    }
 
-        // keep the best lambda0 (ties: lower index)
+    void ModularDE::finish_initialization(const Matrix &candidates, const Vector &f)
+    {
+        const auto &s = p.settings;
+        const auto lambda0 = static_cast<Index>(*s.lambda0);
+        if (f.size() != candidates.cols())
+            throw std::invalid_argument("one fitness value per candidate is required (+inf if not evaluated)");
+        for (Index i = 0; i < f.size(); ++i) // also covers user-supplied initial_fitness (not counted)
+            if (f(i) < p.stats.best_f)
+            {
+                p.stats.best_f = f(i);
+                p.stats.best_x = candidates.col(i);
+            }
+
         Population all;
         all.X = candidates;
         all.f = f;
         all.F = Vector::Constant(f.size(), *s.F0);
         all.CR = Vector::Constant(f.size(), *s.CR0);
-        Indices order = all.argsort();
+        Indices order = all.argsort(); // ties: lower index
         order.resize(static_cast<size_t>(lambda0));
         all.keep(order);
         p.pop = std::move(all);
         p.lambda = lambda0;
         p.archive.members.clear();
         p.initialized = true;
-        update_generation_stats();
+        update_stats();
     }
+
+    void ModularDE::initialize(Objective &objective)
+    {
+        const auto &s = p.settings;
+        const Matrix candidates = initial_candidates();
+        Vector f;
+        if (s.initial_population && s.initial_fitness)
+            f = *s.initial_fitness; // known values: not evaluated, not counted
+        else
+        {
+            f = evaluate_points(candidates, objective,
+                                [&](Index)
+                                {
+                                    p.stats.curr_F = *s.F0;
+                                    p.stats.curr_CR = *s.CR0;
+                                    p.stats.corrected = false;
+                                    p.stats.CS = p.stats.ED = 0;
+                                });
+        }
+        finish_initialization(candidates, f);
+    }
+
+    // ------------------------------------------------------------------ generation
 
     void ModularDE::sample_parameters() { modde::sample_parameters(p); }
 
@@ -159,6 +193,15 @@ namespace modde
     void ModularDE::crossover() { apply_crossover(p); }
 
     void ModularDE::correct_bounds() { apply_bound_correction(p, *bound_correction); }
+
+    void ModularDE::tell_trials(const Vector &f)
+    {
+        if (f.size() > p.lambda)
+            throw std::invalid_argument("more fitness values than trials");
+        p.f_trial = Vector::Constant(p.lambda, INF);
+        p.f_trial.head(f.size()) = f;
+        record_evaluations(p.U_corrected.leftCols(f.size()), f);
+    }
 
     void ModularDE::evaluate(Objective &objective)
     {
@@ -210,32 +253,33 @@ namespace modde
             rec.replaced.col(j) = replaced[static_cast<size_t>(j)];
 
         commit_jde(p); // before any reordering
+        ++p.stats.generation;
     }
 
-    bool ModularDE::oppositional_generation(Objective &objective)
+    bool ModularDE::draw_opposition()
     {
         if (!p.modules.oppositional_generation)
             return false;
         if (!(p.rng.uniform() < *p.settings.oppositional_jump_rate))
             return false;
-
-        const Index n = p.lambda;
         const Vector a = p.pop.X.rowwise().minCoeff();
         const Vector b = p.pop.X.rowwise().maxCoeff();
-        const Matrix O = (-p.pop.X).colwise() + (a + b);
-        const Vector fO = evaluate_points(O, objective,
-                                          [&](Index i)
-                                          {
-                                              p.stats.curr_F = p.pop.F(i);
-                                              p.stats.curr_CR = p.pop.CR(i);
-                                              p.stats.corrected = false;
-                                              p.stats.CS = p.stats.ED = 0;
-                                          });
+        p.opposites = (-p.pop.X).colwise() + (a + b);
+        return true;
+    }
 
-        // Best n of X u O; stable sort keeps existing members first on ties.
+    void ModularDE::finish_opposition(const Vector &fO_evaluated)
+    {
+        const Index n = p.lambda;
+        if (fO_evaluated.size() > n)
+            throw std::invalid_argument("more fitness values than opposite points");
+        Vector fO = Vector::Constant(n, INF);
+        fO.head(fO_evaluated.size()) = fO_evaluated;
+
+        // Best n of X u O; the stable sort keeps existing members first on ties.
         Population all;
         all.X.resize(p.d, 2 * n);
-        all.X << p.pop.X, O;
+        all.X << p.pop.X, p.opposites;
         all.f.resize(2 * n);
         all.f << p.pop.f, fO;
         all.F.resize(2 * n);
@@ -246,6 +290,21 @@ namespace modde
         order.resize(static_cast<size_t>(n));
         all.keep(order);
         p.pop = std::move(all);
+    }
+
+    bool ModularDE::oppositional_generation(Objective &objective)
+    {
+        if (!draw_opposition())
+            return false;
+        const Vector fO = evaluate_points(p.opposites, objective,
+                                          [&](Index i)
+                                          {
+                                              p.stats.curr_F = p.pop.F(i);
+                                              p.stats.curr_CR = p.pop.CR(i);
+                                              p.stats.corrected = false;
+                                              p.stats.CS = p.stats.ED = 0;
+                                          });
+        finish_opposition(fO);
         return true;
     }
 
@@ -295,11 +354,7 @@ namespace modde
     bool ModularDE::step(Objective &objective)
     {
         if (!p.initialized)
-        {
             initialize(objective);
-            if (break_conditions())
-                return false;
-        }
         if (break_conditions())
             return false;
 
@@ -309,14 +364,13 @@ namespace modde
         correct_bounds();
         evaluate(objective);
         select(); // evaluated trials are always selected (D-D7)
-        ++p.stats.generation;
         if (!break_conditions())
         {
             const bool jumped = oppositional_generation(objective);
             if (!(jumped && break_conditions()))
                 adapt();
         }
-        update_generation_stats();
+        update_stats();
         return !break_conditions();
     }
 
@@ -327,7 +381,7 @@ namespace modde
         }
     }
 
-    void ModularDE::update_generation_stats()
+    void ModularDE::update_stats()
     {
         auto &st = p.stats;
         const auto &X = p.pop.X;

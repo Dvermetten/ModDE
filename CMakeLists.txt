@@ -43,3 +43,14 @@ else()
 endif()
 
 install(TARGETS _core LIBRARY DESTINATION modde)
+
+# Type stubs for the extension (+ PEP 561 marker for the whole package)
+nanobind_add_stub(
+  _core_stub
+  MODULE _core
+  OUTPUT _core.pyi
+  PYTHON_PATH $<TARGET_FILE_DIR:_core>
+  DEPENDS _core
+  MARKER_FILE py.typed
+)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/_core.pyi" "${CMAKE_CURRENT_BINARY_DIR}/py.typed" DESTINATION modde)
