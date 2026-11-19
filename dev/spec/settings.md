@@ -40,6 +40,7 @@ an error that names the value and the module(s) involved.
 - `use_archive` with `mutation_n_comps = 0`;
 - `pbest_*` without `mutation_reference = PBEST` (covered by step 5);
 - `mutation_use_weighted_F` with `mutation_reference = NONE`.
+- `mutation_n_comps = 0` with `mutation_reference = NONE` (Phase 4 interaction study, D-A6): the donors contain no difference vector. With `mutation_base = BEST` the population collapses onto the best point (the one *conflict* in the study); otherwise the search relies on crossover only and is clearly worse than classic DE. With a reference term (current-to-X/0) it works well.
 
 ### `n_parents_needed`
 The number of distinct population members, besides the target, that the mutation must draw:

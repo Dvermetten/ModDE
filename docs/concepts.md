@@ -47,3 +47,10 @@ function is wrapped as one automatically (`wrap=False` to opt out). The problem
 counts the evaluations, and the budget applies to that count. If the problem
 already has evaluations when a run starts, modde warns and counts them too.
 Maximisation problems are handled transparently.
+
+!!! tip "Speed"
+    Wrapping a plain function as an ioh problem costs a few microseconds per evaluation, because ioh
+    calls your function once per point. For cheap functions that accept a whole `(n, d)` array, pass
+    `wrap=False, vectorized=True` to skip ioh and evaluate a whole generation per call. This is several
+    times faster, but the optimizer then counts the budget itself, and ioh logging is not available.
+

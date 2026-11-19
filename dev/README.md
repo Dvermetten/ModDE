@@ -105,11 +105,13 @@ implemented in C++ against that spec, with tests derived from it.
 - **M3:** the full public API is usable. ✅ (release pending)
 
 ### Phase 4: Validation campaign (WS3, part 2)
-- [ ] Property-based invariant tests over random configurations.
-- [ ] Pairwise interaction matrix, results in `docs/` (generated).
-- [ ] Reference-variant validation (DE/rand/1/bin, JADE, SHADE, L-SHADE, jDE, jSO-style) against the literature or reference implementations.
-- [ ] Performance benchmarks against 0.0.4 (and other DE libraries if wanted).
-- **M4:** the validation report is published and every interaction is classified.
+- [x] Logging validation (§5.3a): `tests/test_logging.py`; reported values belong to the evaluated individual in every mode; full ioh log matches the evaluations.
+- [x] Invariant tests over sampled configurations (`tests/test_runs.py`, from Phase 2) and over 46 160 study runs without a single failure.
+- [x] Pairwise interaction matrix: 541 pairs, no incompatible combinations; results in `docs/data/`, generated docs page *Module interactions*; D-A6 (`mutation_n_comps = 0`) answered (resolution warning added).
+- [x] Reference-variant validation (D-D14) against modde's own independent implementations written from the papers: DE, jDE, SHADE, L-SHADE validated.
+- [x] Regression snapshot per platform (`tests/test_regression.py`, `tools/make_regression_snapshot.py`; Windows snapshot committed, Linux pending).
+- [x] Benchmark harness (`benchmarks/benchmark.py`) and results ([benchmarks.md](benchmarks.md)).
+- **M4:** the validation results are recorded ([03_module_validation.md](03_module_validation.md) §7) and every interaction is classified. ✅
 
 ### Phase 4b: CEC-suite validation (separate stage)
 - [ ] Wrap CEC2014/CEC2017 implementations with `ioh.wrap_problem` (no integration into ioh). Validate the wrapped functions themselves first.

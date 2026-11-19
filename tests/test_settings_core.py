@@ -88,6 +88,8 @@ def test_lambda0_boundary_is_valid():
     ({"pbest_rate": 0.2}, "pbest_rate has no effect"),
     ({"use_archive": True, "mutation_n_comps": 0, "mutation_base": "TARGET"}, "use_archive has no effect"),
     ({"mutation_use_weighted_F": True}, "mutation_use_weighted_F has no effect"),
+    ({"mutation_n_comps": 0}, "relies on crossover only"),
+    ({"mutation_n_comps": 0, "mutation_base": "BEST"}, "population collapses"),
 ])
 def test_warnings_for_settings_without_effect(kw, fragment):
     assert any(fragment in w for w in resolved(5, **kw).warnings)

@@ -199,6 +199,13 @@ namespace modde
         inactive("lambda_min", lambda_min.has_value(), m.population_reduction == PopulationReduction::LINEAR);
         if (m.use_archive && m.mutation_n_comps == 0)
             s.warnings.push_back("use_archive has no effect when mutation_n_comps = 0");
+        if (m.mutation_n_comps == 0 && m.mutation_reference == MutationReference::NONE)
+            s.warnings.push_back(
+                m.mutation_base == MutationBase::BEST
+                    ? "mutation_n_comps = 0 with mutation_base = BEST and no mutation_reference: every donor is "
+                      "the best individual, so the population collapses (interaction study: conflict)"
+                    : "mutation_n_comps = 0 without a mutation_reference: donors contain no difference vector "
+                      "and the search relies on crossover only (interaction study: worse than classic DE)");
         if (m.mutation_use_weighted_F && m.mutation_reference == MutationReference::NONE)
             s.warnings.push_back("mutation_use_weighted_F has no effect when mutation_reference = NONE");
         if (s.initial_population &&

@@ -140,6 +140,8 @@ must pass these checks:
 - The cost of tracking mode is measured and documented (WS1 benchmarks).
 
 ### 5.4 Reference-variant validation
+**Decided (2026-11-19):** the comparison is against modde's own independent NumPy reference implementations, written directly from the papers and sharing no code with the core, the spec or the registry. Third-party implementations (e.g. pyade) are not used, because their correctness is not vouched for.
+
 Recreate published algorithms as presets and compare statistically (e.g. 25–51 runs, Mann-Whitney U / equivalence test on final error):
 
 | Variant | Compare against | Suite |
@@ -194,3 +196,53 @@ The published L-SHADE and jSO results are on CEC2014 and CEC2017, which ioh
 - [ ] Choose and validate a CEC2014/2017 implementation (§5.6).
 - [ ] Wrap it with `ioh.wrap_problem`. Run the presets under the competition protocol.
 - [ ] Compare against published results. Add to the validation report.
+
+## 7. Phase 4 results (2026-11-19)
+
+### 7.1 Logging validation (§5.3a): passed
+`tests/test_logging.py`: for every evaluation (initial candidates, trials, oppositional jumps) the
+reported `curr_F`, `curr_CR`, `corrected`, `CS`, `ED` belong to the evaluated individual, with
+per-point and vectorised objectives. A full ioh log (trigger ALWAYS) has one row per evaluation
+and the watched values equal those seen by the objective. Evaluation counts equal the budget in
+per-point, batch and ask-tell mode.
+
+### 7.2 Interaction matrix (§5.3): no incompatible pairs
+Baseline + 35 options alone + 541 cross-module pairs; BBOB f1/f8/f15/f21, d = 5, 20, 10 runs,
+budget 2000·d; 46 160 runs, all completed without error. Interaction = deviation of the pair's
+ECDF-AUC from the sum of the separate effects; significant if |I| ≥ 0.02 and |z| > 3.29.
+Results page: `docs/interactions.md` (generated from `docs/data/interactions_*.csv`).
+
+| Class | Pairs |
+|---|---|
+| compatible | 460 |
+| no effect | 67 (58 involve `mutation_use_weighted_F` or `use_jso_caps`, which do nothing without a reference term / adaptation; 9 are bound corrections with `mutation_n_comps = 0`, whose donors never leave the domain) |
+| synergy | 11 (TARGET/BEST base with reference terms, p-best, archive, SHADE; reference terms with `n_comps = 0`) |
+| mixed | 2 |
+| conflict | 1 (`mutation_base = BEST` + `mutation_n_comps = 0`: every donor is the best point) |
+| incompatible | 0 |
+
+- **`mutation_n_comps = 0` (D-A6):** works with a reference term; alone it is worse than classic DE (crossover only); with a BEST base it conflicts. Kept in the API with a resolution warning; ConfigSpace range stays {1, 2}.
+- Alone versus classic DE: `mutation_base = BEST` better; TARGET base, RAND/BEST reference, `n_comps` 0 and 2 worse; all other options neutral or without effect. The TARGET/reference options are only worse *alone*; together they form the strong current-to-X variants.
+- Study code and raw data: local only (`dev/studies/interactions/`).
+
+### 7.3 Reference-variant validation (§5.4): all four presets validated (D-D14)
+modde presets vs modde's own independent NumPy implementations written from the papers (no shared
+code with the core, spec or registry; no third-party code). BBOB f1-f24, d = 5, 20, 25 runs per
+function, budget 2000·d; 9 600 runs.
+
+| Variant | d | Final precision ▲ / ▼ / ≈ | Anytime ▲ / ▼ / ≈ | Mean AUC modde / reference |
+|---|---|---|---|---|
+| DE | 5 | 0 / 1 / 23 | 1 / 1 / 22 | 0.139 / 0.138 |
+| DE | 20 | 0 / 0 / 24 | 0 / 0 / 24 | 0.031 / 0.031 |
+| jDE | 5 | 1 / 0 / 23 | 1 / 0 / 23 | 0.102 / 0.100 |
+| jDE | 20 | 2 / 0 / 22 | 0 / 0 / 24 | 0.047 / 0.048 |
+| SHADE | 5 | 0 / 1 / 23 | 2 / 0 / 22 | 0.103 / 0.102 |
+| SHADE | 20 | 1 / 2 / 21 | 0 / 2 / 22 | 0.064 / 0.064 |
+| L-SHADE | 5 | 0 / 0 / 24 | 2 / 0 / 22 | 0.126 / 0.126 |
+| L-SHADE | 20 | 2 / 0 / 22 | 2 / 0 / 22 | 0.049 / 0.049 |
+
+(▲/▼ = modde significantly better/worse, uncorrected α = 0.05; about 1.2 false positives per row expected.)
+After a Holm correction only SHADE d = 20 f24 (modde worse) and jDE d = 5 f1 (modde better) remain; the
+SHADE difference does not replicate on 25 fresh seeds (p = 0.057, medians 105.8 vs 104.3). Report and
+code: local only (`dev/studies/reference_variants/`).
+

@@ -1,0 +1,542 @@
+a,b,cls,detail,mean_interaction,min_interaction,max_interaction
+base_sampler=GAUSSIAN,oppositional_initialization=OPPOSITE,compatible,"0 positive, 0 negative of 8 cells",-0.0006944444444444523,-0.0113211951447246,0.005975723622782439
+base_sampler=GAUSSIAN,oppositional_initialization=QUASI_OPPOSITE,compatible,"0 positive, 0 negative of 8 cells",-0.006065170321001972,-0.04801587301587304,0.011484593837535001
+base_sampler=GAUSSIAN,mutation_base=BEST,compatible,"0 positive, 0 negative of 8 cells",-0.01209693647573973,-0.12196545284780583,0.02760874464728419
+base_sampler=GAUSSIAN,mutation_base=TARGET,compatible,"0 positive, 0 negative of 8 cells",-0.003130332592807254,-0.032633053221288566,0.00436507936507935
+base_sampler=GAUSSIAN,mutation_reference=RAND,compatible,"0 positive, 0 negative of 8 cells",-0.0038202493641134746,-0.02864145658263309,0.006582633053221265
+base_sampler=GAUSSIAN,mutation_reference=BEST,compatible,"0 positive, 0 negative of 8 cells",0.0005130356740397194,-0.010574229691876824,0.008543417366946748
+base_sampler=GAUSSIAN,mutation_reference=PBEST,compatible,"0 positive, 0 negative of 8 cells",-0.0037108809040857812,-0.03485060690943048,0.010830999066293145
+base_sampler=GAUSSIAN,mutation_n_comps=0,compatible,"0 positive, 0 negative of 8 cells",-0.00952300460414051,-0.04530812324929975,0.0019157088122605387
+base_sampler=GAUSSIAN,mutation_n_comps=2,compatible,"0 positive, 0 negative of 8 cells",-0.006393678160919556,-0.04663865546218496,0.000770308123249297
+base_sampler=GAUSSIAN,mutation_use_weighted_F=True,no effect,mutation_use_weighted_F=True has no effect,,,
+base_sampler=GAUSSIAN,use_archive=True,compatible,"0 positive, 0 negative of 8 cells",0.003273608293892261,-0.0009803921568627486,0.015009337068160572
+base_sampler=GAUSSIAN,crossover=EXP,compatible,"0 positive, 0 negative of 8 cells",0.005254414984384555,-0.003641456582633054,0.023622782446311857
+base_sampler=GAUSSIAN,eigenvalue_crossover=True,compatible,"0 positive, 0 negative of 8 cells",-0.001463545188190233,-0.019257703081232563,0.007076853729997751
+base_sampler=GAUSSIAN,bound_correction=NONE,compatible,"0 positive, 0 negative of 8 cells",-0.006045651019028315,-0.07584033613445387,0.010637818345729098
+base_sampler=GAUSSIAN,bound_correction=UNIF_RESAMPLE,compatible,"0 positive, 0 negative of 8 cells",-0.0060549075952220045,-0.03811858076563965,0.004237097137705655
+base_sampler=GAUSSIAN,bound_correction=COTN,compatible,"0 positive, 1 negative of 8 cells",-0.01333721707073636,-0.1015873015873017,0.002871148459383757
+base_sampler=GAUSSIAN,bound_correction=TOROIDAL,compatible,"0 positive, 0 negative of 8 cells",-0.003979724073537484,-0.043650793650793746,0.009465855307640297
+base_sampler=GAUSSIAN,bound_correction=MIRROR,compatible,"0 positive, 0 negative of 8 cells",-0.007074438970990712,-0.05205415499533153,0.0025210084033613356
+base_sampler=GAUSSIAN,bound_correction=HVB,compatible,"0 positive, 0 negative of 8 cells",-0.002000024147590075,-0.016526610644257728,0.010107376283846864
+base_sampler=GAUSSIAN,bound_correction=EXPC_TARGET,compatible,"0 positive, 0 negative of 8 cells",-0.004840082584758049,-0.026657329598506085,0.0019833220644579624
+base_sampler=GAUSSIAN,bound_correction=EXPC_CENTER,compatible,"0 positive, 0 negative of 8 cells",-0.002193808557905931,-0.015919701213818888,0.010480859010270765
+base_sampler=GAUSSIAN,bound_correction=EXPS,compatible,"0 positive, 1 negative of 8 cells",-0.012738658681863566,-0.09913632119514479,0.008947487040793331
+base_sampler=GAUSSIAN,adaptation_method_F=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.00326656524678836,6.776263578034403e-21,0.008870214752567634
+base_sampler=GAUSSIAN,adaptation_method_F=SHADE_MODIFIED,compatible,"0 positive, 0 negative of 8 cells",0.0017709238867960819,-0.003804855275443511,0.0049132296596799616
+base_sampler=GAUSSIAN,adaptation_method_F=JDE,compatible,"0 positive, 0 negative of 8 cells",0.0018309910170964902,-0.0030345471521942002,0.013445378151260484
+base_sampler=GAUSSIAN,adaptation_method_CR=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.0036951849705399295,-0.0033146591970121403,0.01834733893557422
+base_sampler=GAUSSIAN,adaptation_method_CR=LSHADE,compatible,"0 positive, 0 negative of 8 cells",0.0021506447406548774,-0.005508870214752569,0.015802987861811363
+base_sampler=GAUSSIAN,adaptation_method_CR=JDE,compatible,"0 positive, 0 negative of 8 cells",0.001521096944524928,-0.0014939309056956132,0.0077964519140989175
+base_sampler=GAUSSIAN,use_jso_caps=True,no effect,use_jso_caps=True has no effect,,,
+base_sampler=GAUSSIAN,population_reduction=LINEAR,compatible,"0 positive, 0 negative of 8 cells",-0.0032007630638462526,-0.039705882352941285,0.012394957983193261
+base_sampler=GAUSSIAN,oppositional_generation=True,compatible,"0 positive, 0 negative of 8 cells",0.0004633318844779169,-0.01776377217553693,0.007212885154061599
+base_sampler=SOBOL,oppositional_initialization=OPPOSITE,compatible,"0 positive, 0 negative of 8 cells",-0.001455898451334558,-0.013118580765639598,0.003991596638655476
+base_sampler=SOBOL,oppositional_initialization=QUASI_OPPOSITE,compatible,"0 positive, 0 negative of 8 cells",-0.0011084749991950775,-0.007726423902894464,0.0006310570205093555
+base_sampler=SOBOL,mutation_base=BEST,compatible,"0 positive, 0 negative of 8 cells",0.0021882747351814323,-0.029645191409897298,0.030335812485913903
+base_sampler=SOBOL,mutation_base=TARGET,compatible,"0 positive, 0 negative of 8 cells",0.0011763900962683971,-0.0042016806722689135,0.005788982259570502
+base_sampler=SOBOL,mutation_reference=RAND,compatible,"0 positive, 0 negative of 8 cells",0.000750587591358376,-0.0037114845938375426,0.008730158730158727
+base_sampler=SOBOL,mutation_reference=BEST,compatible,"0 positive, 0 negative of 8 cells",0.0033287452912199346,-0.0014424160468785169,0.024579831932773105
+base_sampler=SOBOL,mutation_reference=PBEST,compatible,"0 positive, 0 negative of 8 cells",-0.0021731824913873614,-0.016690009337068157,0.00709617180205413
+base_sampler=SOBOL,mutation_n_comps=0,compatible,"0 positive, 0 negative of 8 cells",0.0020632103416079106,-0.0011437908496731986,0.009056956115779669
+base_sampler=SOBOL,mutation_n_comps=2,compatible,"0 positive, 0 negative of 8 cells",-0.0009869321291735072,-0.003361344537815128,0.0005602240896358524
+base_sampler=SOBOL,mutation_use_weighted_F=True,no effect,mutation_use_weighted_F=True has no effect,,,
+base_sampler=SOBOL,use_archive=True,compatible,"0 positive, 0 negative of 8 cells",-4.829518014096493e-06,-0.0056022408963585235,0.005088702147525714
+base_sampler=SOBOL,crossover=EXP,compatible,"0 positive, 0 negative of 8 cells",0.0026869224701374797,-0.0002100840336134585,0.009523809523809545
+base_sampler=SOBOL,eigenvalue_crossover=True,compatible,"0 positive, 0 negative of 8 cells",0.007539380694806668,-0.004388422035480857,0.06456582633053223
+base_sampler=SOBOL,bound_correction=NONE,compatible,"0 positive, 0 negative of 8 cells",0.0010412642068321585,-0.0008169934640522847,0.006629318394024281
+base_sampler=SOBOL,bound_correction=UNIF_RESAMPLE,compatible,"0 positive, 0 negative of 8 cells",0.0015662730609485183,-0.003011204481792727,0.010504201680672287
+base_sampler=SOBOL,bound_correction=COTN,compatible,"0 positive, 0 negative of 8 cells",-0.0037487121285295828,-0.025210084033613467,0.0027310924369747247
+base_sampler=SOBOL,bound_correction=TOROIDAL,compatible,"0 positive, 0 negative of 8 cells",-0.0006706993142084456,-0.01774042950513538,0.010037348272642382
+base_sampler=SOBOL,bound_correction=MIRROR,compatible,"0 positive, 0 negative of 8 cells",-0.0009399449434946451,-0.003851540616246485,2.334267040147997e-05
+base_sampler=SOBOL,bound_correction=HVB,compatible,"0 positive, 0 negative of 8 cells",0.004349182201616288,-0.000746965452847817,0.01624649859943983
+base_sampler=SOBOL,bound_correction=EXPC_TARGET,compatible,"0 positive, 0 negative of 8 cells",-8.280611095012706e-05,-0.008520074696545255,0.0037348272642390157
+base_sampler=SOBOL,bound_correction=EXPC_CENTER,compatible,"0 positive, 0 negative of 8 cells",0.003542451463343964,-0.0019140989729225094,0.021918767507002834
+base_sampler=SOBOL,bound_correction=EXPS,compatible,"0 positive, 0 negative of 8 cells",-0.0029271909913390626,-0.019584500466853394,0.003501400560224077
+base_sampler=SOBOL,adaptation_method_F=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.006287428764609283,-0.0037581699346405303,0.04344070961718019
+base_sampler=SOBOL,adaptation_method_F=SHADE_MODIFIED,compatible,"0 positive, 0 negative of 8 cells",0.0005597210148427171,-0.005812324929971996,0.006746031746031722
+base_sampler=SOBOL,adaptation_method_F=JDE,compatible,"0 positive, 0 negative of 8 cells",0.005861726874657913,-0.003361344537815128,0.036321195144724566
+base_sampler=SOBOL,adaptation_method_CR=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.003888265076145399,-0.0035947712418300734,0.030672268907563027
+base_sampler=SOBOL,adaptation_method_CR=LSHADE,compatible,"0 positive, 0 negative of 8 cells",0.005609585788338329,-0.006512605042016811,0.0409663865546219
+base_sampler=SOBOL,adaptation_method_CR=JDE,compatible,"0 positive, 0 negative of 8 cells",-0.0005972503944106435,-0.011484593837535029,0.007352941176470562
+base_sampler=SOBOL,use_jso_caps=True,no effect,use_jso_caps=True has no effect,,,
+base_sampler=SOBOL,population_reduction=LINEAR,compatible,"0 positive, 0 negative of 8 cells",-0.00022759103641456957,-0.008029878618113884,0.005392156862745079
+base_sampler=SOBOL,oppositional_generation=True,compatible,"0 positive, 0 negative of 8 cells",0.0023825622202904165,-0.004108309990662945,0.0169000933706816
+base_sampler=HALTON,oppositional_initialization=OPPOSITE,compatible,"0 positive, 0 negative of 8 cells",-0.0001523310473614801,-0.011321195144724572,0.014192343604108315
+base_sampler=HALTON,oppositional_initialization=QUASI_OPPOSITE,compatible,"0 positive, 0 negative of 8 cells",-0.004444062107601656,-0.03025210084033611,0.0007936507936507908
+base_sampler=HALTON,mutation_base=BEST,compatible,"0 positive, 0 negative of 8 cells",-0.0029137085868830253,-0.03312324929971988,0.01032228983547441
+base_sampler=HALTON,mutation_base=TARGET,compatible,"0 positive, 0 negative of 8 cells",0.00023654576773237974,-0.0031045751633987373,0.0050653594771242205
+base_sampler=HALTON,mutation_reference=RAND,compatible,"0 positive, 0 negative of 8 cells",-0.0005270211532889067,-0.006862745098039247,0.00674603174603175
+base_sampler=HALTON,mutation_reference=BEST,compatible,"0 positive, 0 negative of 8 cells",0.0028908689912746713,-0.0026610644257702987,0.024346405228758167
+base_sampler=HALTON,mutation_reference=PBEST,compatible,"0 positive, 0 negative of 8 cells",-0.0033566156347596575,-0.014122315592903834,0.0006535947712418347
+base_sampler=HALTON,mutation_n_comps=0,compatible,"0 positive, 0 negative of 8 cells",-0.00042298528606845263,-0.009360410830999089,0.004855275443510734
+base_sampler=HALTON,mutation_n_comps=2,compatible,"0 positive, 0 negative of 8 cells",-0.005409160790753087,-0.025910364145658255,2.2537750732476935e-05
+base_sampler=HALTON,mutation_use_weighted_F=True,no effect,mutation_use_weighted_F=True has no effect,,,
+base_sampler=HALTON,use_archive=True,compatible,"0 positive, 0 negative of 8 cells",-0.003656146366592613,-0.02976190476190474,0.0042250233426704
+base_sampler=HALTON,crossover=EXP,compatible,"0 positive, 0 negative of 8 cells",0.0014575082906725903,-0.006465919701213851,0.018137254901960803
+base_sampler=HALTON,eigenvalue_crossover=True,compatible,"0 positive, 0 negative of 8 cells",0.0011626058469364799,-0.01461251167133519,0.02941176470588236
+base_sampler=HALTON,bound_correction=NONE,compatible,"0 positive, 0 negative of 8 cells",-0.00046755771274027176,-0.006465919701213851,0.003338001867413634
+base_sampler=HALTON,bound_correction=UNIF_RESAMPLE,compatible,"0 positive, 0 negative of 8 cells",-0.0008559314530409829,-0.004481792717086819,0.00212418300653594
+base_sampler=HALTON,bound_correction=COTN,compatible,"0 positive, 0 negative of 8 cells",-0.007072426671818165,-0.0559757236227825,0.0014939309056955508
+base_sampler=HALTON,bound_correction=TOROIDAL,compatible,"0 positive, 0 negative of 8 cells",-0.0007541091149103297,-0.005672268907563005,0.003244631185807645
+base_sampler=HALTON,bound_correction=MIRROR,compatible,"0 positive, 0 negative of 8 cells",-0.003913116970926303,-0.021778711484593816,0.001555104800540913
+base_sampler=HALTON,bound_correction=HVB,compatible,"0 positive, 0 negative of 8 cells",0.0042661748607488986,-2.25377507324769e-05,0.023926237161531305
+base_sampler=HALTON,bound_correction=EXPC_TARGET,compatible,"0 positive, 0 negative of 8 cells",-0.001077485591937924,-0.01003734827264241,0.008590102707749764
+base_sampler=HALTON,bound_correction=EXPC_CENTER,compatible,"0 positive, 0 negative of 8 cells",0.0002825268038249747,-0.0027077497665732933,0.0032679738562091387
+base_sampler=HALTON,bound_correction=EXPS,compatible,"0 positive, 0 negative of 8 cells",-0.006934181718664478,-0.0527077497665733,0.003664799253034541
+base_sampler=HALTON,adaptation_method_F=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.0010659148716957974,-0.003641456582633054,0.01580298786181139
+base_sampler=HALTON,adaptation_method_F=SHADE_MODIFIED,compatible,"0 positive, 0 negative of 8 cells",-9.085530764029988e-05,-0.004411764705882351,0.005672268907563061
+base_sampler=HALTON,adaptation_method_F=JDE,compatible,"0 positive, 0 negative of 8 cells",0.008711041888019576,-0.001848095560063108,0.06524276377217553
+base_sampler=HALTON,adaptation_method_CR=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.0011110909881193824,-0.006232492997198913,0.015896358543417366
+base_sampler=HALTON,adaptation_method_CR=LSHADE,compatible,"0 positive, 0 negative of 8 cells",0.0020460051836826668,-0.008076563958916927,0.0228057889822596
+base_sampler=HALTON,adaptation_method_CR=JDE,compatible,"0 positive, 0 negative of 8 cells",-0.0003808276184036838,-0.0035947712418300526,0.003828197945844991
+base_sampler=HALTON,use_jso_caps=True,no effect,use_jso_caps=True has no effect,,,
+base_sampler=HALTON,population_reduction=LINEAR,compatible,"0 positive, 0 negative of 8 cells",-0.0030837478669628856,-0.018067226890756294,0.002591036414565817
+base_sampler=HALTON,oppositional_generation=True,compatible,"0 positive, 0 negative of 8 cells",-0.0007451543835925171,-0.006465919701213824,0.003851540616246499
+base_sampler=LHS,oppositional_initialization=OPPOSITE,compatible,"0 positive, 0 negative of 8 cells",0.0038271917962587275,-0.004131652661064425,0.0363678804855275
+base_sampler=LHS,oppositional_initialization=QUASI_OPPOSITE,compatible,"0 positive, 0 negative of 8 cells",0.0011895706558485543,-0.0014005602240896378,0.010807656395891707
+base_sampler=LHS,mutation_base=BEST,compatible,"0 positive, 0 negative of 8 cells",-0.0040610209601081824,-0.0706115779645192,0.020401493930905706
+base_sampler=LHS,mutation_base=TARGET,compatible,"0 positive, 0 negative of 8 cells",0.0016262395762902911,-0.0029878618113912195,0.011251167133520062
+base_sampler=LHS,mutation_reference=RAND,compatible,"0 positive, 0 negative of 8 cells",0.0007439470040889816,-0.003944911297852516,0.009547152194210984
+base_sampler=LHS,mutation_reference=BEST,compatible,"0 positive, 0 negative of 8 cells",0.0043537098747544935,-0.0009015100292990713,0.031232492997198824
+base_sampler=LHS,mutation_reference=PBEST,compatible,"0 positive, 0 negative of 8 cells",-0.0001234545542354922,-0.004855275443510776,0.004178338001867399
+base_sampler=LHS,mutation_n_comps=0,compatible,"0 positive, 0 negative of 8 cells",0.0010502189381499788,-0.005882352941176394,0.00903361344537812
+base_sampler=LHS,mutation_n_comps=2,compatible,"0 positive, 0 negative of 8 cells",-0.0028485100936926503,-0.00833333333333336,4.507550146495842e-05
+base_sampler=LHS,mutation_use_weighted_F=True,no effect,mutation_use_weighted_F=True has no effect,,,
+base_sampler=LHS,use_archive=True,compatible,"0 positive, 0 negative of 8 cells",-0.001865602562864225,-0.016456582633053246,0.0025910364145658726
+base_sampler=LHS,crossover=EXP,compatible,"0 positive, 0 negative of 8 cells",0.002209504491451751,-0.0011204481792717116,0.01202147525676936
+base_sampler=LHS,eigenvalue_crossover=True,compatible,"0 positive, 0 negative of 8 cells",0.0021996442255062918,-0.008823529411764702,0.024253034547152164
+base_sampler=LHS,bound_correction=NONE,compatible,"0 positive, 0 negative of 8 cells",0.0014425166618371418,-0.00018030200585981504,0.0064192343604107804
+base_sampler=LHS,bound_correction=UNIF_RESAMPLE,compatible,"0 positive, 0 negative of 8 cells",-0.0023871905083872654,-0.023202614379085024,0.0049253034547152574
+base_sampler=LHS,bound_correction=COTN,compatible,"0 positive, 0 negative of 8 cells",-0.0031296282880968595,-0.032516339869281125,0.004131652661064411
+base_sampler=LHS,bound_correction=TOROIDAL,compatible,"0 positive, 0 negative of 8 cells",0.0033120432080878262,-0.0011437908496731986,0.01827731092436971
+base_sampler=LHS,bound_correction=MIRROR,compatible,"0 positive, 0 negative of 8 cells",0.00027749605589361993,-0.00838001867413632,0.01160130718954247
+base_sampler=LHS,bound_correction=HVB,compatible,"0 positive, 0 negative of 8 cells",0.003057587977719825,-4.507550146495365e-05,0.00830999066293181
+base_sampler=LHS,bound_correction=EXPC_TARGET,compatible,"0 positive, 0 negative of 8 cells",0.001098614733249618,-0.001237161531279174,0.006512605042016784
+base_sampler=LHS,bound_correction=EXPC_CENTER,compatible,"0 positive, 0 negative of 8 cells",0.0022816454167874046,-0.0008564345278341268,0.007376283846872056
+base_sampler=LHS,bound_correction=EXPS,compatible,"0 positive, 0 negative of 8 cells",-0.00798923017482855,-0.06605975723622784,0.00870681605975726
+base_sampler=LHS,adaptation_method_F=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.005439244663382588,-0.0022175536881419225,0.03356676003734824
+base_sampler=LHS,adaptation_method_F=SHADE_MODIFIED,compatible,"0 positive, 0 negative of 8 cells",0.0017141770501303902,-0.006162464985994397,0.007212885154061599
+base_sampler=LHS,adaptation_method_F=JDE,compatible,"0 positive, 0 negative of 8 cells",0.0018396439035384302,-0.010294117647058829,0.01937441643323995
+base_sampler=LHS,adaptation_method_CR=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.007676015808622292,-0.0026844070961717925,0.05595238095238089
+base_sampler=LHS,adaptation_method_CR=LSHADE,compatible,"0 positive, 0 negative of 8 cells",0.007038821275636687,-0.006232492997198878,0.06967787114845936
+base_sampler=LHS,adaptation_method_CR=JDE,compatible,"0 positive, 0 negative of 8 cells",0.003385290897968384,-0.0020774976657329525,0.02581699346405225
+base_sampler=LHS,use_jso_caps=True,no effect,use_jso_caps=True has no effect,,,
+base_sampler=LHS,population_reduction=LINEAR,compatible,"0 positive, 0 negative of 8 cells",0.0009286760681283903,-0.005508870214752569,0.007167004732927647
+base_sampler=LHS,oppositional_generation=True,compatible,"0 positive, 0 negative of 8 cells",0.0026202147525676957,-0.0008564345278341268,0.009967320261437873
+oppositional_initialization=OPPOSITE,mutation_base=BEST,compatible,"0 positive, 0 negative of 8 cells",-0.002993798093950233,-0.045378151260504235,0.015753887762001345
+oppositional_initialization=OPPOSITE,mutation_base=TARGET,compatible,"0 positive, 0 negative of 8 cells",0.0033683875849190204,-0.004248366013071894,0.02033146591970117
+oppositional_initialization=OPPOSITE,mutation_reference=RAND,compatible,"0 positive, 0 negative of 8 cells",0.0034077280337422226,-0.006069094304388456,0.026097105508870178
+oppositional_initialization=OPPOSITE,mutation_reference=BEST,compatible,"0 positive, 0 negative of 8 cells",0.004193832705495986,-0.003501400560224077,0.02658730158730152
+oppositional_initialization=OPPOSITE,mutation_reference=PBEST,compatible,"0 positive, 0 negative of 8 cells",0.000977474323062553,-0.0018030200585981565,0.006162464985994404
+oppositional_initialization=OPPOSITE,mutation_n_comps=0,compatible,"0 positive, 0 negative of 8 cells",0.003749215203322711,-0.0007888212756366891,0.014355742296918744
+oppositional_initialization=OPPOSITE,mutation_n_comps=2,compatible,"0 positive, 0 negative of 8 cells",0.001562248462603429,-0.004621848739495782,0.012791783380018629
+oppositional_initialization=OPPOSITE,mutation_use_weighted_F=True,no effect,mutation_use_weighted_F=True has no effect,,,
+oppositional_initialization=OPPOSITE,use_archive=True,compatible,"0 positive, 0 negative of 8 cells",0.0070750426607424505,-0.0011204481792717116,0.04484126984126979
+oppositional_initialization=OPPOSITE,crossover=EXP,compatible,"0 positive, 0 negative of 8 cells",0.006615332914775104,-0.004388422035480843,0.036788048552754415
+oppositional_initialization=OPPOSITE,eigenvalue_crossover=True,compatible,"0 positive, 0 negative of 8 cells",0.008107251521298174,-0.0034547152194210895,0.0610644257703081
+oppositional_initialization=OPPOSITE,bound_correction=NONE,compatible,"0 positive, 0 negative of 8 cells",0.0034316743938954774,-0.005042016806722727,0.016713352007469595
+oppositional_initialization=OPPOSITE,bound_correction=UNIF_RESAMPLE,compatible,"0 positive, 0 negative of 8 cells",0.0009698275862068909,-0.0015873015873015817,0.005999066293183891
+oppositional_initialization=OPPOSITE,bound_correction=COTN,compatible,"0 positive, 0 negative of 8 cells",-0.0009190170321002143,-0.009453781512605147,0.005042016806722699
+oppositional_initialization=OPPOSITE,bound_correction=TOROIDAL,compatible,"0 positive, 0 negative of 8 cells",0.003906979458450038,-0.002147525676937441,0.025326797385620853
+oppositional_initialization=OPPOSITE,bound_correction=MIRROR,compatible,"0 positive, 0 negative of 8 cells",0.0026753517498953527,-0.0031045751633987373,0.02119514472455647
+oppositional_initialization=OPPOSITE,bound_correction=HVB,compatible,"0 positive, 0 negative of 8 cells",0.0029500305869474197,-0.003034547152194214,0.014239028944911275
+oppositional_initialization=OPPOSITE,bound_correction=EXPC_TARGET,compatible,"0 positive, 0 negative of 8 cells",0.0018711363855887053,-0.0028011204481793173,0.012278244631185806
+oppositional_initialization=OPPOSITE,bound_correction=EXPC_CENTER,compatible,"0 positive, 0 negative of 8 cells",0.005388031649441381,-0.0015776425512733921,0.02782446311858075
+oppositional_initialization=OPPOSITE,bound_correction=EXPS,compatible,"0 positive, 0 negative of 8 cells",0.0027839152902540253,-0.0013297272932161347,0.007306255835667602
+oppositional_initialization=OPPOSITE,adaptation_method_F=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.007132091342284032,-0.00060690943043884,0.04659197012138183
+oppositional_initialization=OPPOSITE,adaptation_method_F=SHADE_MODIFIED,compatible,"0 positive, 0 negative of 8 cells",0.003622239125535262,-0.005812324929971989,0.03160597572362275
+oppositional_initialization=OPPOSITE,adaptation_method_F=JDE,compatible,"0 positive, 0 negative of 8 cells",0.005681525483756716,-0.006442577030812302,0.041993464052287544
+oppositional_initialization=OPPOSITE,adaptation_method_CR=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.007077759264625388,-0.003968253968253968,0.04509803921568625
+oppositional_initialization=OPPOSITE,adaptation_method_CR=LSHADE,compatible,"0 positive, 0 negative of 8 cells",0.006526791751183231,-0.0061858076563958975,0.05014005602240895
+oppositional_initialization=OPPOSITE,adaptation_method_CR=JDE,compatible,"0 positive, 0 negative of 8 cells",0.0016505883962780461,-0.00508870214752568,0.01346872082166195
+oppositional_initialization=OPPOSITE,use_jso_caps=True,no effect,use_jso_caps=True has no effect,,,
+oppositional_initialization=OPPOSITE,population_reduction=LINEAR,compatible,"0 positive, 0 negative of 8 cells",0.0008694138574970152,-0.006862745098039219,0.010971055088702136
+oppositional_initialization=OPPOSITE,oppositional_generation=True,compatible,"0 positive, 0 negative of 8 cells",0.0031504555845326605,-0.003313049357674104,0.015266106442576977
+oppositional_initialization=QUASI_OPPOSITE,mutation_base=BEST,compatible,"0 positive, 0 negative of 8 cells",-0.006123627611964324,-0.08356676003734828,0.025535271579896324
+oppositional_initialization=QUASI_OPPOSITE,mutation_base=TARGET,compatible,"0 positive, 0 negative of 8 cells",-0.0005718954248366023,-0.008543417366946776,0.003403200360604014
+oppositional_initialization=QUASI_OPPOSITE,mutation_reference=RAND,compatible,"0 positive, 0 negative of 8 cells",-0.0014086094207798072,-0.014939309056956118,0.010294117647058815
+oppositional_initialization=QUASI_OPPOSITE,mutation_reference=BEST,compatible,"0 positive, 0 negative of 8 cells",0.0009205262564796025,-0.0030425963488843744,0.009593837535014
+oppositional_initialization=QUASI_OPPOSITE,mutation_reference=PBEST,compatible,"0 positive, 0 negative of 8 cells",-0.00284750394410638,-0.02217553688141924,0.0023809523809523725
+oppositional_initialization=QUASI_OPPOSITE,mutation_n_comps=0,compatible,"0 positive, 0 negative of 8 cells",-0.003900037026304774,-0.013935574229691855,0.0011904761904761862
+oppositional_initialization=QUASI_OPPOSITE,mutation_n_comps=2,compatible,"0 positive, 0 negative of 8 cells",-0.004776594545864321,-0.030718954248366015,0.002894491129785237
+oppositional_initialization=QUASI_OPPOSITE,mutation_use_weighted_F=True,no effect,mutation_use_weighted_F=True has no effect,,,
+oppositional_initialization=QUASI_OPPOSITE,use_archive=True,compatible,"0 positive, 0 negative of 8 cells",0.0009835112205801887,-0.002894491129785251,0.006629318394024308
+oppositional_initialization=QUASI_OPPOSITE,crossover=EXP,compatible,"0 positive, 0 negative of 8 cells",0.0023569054058405012,-0.003408029878618102,0.012418300653594783
+oppositional_initialization=QUASI_OPPOSITE,eigenvalue_crossover=True,compatible,"0 positive, 0 negative of 8 cells",0.005345572136900739,-0.007072829131652664,0.045798319327731096
+oppositional_initialization=QUASI_OPPOSITE,bound_correction=NONE,compatible,"0 positive, 0 negative of 8 cells",0.0022184592227695744,-0.004575163398692794,0.007516339869281047
+oppositional_initialization=QUASI_OPPOSITE,bound_correction=UNIF_RESAMPLE,compatible,"0 positive, 0 negative of 8 cells",-0.003017543224186224,-0.02927170868347337,0.0062091503267973774
+oppositional_initialization=QUASI_OPPOSITE,bound_correction=COTN,compatible,"0 positive, 0 negative of 8 cells",-0.0071922590875430695,-0.05088702147525678,0.0001352265043948614
+oppositional_initialization=QUASI_OPPOSITE,bound_correction=TOROIDAL,compatible,"0 positive, 0 negative of 8 cells",0.0010153055475063584,-0.002917833800186738,0.007142857142857131
+oppositional_initialization=QUASI_OPPOSITE,bound_correction=MIRROR,compatible,"0 positive, 0 negative of 8 cells",0.000938737563991112,-0.003618113912231602,0.00760971055088705
+oppositional_initialization=QUASI_OPPOSITE,bound_correction=HVB,compatible,"0 positive, 0 negative of 8 cells",-0.00048778131942431844,-0.011274509803921556,0.012675070028011201
+oppositional_initialization=QUASI_OPPOSITE,bound_correction=EXPC_TARGET,compatible,"0 positive, 0 negative of 8 cells",-0.003332266814771887,-0.023155929038281953,0.006535947712418291
+oppositional_initialization=QUASI_OPPOSITE,bound_correction=EXPC_CENTER,compatible,"0 positive, 0 negative of 8 cells",0.0006311576354679814,-0.003664799253034548,0.009710550887021469
+oppositional_initialization=QUASI_OPPOSITE,bound_correction=EXPS,compatible,"0 positive, 0 negative of 8 cells",-0.006894237580089508,-0.06559290382819796,0.009780578898225964
+oppositional_initialization=QUASI_OPPOSITE,adaptation_method_F=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.005990312791783376,-0.0017740429505135324,0.03319327731092436
+oppositional_initialization=QUASI_OPPOSITE,adaptation_method_F=SHADE_MODIFIED,compatible,"0 positive, 0 negative of 8 cells",-0.002917431340352233,-0.03613445378151259,0.010784313725490186
+oppositional_initialization=QUASI_OPPOSITE,adaptation_method_F=JDE,compatible,"0 positive, 0 negative of 8 cells",0.006249597540165498,-0.002614379084967325,0.04971988795518209
+oppositional_initialization=QUASI_OPPOSITE,adaptation_method_CR=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.007480923403844296,-0.003991596638655462,0.05256769374416434
+oppositional_initialization=QUASI_OPPOSITE,adaptation_method_CR=LSHADE,compatible,"0 positive, 0 negative of 8 cells",0.007936507936507941,-0.0066526610644257675,0.06963118580765643
+oppositional_initialization=QUASI_OPPOSITE,adaptation_method_CR=JDE,compatible,"0 positive, 0 negative of 8 cells",0.005041413116970924,-0.0008403361344537855,0.03279645191409897
+oppositional_initialization=QUASI_OPPOSITE,use_jso_caps=True,no effect,use_jso_caps=True has no effect,,,
+oppositional_initialization=QUASI_OPPOSITE,population_reduction=LINEAR,compatible,"0 positive, 0 negative of 8 cells",0.0010237572040310435,-0.0073996265172735776,0.008496732026143788
+oppositional_initialization=QUASI_OPPOSITE,oppositional_generation=True,compatible,"0 positive, 0 negative of 8 cells",0.004462172800154551,-0.0011671335200746924,0.012815126050420178
+mutation_base=BEST,mutation_reference=RAND,mixed,"1 positive, 1 negative of 8 cells",0.008992361312341018,-0.03776844070961721,0.05212418300653594
+mutation_base=BEST,mutation_reference=BEST,compatible,"0 positive, 1 negative of 8 cells",0.0024222045139894984,-0.0401027077497666,0.04495798319327732
+mutation_base=BEST,mutation_reference=PBEST,synergy,"2 positive, 0 negative of 8 cells",0.013045634920634914,-0.02637721755368816,0.06136788048552755
+mutation_base=BEST,mutation_n_comps=0,conflict,"0 positive, 4 negative of 8 cells",-0.039179163044528155,-0.14661531279178336,-0.0014874915483434755
+mutation_base=BEST,mutation_n_comps=2,compatible,"1 positive, 0 negative of 8 cells",0.006886188383399335,-0.026657329598506085,0.056279178338001876
+mutation_base=BEST,mutation_use_weighted_F=True,no effect,mutation_use_weighted_F=True has no effect,,,
+mutation_base=BEST,use_archive=True,synergy,"2 positive, 0 negative of 8 cells",0.02804611787243633,-0.014472455648926186,0.11279178338001868
+mutation_base=BEST,crossover=EXP,compatible,"1 positive, 0 negative of 8 cells",0.02280629205705271,-0.00522875816993465,0.06488618435880097
+mutation_base=BEST,eigenvalue_crossover=True,compatible,"0 positive, 0 negative of 8 cells",0.005431597926526935,-0.02014874915483434,0.08828197945845004
+mutation_base=BEST,bound_correction=NONE,compatible,"0 positive, 0 negative of 8 cells",0.0073733660130718935,-0.006139122315592903,0.02129817444219069
+mutation_base=BEST,bound_correction=UNIF_RESAMPLE,compatible,"0 positive, 0 negative of 8 cells",-0.00014055909720210504,-0.05791316526610649,0.02507002801120449
+mutation_base=BEST,bound_correction=COTN,compatible,"1 positive, 0 negative of 8 cells",-0.0027469896004378895,-0.0852474323062559,0.03316993464052288
+mutation_base=BEST,bound_correction=TOROIDAL,compatible,"0 positive, 0 negative of 8 cells",0.013668542129495472,-0.004621848739495803,0.03491097588460674
+mutation_base=BEST,bound_correction=MIRROR,compatible,"0 positive, 0 negative of 8 cells",-0.00042801603399981135,-0.01227824463118582,0.006378183457290965
+mutation_base=BEST,bound_correction=HVB,compatible,"0 positive, 0 negative of 8 cells",0.0018621816542708988,-0.017413632119514494,0.014028944911297858
+mutation_base=BEST,bound_correction=EXPC_TARGET,compatible,"0 positive, 0 negative of 8 cells",0.005846735245822456,-0.006465919701213831,0.026353874883286638
+mutation_base=BEST,bound_correction=EXPC_CENTER,compatible,"0 positive, 0 negative of 8 cells",0.00617021233780868,-0.016993464052287605,0.022560288483209366
+mutation_base=BEST,bound_correction=EXPS,compatible,"1 positive, 0 negative of 8 cells",-0.004711697897549832,-0.0913165266106443,0.029862519720531895
+mutation_base=BEST,adaptation_method_F=SHADE,synergy,"2 positive, 0 negative of 8 cells",0.025306875623812737,-0.009640522875816994,0.08974532341672303
+mutation_base=BEST,adaptation_method_F=SHADE_MODIFIED,synergy,"2 positive, 0 negative of 8 cells",0.02555539457162175,-0.009593837535014006,0.09700247915258059
+mutation_base=BEST,adaptation_method_F=JDE,compatible,"0 positive, 0 negative of 8 cells",0.009438387423935102,-0.003804855275443511,0.04003267973856209
+mutation_base=BEST,adaptation_method_CR=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.0033498744325316234,-0.006909430438842207,0.03639122315592899
+mutation_base=BEST,adaptation_method_CR=LSHADE,compatible,"0 positive, 0 negative of 8 cells",0.008022030651340991,-0.006956115779645201,0.05014005602240895
+mutation_base=BEST,adaptation_method_CR=JDE,compatible,"1 positive, 0 negative of 8 cells",0.021066659422389646,-0.01267507002801116,0.08600405679513184
+mutation_base=BEST,use_jso_caps=True,no effect,use_jso_caps=True has no effect,,,
+mutation_base=BEST,population_reduction=LINEAR,compatible,"0 positive, 0 negative of 8 cells",-0.005144140989729233,-0.022312373225152123,0.00555555555555555
+mutation_base=BEST,oppositional_generation=True,compatible,"0 positive, 0 negative of 8 cells",-0.0002094803438616828,-0.014332399626517223,0.018650793650793612
+mutation_base=TARGET,mutation_reference=RAND,synergy,"5 positive, 0 negative of 8 cells",0.06120760085643452,0.0001577642551273383,0.1560457516339869
+mutation_base=TARGET,mutation_reference=BEST,synergy,"6 positive, 0 negative of 8 cells",0.08666046878521523,0.00018030200585981518,0.20667600373482722
+mutation_base=TARGET,mutation_reference=PBEST,synergy,"6 positive, 0 negative of 8 cells",0.08429692279210534,0.001126887536623845,0.20457516339869278
+mutation_base=TARGET,mutation_n_comps=0,synergy,"3 positive, 0 negative of 8 cells",0.016147694710067932,-0.016790624295695285,0.0638188608776844
+mutation_base=TARGET,mutation_n_comps=2,compatible,"0 positive, 0 negative of 8 cells",0.011161418590424669,-0.0013071895424836555,0.0433940242763772
+mutation_base=TARGET,mutation_use_weighted_F=True,no effect,mutation_use_weighted_F=True has no effect,,,
+mutation_base=TARGET,use_archive=True,compatible,"0 positive, 0 negative of 8 cells",0.005486332464020088,-0.004084967320261451,0.02023809523809522
+mutation_base=TARGET,crossover=EXP,compatible,"0 positive, 0 negative of 8 cells",0.005791900093370678,-0.005228758169934643,0.027194211017740416
+mutation_base=TARGET,eigenvalue_crossover=True,compatible,"0 positive, 0 negative of 8 cells",0.0032420151968833473,-0.003515889114266396,0.03573762838468719
+mutation_base=TARGET,bound_correction=NONE,compatible,"0 positive, 0 negative of 8 cells",-0.0009956856305740763,-0.02133520074696546,0.008226279017354066
+mutation_base=TARGET,bound_correction=UNIF_RESAMPLE,compatible,"0 positive, 0 negative of 8 cells",0.0004562888373740258,-0.017857142857142877,0.007978363759296822
+mutation_base=TARGET,bound_correction=COTN,compatible,"0 positive, 0 negative of 8 cells",-0.0022493480150681043,-0.03454715219421106,0.00765639589169001
+mutation_base=TARGET,bound_correction=TOROIDAL,compatible,"0 positive, 0 negative of 8 cells",0.003111014520750821,-0.006862745098039219,0.012170385395537518
+mutation_base=TARGET,bound_correction=MIRROR,compatible,"0 positive, 0 negative of 8 cells",-0.0004689663221610559,-0.010550887021475247,0.0062091503267973774
+mutation_base=TARGET,bound_correction=HVB,compatible,"0 positive, 0 negative of 8 cells",-0.0015946464792813701,-0.020494864612511654,0.01171802054154994
+mutation_base=TARGET,bound_correction=EXPC_TARGET,compatible,"0 positive, 0 negative of 8 cells",-0.0012846517917511904,-0.011391223155929026,0.005322128851540597
+mutation_base=TARGET,bound_correction=EXPC_CENTER,compatible,"0 positive, 0 negative of 8 cells",0.0016641714156927076,-0.0041783380018674265,0.010737628384687198
+mutation_base=TARGET,bound_correction=EXPS,compatible,"0 positive, 0 negative of 8 cells",-0.0016500853214849202,-0.03755835667600374,0.007586367880485501
+mutation_base=TARGET,adaptation_method_F=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.007251420683215803,-0.012846517917511832,0.06080765639589167
+mutation_base=TARGET,adaptation_method_F=SHADE_MODIFIED,compatible,"0 positive, 0 negative of 8 cells",0.004411664090923718,-0.011742168131620469,0.03438375350140058
+mutation_base=TARGET,adaptation_method_F=JDE,compatible,"0 positive, 0 negative of 8 cells",0.005628199555684341,-0.015100292990759524,0.053081232492997205
+mutation_base=TARGET,adaptation_method_CR=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.00901389291348723,-0.006092436974789915,0.0618347338935574
+mutation_base=TARGET,adaptation_method_CR=LSHADE,compatible,"0 positive, 0 negative of 8 cells",0.008151220258218229,-0.0069561157796451945,0.06402894491129787
+mutation_base=TARGET,adaptation_method_CR=JDE,compatible,"0 positive, 0 negative of 8 cells",0.010692955343056755,-0.003966644128915932,0.052287581699346386
+mutation_base=TARGET,use_jso_caps=True,no effect,use_jso_caps=True has no effect,,,
+mutation_base=TARGET,population_reduction=LINEAR,mixed,"1 positive, 1 negative of 8 cells",0.00381833767989954,-0.02114041018706333,0.0326797385620915
+mutation_base=TARGET,oppositional_generation=True,compatible,"1 positive, 0 negative of 8 cells",0.01635999227277118,-0.0002253775073247689,0.057726423902894536
+mutation_reference=RAND,mutation_n_comps=0,synergy,"5 positive, 0 negative of 8 cells",0.065176257284523,2.25377507324769e-05,0.18713818860877682
+mutation_reference=RAND,mutation_n_comps=2,compatible,"0 positive, 0 negative of 8 cells",0.008860857561415358,-0.0009570494864612616,0.04610177404295049
+mutation_reference=RAND,mutation_use_weighted_F=True,compatible,"0 positive, 0 negative of 8 cells",0.005155007405260951,-0.0008113590263691683,0.017950513538748825
+mutation_reference=RAND,use_archive=True,compatible,"0 positive, 0 negative of 8 cells",0.0031418026980907184,-0.006512605042016811,0.027054154995331453
+mutation_reference=RAND,crossover=EXP,compatible,"0 positive, 0 negative of 8 cells",0.006148881966579724,-0.0017579445571331983,0.027054154995331453
+mutation_reference=RAND,eigenvalue_crossover=True,compatible,"0 positive, 0 negative of 8 cells",0.005932861650407286,-0.004304710389903085,0.04925303454715216
+mutation_reference=RAND,bound_correction=NONE,compatible,"0 positive, 0 negative of 8 cells",-0.004341937924595134,-0.02978524743230629,0.0066526610644257606
+mutation_reference=RAND,bound_correction=UNIF_RESAMPLE,compatible,"0 positive, 0 negative of 8 cells",0.00041684777359219153,-0.007142857142857173,0.010620915032679736
+mutation_reference=RAND,bound_correction=COTN,compatible,"0 positive, 0 negative of 8 cells",-0.0029441949193470653,-0.03333333333333341,0.014845938375350136
+mutation_reference=RAND,bound_correction=TOROIDAL,compatible,"0 positive, 0 negative of 8 cells",-0.000830073408673829,-0.011087768440709661,0.004621848739495782
+mutation_reference=RAND,bound_correction=MIRROR,compatible,"0 positive, 0 negative of 8 cells",0.00102858672204513,-0.001377217553688151,0.01022408963585434
+mutation_reference=RAND,bound_correction=HVB,compatible,"0 positive, 0 negative of 8 cells",0.006541783380018665,-0.0020774976657329663,0.020448179271708673
+mutation_reference=RAND,bound_correction=EXPC_TARGET,compatible,"0 positive, 0 negative of 8 cells",0.004080540262081837,-0.0014005602240896864,0.01692343604108309
+mutation_reference=RAND,bound_correction=EXPC_CENTER,compatible,"0 positive, 0 negative of 8 cells",0.004298371647509572,-0.0014705882352941194,0.016339869281045742
+mutation_reference=RAND,bound_correction=EXPS,compatible,"0 positive, 0 negative of 8 cells",-0.002469292314627009,-0.04047619047619053,0.010084033613445377
+mutation_reference=RAND,adaptation_method_F=SHADE,compatible,"1 positive, 0 negative of 8 cells",0.020699716668276483,-0.001984126984126984,0.09652194211017737
+mutation_reference=RAND,adaptation_method_F=SHADE_MODIFIED,compatible,"1 positive, 0 negative of 8 cells",0.017392502978202763,-0.003641456582633061,0.061951447245564895
+mutation_reference=RAND,adaptation_method_F=JDE,compatible,"0 positive, 0 negative of 8 cells",0.010638019575646345,-0.0021708683473389417,0.05826330532212881
+mutation_reference=RAND,adaptation_method_CR=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.0077843781190637135,-0.003991596638655469,0.051073762838468706
+mutation_reference=RAND,adaptation_method_CR=LSHADE,compatible,"0 positive, 0 negative of 8 cells",0.00710140377990276,-0.006419234360410836,0.059337068160597584
+mutation_reference=RAND,adaptation_method_CR=JDE,compatible,"0 positive, 0 negative of 8 cells",0.008459202646575861,-0.002427637721755374,0.040616246498599407
+mutation_reference=RAND,use_jso_caps=True,no effect,use_jso_caps=True has no effect,,,
+mutation_reference=RAND,population_reduction=LINEAR,compatible,"1 positive, 0 negative of 8 cells",0.007080274638591056,-0.017038539553752542,0.06087768440709615
+mutation_reference=RAND,oppositional_generation=True,compatible,"0 positive, 0 negative of 8 cells",0.007563729514794417,-0.003313049357674104,0.029131652661064406
+mutation_reference=BEST,mutation_n_comps=0,synergy,"6 positive, 0 negative of 8 cells",0.06414133182008434,2.25377507324769e-05,0.19197012138188604
+mutation_reference=BEST,mutation_n_comps=2,compatible,"0 positive, 0 negative of 8 cells",0.007415020605943515,-0.010457516339869286,0.050560224089635813
+mutation_reference=BEST,mutation_use_weighted_F=True,compatible,"0 positive, 0 negative of 8 cells",0.004852961299462305,0.0,0.011484593837534973
+mutation_reference=BEST,use_archive=True,compatible,"0 positive, 0 negative of 8 cells",0.004438528284877164,-0.012535014005602252,0.043464052287581684
+mutation_reference=BEST,crossover=EXP,compatible,"0 positive, 0 negative of 8 cells",0.0068711967545638875,-0.0017579445571331983,0.041573295985060654
+mutation_reference=BEST,eigenvalue_crossover=True,compatible,"0 positive, 0 negative of 8 cells",0.006491475900705109,-0.0019157088122605317,0.0548786181139122
+mutation_reference=BEST,bound_correction=NONE,compatible,"0 positive, 0 negative of 8 cells",-0.005519434785408417,-0.019000933706816076,0.0009803921568627486
+mutation_reference=BEST,bound_correction=UNIF_RESAMPLE,compatible,"0 positive, 0 negative of 8 cells",0.0020512371615312754,-0.0033806626098715348,0.013748832866479876
+mutation_reference=BEST,bound_correction=COTN,compatible,"0 positive, 0 negative of 8 cells",0.0011769937860201362,-0.014775910364145745,0.011484593837535015
+mutation_reference=BEST,bound_correction=TOROIDAL,compatible,"0 positive, 0 negative of 8 cells",-0.00319251263723881,-0.014075630252100874,0.0012605042016806678
+mutation_reference=BEST,bound_correction=MIRROR,compatible,"0 positive, 0 negative of 8 cells",0.005973811938568522,-0.0008564345278341198,0.03214285714285714
+mutation_reference=BEST,bound_correction=HVB,compatible,"0 positive, 0 negative of 8 cells",0.010262423935091268,-0.0007437457741717377,0.03536414565826329
+mutation_reference=BEST,bound_correction=EXPC_TARGET,compatible,"0 positive, 0 negative of 8 cells",0.007769285875269636,-0.0005409060175794453,0.037628384687208194
+mutation_reference=BEST,bound_correction=EXPC_CENTER,compatible,"0 positive, 0 negative of 8 cells",0.007072326056859517,-0.0006986702727067838,0.029365079365079344
+mutation_reference=BEST,bound_correction=EXPS,compatible,"0 positive, 0 negative of 8 cells",-0.0005430189317106272,-0.0121848739495799,0.007306255835667574
+mutation_reference=BEST,adaptation_method_F=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.016077566083904815,6.76132521974307e-05,0.06981792717086832
+mutation_reference=BEST,adaptation_method_F=SHADE_MODIFIED,compatible,"0 positive, 0 negative of 8 cells",0.013285299752084735,-0.0007469654528478101,0.041830065359477114
+mutation_reference=BEST,adaptation_method_F=JDE,compatible,"0 positive, 0 negative of 8 cells",0.011623341865481819,-0.0008338967771016447,0.06743697478991595
+mutation_reference=BEST,adaptation_method_CR=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.006839301812679087,-0.0004507550146495426,0.04161998132586364
+mutation_reference=BEST,adaptation_method_CR=LSHADE,compatible,"0 positive, 0 negative of 8 cells",0.007367932805306028,-0.002731092436974794,0.05578898225957049
+mutation_reference=BEST,adaptation_method_CR=JDE,compatible,"0 positive, 0 negative of 8 cells",0.0075268038249782605,-0.00014005602240897003,0.04654528478057887
+mutation_reference=BEST,use_jso_caps=True,no effect,use_jso_caps=True has no effect,,,
+mutation_reference=BEST,population_reduction=LINEAR,compatible,"1 positive, 0 negative of 8 cells",0.010103854760294914,-0.015551048005409067,0.054388422035480846
+mutation_reference=BEST,oppositional_generation=True,compatible,"0 positive, 0 negative of 8 cells",0.008667173766058134,-0.0016903313049357672,0.034710550887021435
+mutation_reference=PBEST,mutation_n_comps=0,synergy,"5 positive, 0 negative of 8 cells",0.061992900608519266,2.25377507324769e-05,0.19894957983193276
+mutation_reference=PBEST,mutation_n_comps=2,compatible,"0 positive, 0 negative of 8 cells",0.004796113847837972,-0.012138188608776856,0.0318160597572362
+mutation_reference=PBEST,mutation_use_weighted_F=True,compatible,"0 positive, 0 negative of 8 cells",0.0019647082971119426,-0.01834733893557422,0.020424836601307117
+mutation_reference=PBEST,use_archive=True,compatible,"0 positive, 0 negative of 8 cells",0.001368564667246204,-0.015709617180205415,0.017833800186741355
+mutation_reference=PBEST,crossover=EXP,compatible,"0 positive, 0 negative of 8 cells",0.0027312936668920425,-0.0017579445571331983,0.011181139122315581
+mutation_reference=PBEST,eigenvalue_crossover=True,compatible,"0 positive, 0 negative of 8 cells",0.0043779580797836375,-0.002917833800186745,0.04208683473389355
+mutation_reference=PBEST,bound_correction=NONE,compatible,"0 positive, 0 negative of 8 cells",-0.008105239222125638,-0.045378151260504235,0.0006761325219743071
+mutation_reference=PBEST,bound_correction=UNIF_RESAMPLE,compatible,"0 positive, 0 negative of 8 cells",-0.002352478347660908,-0.02614379084967322,0.004761904761904759
+mutation_reference=PBEST,bound_correction=COTN,compatible,"0 positive, 0 negative of 8 cells",-0.001763880839692214,-0.02476657329598511,0.005975723622782453
+mutation_reference=PBEST,bound_correction=TOROIDAL,compatible,"0 positive, 0 negative of 8 cells",-0.006307853601210606,-0.036624649859943986,0.0005183682668469687
+mutation_reference=PBEST,bound_correction=MIRROR,compatible,"0 positive, 0 negative of 8 cells",0.0014415105122508678,-0.0018706333107955803,0.005462184873949574
+mutation_reference=PBEST,bound_correction=HVB,compatible,"0 positive, 0 negative of 8 cells",0.007776831997166677,-0.0007437457741717377,0.025676937441643316
+mutation_reference=PBEST,bound_correction=EXPC_TARGET,compatible,"0 positive, 0 negative of 8 cells",0.0015251215428700117,-0.010784313725490186,0.007166199813258556
+mutation_reference=PBEST,bound_correction=EXPC_CENTER,compatible,"0 positive, 0 negative of 8 cells",0.0037463979844811375,-0.0013071895424836624,0.015056022408963532
+mutation_reference=PBEST,bound_correction=EXPS,compatible,"0 positive, 0 negative of 8 cells",-0.0031078954570333958,-0.03534080298786185,0.009126984126984095
+mutation_reference=PBEST,adaptation_method_F=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.017502978202775344,-0.0011671335200746924,0.08538748832866477
+mutation_reference=PBEST,adaptation_method_F=SHADE_MODIFIED,compatible,"0 positive, 0 negative of 8 cells",0.006987306416819592,-0.002894491129785251,0.02469654528478049
+mutation_reference=PBEST,adaptation_method_F=JDE,compatible,"0 positive, 0 negative of 8 cells",0.007805004185582273,-0.0008564345278341218,0.03664799253034545
+mutation_reference=PBEST,adaptation_method_CR=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.004996538845423222,-0.0008169934640522847,0.029178338001867393
+mutation_reference=PBEST,adaptation_method_CR=LSHADE,compatible,"0 positive, 0 negative of 8 cells",0.005960027689236612,-0.0041244083840432655,0.050770308123249286
+mutation_reference=PBEST,adaptation_method_CR=JDE,compatible,"0 positive, 0 negative of 8 cells",0.005435320679996131,-0.0006302521008403339,0.025840336134453773
+mutation_reference=PBEST,use_jso_caps=True,no effect,use_jso_caps=True has no effect,,,
+mutation_reference=PBEST,population_reduction=LINEAR,compatible,"1 positive, 0 negative of 8 cells",0.0025220145529476013,-0.017483660130718975,0.056115779645191405
+mutation_reference=PBEST,oppositional_generation=True,compatible,"0 positive, 0 negative of 8 cells",0.007696541260182225,-0.003876493125986029,0.03452380952380951
+mutation_n_comps=0,mutation_use_weighted_F=True,no effect,mutation_use_weighted_F=True has no effect,,,
+mutation_n_comps=0,use_archive=True,compatible,"0 positive, 0 negative of 8 cells",0.00436970765317621,-0.009313725490196087,0.023902894491129784
+mutation_n_comps=0,crossover=EXP,compatible,"0 positive, 0 negative of 8 cells",0.00680358350236646,-0.0017579445571331983,0.02387955182072829
+mutation_n_comps=0,eigenvalue_crossover=True,compatible,"0 positive, 0 negative of 8 cells",0.005475767893364244,-0.018007662835249037,0.04694211017740427
+mutation_n_comps=0,bound_correction=NONE,no effect,bound_correction=NONE has no effect,,,
+mutation_n_comps=0,bound_correction=UNIF_RESAMPLE,no effect,bound_correction=UNIF_RESAMPLE has no effect,,,
+mutation_n_comps=0,bound_correction=COTN,no effect,bound_correction=COTN has no effect,,,
+mutation_n_comps=0,bound_correction=TOROIDAL,no effect,bound_correction=TOROIDAL has no effect,,,
+mutation_n_comps=0,bound_correction=MIRROR,no effect,bound_correction=MIRROR has no effect,,,
+mutation_n_comps=0,bound_correction=HVB,no effect,bound_correction=HVB has no effect,,,
+mutation_n_comps=0,bound_correction=EXPC_TARGET,no effect,bound_correction=EXPC_TARGET has no effect,,,
+mutation_n_comps=0,bound_correction=EXPC_CENTER,no effect,bound_correction=EXPC_CENTER has no effect,,,
+mutation_n_comps=0,bound_correction=EXPS,no effect,bound_correction=EXPS has no effect,,,
+mutation_n_comps=0,adaptation_method_F=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.007381415209762054,-0.010727969348659008,0.0471988795518207
+mutation_n_comps=0,adaptation_method_F=SHADE_MODIFIED,compatible,"0 positive, 0 negative of 8 cells",0.004414481309765275,-0.012936668920441749,0.02908496732026139
+mutation_n_comps=0,adaptation_method_F=JDE,compatible,"0 positive, 1 negative of 8 cells",0.0015231092436974797,-0.022019382465629934,0.038982259570494865
+mutation_n_comps=0,adaptation_method_CR=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.004717131105315684,-0.005088702147525714,0.04005602240896358
+mutation_n_comps=0,adaptation_method_CR=LSHADE,compatible,"0 positive, 0 negative of 8 cells",0.004619836440323253,-0.007469654528478087,0.05343137254901961
+mutation_n_comps=0,adaptation_method_CR=JDE,compatible,"0 positive, 0 negative of 8 cells",0.010937147847644806,2.25377507324769e-05,0.04582166199813256
+mutation_n_comps=0,use_jso_caps=True,no effect,use_jso_caps=True has no effect,,,
+mutation_n_comps=0,population_reduction=LINEAR,compatible,"0 positive, 1 negative of 8 cells",-0.007104019768827074,-0.030809105251295925,0.009757236227824456
+mutation_n_comps=0,oppositional_generation=True,compatible,"0 positive, 0 negative of 8 cells",0.004898036800927272,-0.006806400721208028,0.026704014939309045
+mutation_n_comps=2,mutation_use_weighted_F=True,no effect,mutation_use_weighted_F=True has no effect,,,
+mutation_n_comps=2,use_archive=True,compatible,"0 positive, 0 negative of 8 cells",-0.0022754072893525247,-0.014775910364145661,0.0017128690556682466
+mutation_n_comps=2,crossover=EXP,compatible,"0 positive, 0 negative of 8 cells",0.002156581023213879,-0.002917833800186745,0.013025210084033595
+mutation_n_comps=2,eigenvalue_crossover=True,compatible,"0 positive, 0 negative of 8 cells",0.006114371035770636,-0.003763804372323633,0.046685340802987835
+mutation_n_comps=2,bound_correction=NONE,compatible,"0 positive, 0 negative of 8 cells",-0.00384751601790142,-0.02504668534080301,0.0027077497665732864
+mutation_n_comps=2,bound_correction=UNIF_RESAMPLE,compatible,"0 positive, 0 negative of 8 cells",-0.002568398048874723,-0.016760037348272666,0.0020541549953314725
+mutation_n_comps=2,bound_correction=COTN,compatible,"0 positive, 0 negative of 8 cells",-0.003220483595737157,-0.026914098972922545,0.0027077497665732864
+mutation_n_comps=2,bound_correction=TOROIDAL,compatible,"0 positive, 0 negative of 8 cells",-0.00254364676905246,-0.02462651727357612,0.003313049357674097
+mutation_n_comps=2,bound_correction=MIRROR,compatible,"0 positive, 0 negative of 8 cells",0.0014023712933449199,-0.0035714285714286143,0.013818860877684414
+mutation_n_comps=2,bound_correction=HVB,compatible,"0 positive, 0 negative of 8 cells",0.0027155977333462133,-0.0007437457741717377,0.010550887021475247
+mutation_n_comps=2,bound_correction=EXPC_TARGET,compatible,"0 positive, 0 negative of 8 cells",0.0009700288161241502,-0.004808590102707733,0.005322128851540611
+mutation_n_comps=2,bound_correction=EXPC_CENTER,compatible,"0 positive, 0 negative of 8 cells",0.0011790060851926958,-0.0031746031746031703,0.00795985060690943
+mutation_n_comps=2,bound_correction=EXPS,compatible,"0 positive, 0 negative of 8 cells",-0.005886779999356069,-0.046265172735761,0.0017804823078656704
+mutation_n_comps=2,adaptation_method_F=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.013105903280852557,-0.0019140989729224955,0.06687675070028007
+mutation_n_comps=2,adaptation_method_F=SHADE_MODIFIED,compatible,"0 positive, 0 negative of 8 cells",0.008744446054283771,-0.002007469654528478,0.033333333333333326
+mutation_n_comps=2,adaptation_method_F=JDE,compatible,"0 positive, 0 negative of 8 cells",0.009890148588170899,-0.0011268875366238446,0.055765639589169
+mutation_n_comps=2,adaptation_method_CR=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.003966442898998676,-0.004738562091503265,0.02885154061624648
+mutation_n_comps=2,adaptation_method_CR=LSHADE,compatible,"0 positive, 0 negative of 8 cells",0.004812514086094211,-0.005859010270774977,0.042156862745098056
+mutation_n_comps=2,adaptation_method_CR=JDE,compatible,"0 positive, 0 negative of 8 cells",0.0038703556135097662,-0.006722689075630256,0.02166199813258632
+mutation_n_comps=2,use_jso_caps=True,no effect,use_jso_caps=True has no effect,,,
+mutation_n_comps=2,population_reduction=LINEAR,compatible,"1 positive, 0 negative of 8 cells",0.0027190186419395286,-0.017827360829389217,0.035807656395891674
+mutation_n_comps=2,oppositional_generation=True,compatible,"0 positive, 0 negative of 8 cells",0.002654323223542288,-0.005363984674329504,0.011741363211951461
+mutation_use_weighted_F=True,use_archive=True,no effect,mutation_use_weighted_F=True has no effect,,,
+mutation_use_weighted_F=True,crossover=EXP,no effect,mutation_use_weighted_F=True has no effect,,,
+mutation_use_weighted_F=True,eigenvalue_crossover=True,no effect,mutation_use_weighted_F=True has no effect,,,
+mutation_use_weighted_F=True,bound_correction=NONE,no effect,mutation_use_weighted_F=True has no effect,,,
+mutation_use_weighted_F=True,bound_correction=UNIF_RESAMPLE,no effect,mutation_use_weighted_F=True has no effect,,,
+mutation_use_weighted_F=True,bound_correction=COTN,no effect,mutation_use_weighted_F=True has no effect,,,
+mutation_use_weighted_F=True,bound_correction=TOROIDAL,no effect,mutation_use_weighted_F=True has no effect,,,
+mutation_use_weighted_F=True,bound_correction=MIRROR,no effect,mutation_use_weighted_F=True has no effect,,,
+mutation_use_weighted_F=True,bound_correction=HVB,no effect,mutation_use_weighted_F=True has no effect,,,
+mutation_use_weighted_F=True,bound_correction=EXPC_TARGET,no effect,mutation_use_weighted_F=True has no effect,,,
+mutation_use_weighted_F=True,bound_correction=EXPC_CENTER,no effect,mutation_use_weighted_F=True has no effect,,,
+mutation_use_weighted_F=True,bound_correction=EXPS,no effect,mutation_use_weighted_F=True has no effect,,,
+mutation_use_weighted_F=True,adaptation_method_F=SHADE,no effect,mutation_use_weighted_F=True has no effect,,,
+mutation_use_weighted_F=True,adaptation_method_F=SHADE_MODIFIED,no effect,mutation_use_weighted_F=True has no effect,,,
+mutation_use_weighted_F=True,adaptation_method_F=JDE,no effect,mutation_use_weighted_F=True has no effect,,,
+mutation_use_weighted_F=True,adaptation_method_CR=SHADE,no effect,mutation_use_weighted_F=True has no effect,,,
+mutation_use_weighted_F=True,adaptation_method_CR=LSHADE,no effect,mutation_use_weighted_F=True has no effect,,,
+mutation_use_weighted_F=True,adaptation_method_CR=JDE,no effect,mutation_use_weighted_F=True has no effect,,,
+mutation_use_weighted_F=True,use_jso_caps=True,no effect,use_jso_caps=True has no effect,,,
+mutation_use_weighted_F=True,population_reduction=LINEAR,no effect,mutation_use_weighted_F=True has no effect,,,
+mutation_use_weighted_F=True,oppositional_generation=True,no effect,mutation_use_weighted_F=True has no effect,,,
+use_archive=True,crossover=EXP,compatible,"0 positive, 0 negative of 8 cells",0.002400471682926039,-0.0025443510737628433,0.01050420168067226
+use_archive=True,eigenvalue_crossover=True,compatible,"0 positive, 0 negative of 8 cells",0.00608841237644483,-0.0013305322128851563,0.04395424836601308
+use_archive=True,bound_correction=NONE,compatible,"0 positive, 0 negative of 8 cells",-0.0008375189156122212,-0.009640522875816987,0.00838001867413632
+use_archive=True,bound_correction=UNIF_RESAMPLE,compatible,"0 positive, 0 negative of 8 cells",0.001609537493158179,-0.002007469654528485,0.010014005602240889
+use_archive=True,bound_correction=COTN,compatible,"0 positive, 0 negative of 8 cells",-3.441031585049454e-05,-0.007446311858076621,0.0045051353874883265
+use_archive=True,bound_correction=TOROIDAL,compatible,"0 positive, 0 negative of 8 cells",0.0013804372323642051,-0.00495830516114492,0.0168067226890756
+use_archive=True,bound_correction=MIRROR,compatible,"0 positive, 0 negative of 8 cells",0.001442717891754396,-0.0019833220644579694,0.008029878618113911
+use_archive=True,bound_correction=HVB,compatible,"0 positive, 0 negative of 8 cells",0.003583904826298335,-0.0006769374416433285,0.014379084967320252
+use_archive=True,bound_correction=EXPC_TARGET,compatible,"0 positive, 0 negative of 8 cells",0.0027095608358285892,-2.253775073247661e-05,0.010270774976657376
+use_archive=True,bound_correction=EXPC_CENTER,compatible,"0 positive, 0 negative of 8 cells",0.0030306231688077556,-0.0011437908496732055,0.01015406162464988
+use_archive=True,bound_correction=EXPS,compatible,"0 positive, 0 negative of 8 cells",-0.0020168268456808016,-0.023879551820728318,0.008450046685340828
+use_archive=True,adaptation_method_F=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.007449632151711251,-0.008380018674136333,0.052777777777777785
+use_archive=True,adaptation_method_F=SHADE_MODIFIED,compatible,"0 positive, 0 negative of 8 cells",0.00041161579574358013,-0.013001867413632143,0.012908496732026153
+use_archive=True,adaptation_method_F=JDE,compatible,"0 positive, 0 negative of 8 cells",0.0023347701149425324,-0.0026610644257703125,0.010317460317460309
+use_archive=True,adaptation_method_CR=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.0054487024694935375,-0.0009803921568627486,0.02775443510737627
+use_archive=True,adaptation_method_CR=LSHADE,compatible,"0 positive, 0 negative of 8 cells",0.009147811423419944,-0.0045051353874883265,0.06489262371615315
+use_archive=True,adaptation_method_CR=JDE,compatible,"0 positive, 0 negative of 8 cells",0.004521133165910035,-0.009803921568627444,0.036064425770308106
+use_archive=True,use_jso_caps=True,no effect,use_jso_caps=True has no effect,,,
+use_archive=True,population_reduction=LINEAR,compatible,"1 positive, 0 negative of 8 cells",0.004067862777294818,-0.01136788048552756,0.04038281979458448
+use_archive=True,oppositional_generation=True,compatible,"0 positive, 0 negative of 8 cells",0.008090146978331561,-0.003200360604011722,0.05499533146591967
+crossover=EXP,eigenvalue_crossover=True,compatible,"0 positive, 0 negative of 8 cells",0.01163461074084806,-0.002731092436974794,0.06596638655462181
+crossover=EXP,bound_correction=NONE,compatible,"0 positive, 0 negative of 8 cells",0.007215802987861808,-0.0007002801120448224,0.026097105508870205
+crossover=EXP,bound_correction=UNIF_RESAMPLE,compatible,"0 positive, 0 negative of 8 cells",0.003249460703821754,-0.0014239028944911386,0.010924369747899149
+crossover=EXP,bound_correction=COTN,compatible,"0 positive, 0 negative of 8 cells",-0.0013172510383463855,-0.015056022408963643,0.006605975723622787
+crossover=EXP,bound_correction=TOROIDAL,compatible,"0 positive, 0 negative of 8 cells",0.005742699378602012,-0.002871148459383757,0.022899159663865548
+crossover=EXP,bound_correction=MIRROR,compatible,"0 positive, 0 negative of 8 cells",0.004824084806336321,-0.0033146591970121472,0.031629318394024275
+crossover=EXP,bound_correction=HVB,compatible,"0 positive, 0 negative of 8 cells",0.003999243375511125,-0.0023576097105508925,0.018954248366013088
+crossover=EXP,bound_correction=EXPC_TARGET,compatible,"0 positive, 0 negative of 8 cells",0.006053398370842586,-0.002684407096171848,0.03716153127917837
+crossover=EXP,bound_correction=EXPC_CENTER,compatible,"0 positive, 0 negative of 8 cells",0.005062944718117129,-0.002614379084967325,0.025863678804855267
+crossover=EXP,bound_correction=EXPS,compatible,"0 positive, 0 negative of 8 cells",0.0010111803342026378,-0.009337068160597622,0.008053221288515405
+crossover=EXP,adaptation_method_F=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.0033145585820535057,-0.018728870858688303,0.04927637721755365
+crossover=EXP,adaptation_method_F=SHADE_MODIFIED,compatible,"0 positive, 0 negative of 8 cells",0.0009986034643742546,-0.01895424836601308,0.032189542483660155
+crossover=EXP,adaptation_method_F=JDE,compatible,"0 positive, 0 negative of 8 cells",0.006931766959657424,-0.01196754563894524,0.04229691876750699
+crossover=EXP,adaptation_method_CR=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.0077196827006664704,-0.005025918413342358,0.058846872082166185
+crossover=EXP,adaptation_method_CR=LSHADE,compatible,"0 positive, 0 negative of 8 cells",0.011307511510351266,-0.005695611577964527,0.07537348272642391
+crossover=EXP,adaptation_method_CR=JDE,compatible,"0 positive, 0 negative of 8 cells",0.005855790592098906,-0.009848997070092402,0.04411764705882351
+crossover=EXP,use_jso_caps=True,no effect,use_jso_caps=True has no effect,,,
+crossover=EXP,population_reduction=LINEAR,compatible,"0 positive, 0 negative of 8 cells",0.002791260182233807,-0.004878618113912242,0.02420634920634919
+crossover=EXP,oppositional_generation=True,compatible,"0 positive, 0 negative of 8 cells",0.008140051997810616,-0.0042370971377056615,0.04971988795518206
+eigenvalue_crossover=True,bound_correction=NONE,compatible,"0 positive, 0 negative of 8 cells",0.002268062397372741,-0.0036414565826330403,0.016666666666666635
+eigenvalue_crossover=True,bound_correction=UNIF_RESAMPLE,compatible,"0 positive, 0 negative of 8 cells",0.007621683730963646,-0.0035714285714285726,0.05529878618113909
+eigenvalue_crossover=True,bound_correction=COTN,compatible,"0 positive, 0 negative of 8 cells",0.0011000233426703965,-0.009197012138188604,0.01577964519140984
+eigenvalue_crossover=True,bound_correction=TOROIDAL,compatible,"0 positive, 0 negative of 8 cells",0.004618327215943845,-0.0077264239028944914,0.04077964519140986
+eigenvalue_crossover=True,bound_correction=MIRROR,compatible,"0 positive, 0 negative of 8 cells",-0.0004620238900157733,-0.01169467787114846,0.012138188608776856
+eigenvalue_crossover=True,bound_correction=HVB,compatible,"0 positive, 0 negative of 8 cells",0.005800754209729877,-0.004925303454715216,0.046638655462184875
+eigenvalue_crossover=True,bound_correction=EXPC_TARGET,compatible,"0 positive, 0 negative of 8 cells",0.0031611207701471343,-0.009080298786181162,0.04393090569561156
+eigenvalue_crossover=True,bound_correction=EXPC_CENTER,compatible,"0 positive, 0 negative of 8 cells",0.008009755626388487,-0.008963585434173665,0.07247899159663868
+eigenvalue_crossover=True,bound_correction=EXPS,compatible,"0 positive, 0 negative of 8 cells",-0.001178704240316817,-0.006279178338001901,0.0006769374416433216
+eigenvalue_crossover=True,adaptation_method_F=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.005311262436008884,-0.0026594545864322763,0.032959850606909424
+eigenvalue_crossover=True,adaptation_method_F=SHADE_MODIFIED,compatible,"0 positive, 0 negative of 8 cells",0.008105138607167002,-0.003200360604011715,0.04556489262371616
+eigenvalue_crossover=True,adaptation_method_F=JDE,compatible,"0 positive, 0 negative of 8 cells",0.010639428185067128,-0.00989407257155736,0.09703548085901026
+eigenvalue_crossover=True,adaptation_method_CR=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.010293916417141566,-0.002287581699346404,0.06174136321195142
+eigenvalue_crossover=True,adaptation_method_CR=LSHADE,compatible,"0 positive, 0 negative of 8 cells",0.007161672140120414,-0.005508870214752569,0.05595238095238095
+eigenvalue_crossover=True,adaptation_method_CR=JDE,compatible,"0 positive, 0 negative of 8 cells",0.004907695836955474,-0.0034313725490195957,0.034663865546218475
+eigenvalue_crossover=True,use_jso_caps=True,no effect,use_jso_caps=True has no effect,,,
+eigenvalue_crossover=True,population_reduction=LINEAR,compatible,"0 positive, 0 negative of 8 cells",-0.001192589104607357,-0.01162947937795808,0.006581023213883257
+eigenvalue_crossover=True,oppositional_generation=True,compatible,"0 positive, 0 negative of 8 cells",0.006494997424257066,-0.0019374416433239894,0.048039215686274506
+bound_correction=NONE,adaptation_method_F=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.006442174570977811,0.00013522650439486142,0.019654528478057876
+bound_correction=NONE,adaptation_method_F=SHADE_MODIFIED,compatible,"0 positive, 0 negative of 8 cells",0.004831630928233351,-0.0005368814192343585,0.011321195144724544
+bound_correction=NONE,adaptation_method_F=JDE,compatible,"0 positive, 0 negative of 8 cells",0.0026097507968704738,-0.004435107376283831,0.010209601081812035
+bound_correction=NONE,adaptation_method_CR=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.008868202453395145,-0.0007936507936507908,0.05119047619047615
+bound_correction=NONE,adaptation_method_CR=LSHADE,compatible,"0 positive, 0 negative of 8 cells",0.005492570591454975,-0.0029645191409897187,0.03877217553688142
+bound_correction=NONE,adaptation_method_CR=JDE,compatible,"0 positive, 0 negative of 8 cells",0.002245927106474767,-0.007049486461251198,0.010550887021475247
+bound_correction=NONE,use_jso_caps=True,no effect,use_jso_caps=True has no effect,,,
+bound_correction=NONE,population_reduction=LINEAR,compatible,"0 positive, 0 negative of 8 cells",0.0034834910975884543,-0.000770308123249297,0.00950046685340801
+bound_correction=NONE,oppositional_generation=True,compatible,"0 positive, 0 negative of 8 cells",0.0030371631411185134,-0.022642390289449144,0.014041018706333105
+bound_correction=UNIF_RESAMPLE,adaptation_method_F=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.004602933127273892,-0.0019374416433240033,0.01986461251167132
+bound_correction=UNIF_RESAMPLE,adaptation_method_F=SHADE_MODIFIED,compatible,"0 positive, 0 negative of 8 cells",0.0019005159535078356,-0.0029878618113912264,0.007775524002704537
+bound_correction=UNIF_RESAMPLE,adaptation_method_F=JDE,compatible,"0 positive, 0 negative of 8 cells",0.006960945297659287,-0.000910364145658274,0.04586834733893555
+bound_correction=UNIF_RESAMPLE,adaptation_method_CR=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.005642285649892139,-0.003034547152194214,0.03503734827264235
+bound_correction=UNIF_RESAMPLE,adaptation_method_CR=LSHADE,compatible,"0 positive, 0 negative of 8 cells",0.007109654206510196,-0.005298786181139131,0.05877684407096173
+bound_correction=UNIF_RESAMPLE,adaptation_method_CR=JDE,compatible,"0 positive, 0 negative of 8 cells",0.002212019865417424,-0.00040567951318457723,0.006349206349206299
+bound_correction=UNIF_RESAMPLE,use_jso_caps=True,no effect,use_jso_caps=True has no effect,,,
+bound_correction=UNIF_RESAMPLE,population_reduction=LINEAR,compatible,"0 positive, 0 negative of 8 cells",0.0009894475031391754,-0.008356676003734832,0.0074374577417173765
+bound_correction=UNIF_RESAMPLE,oppositional_generation=True,compatible,"0 positive, 0 negative of 8 cells",0.004538438938793909,-0.0011904761904761932,0.015476190476190449
+bound_correction=COTN,adaptation_method_F=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.0031248993850413512,-0.0011043497858913703,0.017670401493930815
+bound_correction=COTN,adaptation_method_F=SHADE_MODIFIED,compatible,"0 positive, 0 negative of 8 cells",-0.003524642615666972,-0.034873949579831975,0.00786647992530344
+bound_correction=COTN,adaptation_method_F=JDE,compatible,"0 positive, 0 negative of 8 cells",0.003178929617824123,-0.004808590102707788,0.013235294117646984
+bound_correction=COTN,adaptation_method_CR=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.0006839804887472122,-0.015312791783380075,0.01855742296918768
+bound_correction=COTN,adaptation_method_CR=LSHADE,compatible,"0 positive, 0 negative of 8 cells",0.0029722664928040045,-0.002894491129785251,0.02514005602240893
+bound_correction=COTN,adaptation_method_CR=JDE,compatible,"0 positive, 0 negative of 8 cells",-0.0019282856820889431,-0.02051820728291323,0.0023890015776425466
+bound_correction=COTN,use_jso_caps=True,no effect,use_jso_caps=True has no effect,,,
+bound_correction=COTN,population_reduction=LINEAR,compatible,"0 positive, 0 negative of 8 cells",-0.0024264303422518556,-0.02931839402427644,0.010854341736694667
+bound_correction=COTN,oppositional_generation=True,compatible,"0 positive, 0 negative of 8 cells",-0.0008361103061914486,-0.02383286647992533,0.009757236227824456
+bound_correction=TOROIDAL,adaptation_method_F=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.009834609131008712,-0.0004732927653820155,0.051237161531279135
+bound_correction=TOROIDAL,adaptation_method_F=SHADE_MODIFIED,compatible,"0 positive, 0 negative of 8 cells",0.0024731156830548238,-0.002754435107376288,0.008706816059757205
+bound_correction=TOROIDAL,adaptation_method_F=JDE,compatible,"0 positive, 0 negative of 8 cells",0.007299816478315461,-0.002028397565922914,0.04386087768440708
+bound_correction=TOROIDAL,adaptation_method_CR=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.007115691104027813,-0.0017973856209150332,0.0392390289449113
+bound_correction=TOROIDAL,adaptation_method_CR=LSHADE,compatible,"0 positive, 0 negative of 8 cells",0.006807306255835669,-0.004551820728291314,0.05592903828197948
+bound_correction=TOROIDAL,adaptation_method_CR=JDE,compatible,"0 positive, 0 negative of 8 cells",0.005196360153256699,-0.0013305322128851493,0.022455648926237137
+bound_correction=TOROIDAL,use_jso_caps=True,no effect,use_jso_caps=True has no effect,,,
+bound_correction=TOROIDAL,population_reduction=LINEAR,compatible,"0 positive, 0 negative of 8 cells",0.0029951060884123673,-0.008543417366946776,0.012666215911652009
+bound_correction=TOROIDAL,oppositional_generation=True,compatible,"0 positive, 0 negative of 8 cells",0.005726600985221665,-0.0019140989729225025,0.017833800186741328
+bound_correction=MIRROR,adaptation_method_F=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.004413978234972139,-0.00453008789722785,0.02861811391223154
+bound_correction=MIRROR,adaptation_method_F=SHADE_MODIFIED,compatible,"0 positive, 0 negative of 8 cells",0.0010242602788241646,-0.004388422035480864,0.012184873949579816
+bound_correction=MIRROR,adaptation_method_F=JDE,compatible,"0 positive, 0 negative of 8 cells",0.001776558324479219,-0.008636788048552765,0.019187675070028026
+bound_correction=MIRROR,adaptation_method_CR=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.004292032905116062,-0.002100840336134502,0.02728758169934639
+bound_correction=MIRROR,adaptation_method_CR=LSHADE,compatible,"0 positive, 0 negative of 8 cells",0.0062530184487588104,-0.005065359477124193,0.054061624649859974
+bound_correction=MIRROR,adaptation_method_CR=JDE,compatible,"0 positive, 0 negative of 8 cells",0.0016883190057632247,-0.0007888212756366822,0.007609710550887022
+bound_correction=MIRROR,use_jso_caps=True,no effect,use_jso_caps=True has no effect,,,
+bound_correction=MIRROR,population_reduction=LINEAR,compatible,"0 positive, 0 negative of 8 cells",-0.00038444975691426914,-0.014215686274509809,0.014075630252100832
+bound_correction=MIRROR,oppositional_generation=True,compatible,"0 positive, 0 negative of 8 cells",0.00022638365691104133,-0.002839756592292089,0.005205415499533156
+bound_correction=HVB,adaptation_method_F=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.005990212176824746,-0.005070993914807309,0.03853874883286648
+bound_correction=HVB,adaptation_method_F=SHADE_MODIFIED,compatible,"0 positive, 0 negative of 8 cells",0.0024372967577835684,-0.004855275443510741,0.011788048552754449
+bound_correction=HVB,adaptation_method_F=JDE,compatible,"0 positive, 0 negative of 8 cells",0.004575867703403205,-0.001073762838468724,0.027941176470588247
+bound_correction=HVB,adaptation_method_CR=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.005032257155735853,-0.000910364145658267,0.017483660130718948
+bound_correction=HVB,adaptation_method_CR=LSHADE,compatible,"0 positive, 0 negative of 8 cells",0.007446311858076569,-0.0032446311858076587,0.051260504201680684
+bound_correction=HVB,adaptation_method_CR=JDE,compatible,"0 positive, 0 negative of 8 cells",0.006676708039537658,-0.0006986702727067792,0.030345471521942113
+bound_correction=HVB,use_jso_caps=True,no effect,use_jso_caps=True has no effect,,,
+bound_correction=HVB,population_reduction=LINEAR,compatible,"0 positive, 0 negative of 8 cells",0.0036348159953636643,-0.0080765639589169,0.025443510737628378
+bound_correction=HVB,oppositional_generation=True,compatible,"0 positive, 0 negative of 8 cells",0.0023786382369039606,-0.0017273576097105517,0.01531279178338002
+bound_correction=EXPC_TARGET,adaptation_method_F=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.00643181123023921,-0.0043272481406355645,0.04430438842203546
+bound_correction=EXPC_TARGET,adaptation_method_F=SHADE_MODIFIED,compatible,"0 positive, 0 negative of 8 cells",0.0019299961363855825,-0.0033355871084065902,0.012511671335200786
+bound_correction=EXPC_TARGET,adaptation_method_F=JDE,compatible,"0 positive, 0 negative of 8 cells",0.006334114105412278,-0.0037348272642390157,0.040359477124183
+bound_correction=EXPC_TARGET,adaptation_method_CR=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.0034755425158569065,-0.002824463118580811,0.02168534080298784
+bound_correction=EXPC_TARGET,adaptation_method_CR=LSHADE,compatible,"0 positive, 0 negative of 8 cells",0.002978202775363016,-0.004271708683473395,0.029154995331465955
+bound_correction=EXPC_TARGET,adaptation_method_CR=JDE,compatible,"0 positive, 0 negative of 8 cells",0.004807080878328332,-0.002707749766573342,0.029435107376283826
+bound_correction=EXPC_TARGET,use_jso_caps=True,no effect,use_jso_caps=True has no effect,,,
+bound_correction=EXPC_TARGET,population_reduction=LINEAR,compatible,"0 positive, 0 negative of 8 cells",-0.002193003638236911,-0.020494864612511654,0.005363984674329497
+bound_correction=EXPC_TARGET,oppositional_generation=True,compatible,"0 positive, 0 negative of 8 cells",0.0006667753308219794,-0.007142857142857173,0.00917366946778711
+bound_correction=EXPC_CENTER,adaptation_method_F=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.003420707363405123,-0.004014939309056956,0.02252567693744162
+bound_correction=EXPC_CENTER,adaptation_method_F=SHADE_MODIFIED,compatible,"0 positive, 0 negative of 8 cells",0.0016164799253034516,-0.003991596638655462,0.01676003734827264
+bound_correction=EXPC_CENTER,adaptation_method_F=JDE,compatible,"0 positive, 0 negative of 8 cells",0.006973924627322189,-0.002731092436974808,0.04925303454715216
+bound_correction=EXPC_CENTER,adaptation_method_CR=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.004999959754016545,-0.00434173669467787,0.031022408963585435
+bound_correction=EXPC_CENTER,adaptation_method_CR=LSHADE,compatible,"0 positive, 0 negative of 8 cells",0.004978226922953088,-0.0063492063492063475,0.028594771241830075
+bound_correction=EXPC_CENTER,adaptation_method_CR=JDE,compatible,"0 positive, 0 negative of 8 cells",0.0047418823851379625,-0.000770308123249297,0.0225957049486461
+bound_correction=EXPC_CENTER,use_jso_caps=True,no effect,use_jso_caps=True has no effect,,,
+bound_correction=EXPC_CENTER,population_reduction=LINEAR,compatible,"0 positive, 0 negative of 8 cells",-0.0008689107827038909,-0.02721755368814191,0.017553688141923415
+bound_correction=EXPC_CENTER,oppositional_generation=True,compatible,"0 positive, 0 negative of 8 cells",0.0030784152741556406,-0.0011437908496731986,0.013235294117647067
+bound_correction=EXPS,adaptation_method_F=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.0020459045687240304,-0.00196078431372549,0.0071428571428571175
+bound_correction=EXPS,adaptation_method_F=SHADE_MODIFIED,compatible,"0 positive, 0 negative of 8 cells",-0.0021189510286873494,-0.03260971055088707,0.009150326797385588
+bound_correction=EXPS,adaptation_method_F=JDE,compatible,"0 positive, 0 negative of 8 cells",0.0030497400109469,-0.007889822595704948,0.016479925303454684
+bound_correction=EXPS,adaptation_method_CR=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.0059826660549277075,-0.0002801120448179331,0.02313258636788043
+bound_correction=EXPS,adaptation_method_CR=LSHADE,compatible,"0 positive, 0 negative of 8 cells",0.003215251617888527,-0.007306255835667602,0.02684407096171798
+bound_correction=EXPS,adaptation_method_CR=JDE,compatible,"0 positive, 0 negative of 8 cells",0.0003520517402363128,-0.012301587301587369,0.008076563958916871
+bound_correction=EXPS,use_jso_caps=True,no effect,use_jso_caps=True has no effect,,,
+bound_correction=EXPS,population_reduction=LINEAR,compatible,"0 positive, 0 negative of 8 cells",-0.0042036929714414665,-0.042623716153128016,0.009263015551048012
+bound_correction=EXPS,oppositional_generation=True,compatible,"0 positive, 0 negative of 8 cells",0.001754423033581247,-0.009173669467787166,0.011554621848739496
+adaptation_method_F=SHADE,adaptation_method_CR=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.009022143340094647,-0.00403828197945845,0.053664799253034495
+adaptation_method_F=SHADE,adaptation_method_CR=LSHADE,compatible,"1 positive, 0 negative of 8 cells",0.014484126984126978,-0.006862745098039219,0.09957983193277312
+adaptation_method_F=SHADE,adaptation_method_CR=JDE,compatible,"0 positive, 0 negative of 8 cells",0.0033056038507356866,-0.015258057245886858,0.0513772175536881
+adaptation_method_F=SHADE,use_jso_caps=True,compatible,"0 positive, 0 negative of 8 cells",0.007386445957693408,-0.0010141987829614604,0.0239028944911297
+adaptation_method_F=SHADE,population_reduction=LINEAR,compatible,"1 positive, 0 negative of 8 cells",0.010901630767249417,-0.005952380952380952,0.053898225957049475
+adaptation_method_F=SHADE,oppositional_generation=True,compatible,"0 positive, 0 negative of 8 cells",0.007815669371196737,-0.004507550146495384,0.03795518207282908
+adaptation_method_F=SHADE_MODIFIED,adaptation_method_CR=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.007638285199137121,-0.007236227824463121,0.058543417366946765
+adaptation_method_F=SHADE_MODIFIED,adaptation_method_CR=LSHADE,compatible,"0 positive, 0 negative of 8 cells",0.009350349335136354,-0.009407096171802055,0.06725023342670405
+adaptation_method_F=SHADE_MODIFIED,adaptation_method_CR=JDE,compatible,"0 positive, 0 negative of 8 cells",0.00010484078688945868,-0.017083615055217487,0.019281045751633974
+adaptation_method_F=SHADE_MODIFIED,use_jso_caps=True,compatible,"0 positive, 0 negative of 8 cells",0.008318542934415135,2.2537750732476908e-05,0.021918767507002723
+adaptation_method_F=SHADE_MODIFIED,population_reduction=LINEAR,compatible,"1 positive, 0 negative of 8 cells",0.005918976786116729,-0.01307189542483661,0.041246498599439754
+adaptation_method_F=SHADE_MODIFIED,oppositional_generation=True,compatible,"0 positive, 0 negative of 8 cells",0.007301225087736231,-0.005927428442641429,0.03403361344537814
+adaptation_method_F=JDE,adaptation_method_CR=SHADE,compatible,"0 positive, 0 negative of 8 cells",0.00977142293699088,-0.004868154158215017,0.0687441643323996
+adaptation_method_F=JDE,adaptation_method_CR=LSHADE,compatible,"1 positive, 0 negative of 8 cells",0.013976222672977236,-0.0014005602240896448,0.11059757236227827
+adaptation_method_F=JDE,adaptation_method_CR=JDE,compatible,"0 positive, 0 negative of 8 cells",0.00666403055475063,-0.01338742393509127,0.0606909430438842
+adaptation_method_F=JDE,use_jso_caps=True,compatible,"0 positive, 0 negative of 8 cells",0.004260942882900286,-0.0042016806722689065,0.039892623716153125
+adaptation_method_F=JDE,population_reduction=LINEAR,compatible,"0 positive, 0 negative of 8 cells",0.009102333462120471,-0.0011719630380887986,0.035247432306255794
+adaptation_method_F=JDE,oppositional_generation=True,compatible,"0 positive, 0 negative of 8 cells",0.007719481470749225,-0.003921568627450973,0.05058356676003736
+adaptation_method_CR=SHADE,use_jso_caps=True,compatible,"0 positive, 0 negative of 8 cells",-0.0026995999549245028,-0.02467320261437911,0.0025016903313049357
+adaptation_method_CR=SHADE,population_reduction=LINEAR,compatible,"0 positive, 0 negative of 8 cells",0.0017604599310988675,-0.009687208216619982,0.009220354808590098
+adaptation_method_CR=SHADE,oppositional_generation=True,compatible,"0 positive, 0 negative of 8 cells",0.00569510850317138,-0.0046202389001577665,0.03506069094304384
+adaptation_method_CR=LSHADE,use_jso_caps=True,compatible,"0 positive, 0 negative of 8 cells",-0.00014488554042306338,-0.006512605042016811,0.00985060690943046
+adaptation_method_CR=LSHADE,population_reduction=LINEAR,compatible,"0 positive, 0 negative of 8 cells",0.005572157023729028,-0.00973389355742297,0.03972922502334267
+adaptation_method_CR=LSHADE,oppositional_generation=True,compatible,"0 positive, 0 negative of 8 cells",0.006067886924884898,-0.004691876750700284,0.05126050420168066
+adaptation_method_CR=JDE,use_jso_caps=True,compatible,"0 positive, 0 negative of 8 cells",-0.00011771950159374155,-0.008239962651727356,0.0043650793650793634
+adaptation_method_CR=JDE,population_reduction=LINEAR,compatible,"0 positive, 0 negative of 8 cells",0.007402946810908262,-0.007446311858076565,0.036344537815126005
+adaptation_method_CR=JDE,oppositional_generation=True,compatible,"0 positive, 0 negative of 8 cells",0.00423236823465018,-0.006220419202163617,0.019864612511671292
+use_jso_caps=True,population_reduction=LINEAR,no effect,use_jso_caps=True has no effect,,,
+use_jso_caps=True,oppositional_generation=True,no effect,use_jso_caps=True has no effect,,,
+population_reduction=LINEAR,oppositional_generation=True,compatible,"0 positive, 0 negative of 8 cells",0.0032382924434141477,-0.0018907563025210156,0.013632119514472435

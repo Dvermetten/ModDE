@@ -20,6 +20,7 @@ theme:
 
 hooks:
   - tools/docs_parameters.py   # generates docs/parameters.md from the registry
+  - tools/docs_interactions.py # generates docs/interactions.md from docs/data/
 
 plugins:
   - search
@@ -52,6 +53,7 @@ nav:
       - Ask-tell: notebooks/03_ask_tell.ipynb
   - Concepts: concepts.md
   - Parameters: parameters.md
+  - Module interactions: interactions.md
   - API reference: api.md
   - Reproducibility: reproducibility.md
   - Migrating from 0.0.4: migration.md

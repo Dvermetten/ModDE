@@ -453,3 +453,5 @@ add_sigma, add_learning_rates)`:
 | 2026-11-19 | Phase 3 implemented the recommendations of D-E1 (MkDocs Material), D-C2, D-C8, D-C10, D-B8, D-B10, D-D12 and D-E7; awaiting confirmation. | Phase 3 |
 | 2026-11-19 | irace exporter added (D-C10); dedicated logging integration postponed (D-B8 → FR-7). | D-C10, D-B8 |
 | 2026-11-19 | Phase 3 recommendations confirmed (D-B10, D-C2, D-C8, D-D12, D-E1, D-E7). Remaining open decisions closed with their recommendations: D-B5, D-B6, D-C1, D-C5, D-C7, D-D14, D-E4 (version 1.0.0a1), D-E5 (keep the repository until 1.0), D-E6, D-E8. | all |
+| 2026-11-19 | Reference-variant validation uses **modde's own independent reference implementations**, written from the original papers (not pyade or other third-party code, whose correctness is not vouched for). | D-D14, WS3 §5.4 |
+| 2026-11-19 | D-A6 follow-up (interaction study): `mutation_n_comps = 0` stays allowed in the API (it works well with a reference term, current-to-X/0) and stays out of the ConfigSpace range {1, 2}. Resolution warns when it is combined with `mutation_reference = NONE` (crossover only; with a BEST base the population collapses). | D-A6, WS3 §5.3 |
