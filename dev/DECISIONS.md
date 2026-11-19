@@ -447,3 +447,4 @@ add_sigma, add_learning_rates)`:
 | 2026-11-19 | ConfigSpace (≥ 1.0) is a hard dependency. | D-C9 |
 | 2026-11-19 | Problem with existing evaluations at start: warn, don't fail; budget applies to the problem's total count (`evaluations ≤ budget`). | D-B3 |
 | 2026-11-19 | Implement quasi-oppositional initialisation using `oppositional_initialization_factor` (KI-37): `oppositional_initialization ∈ {NONE, OPPOSITE, QUASI_OPPOSITE}`, factor scales the opposite point toward the centre. | D-D10, KI-37 |
+| 2026-11-19 | Phase 1 spec review: renamed settings, fixed constant schedules, F0/CR0 as SHADE memory init, and the eigen-crossover note accepted. Bound-correction references taken from the ModDE paper; preset verification deferred. M1 reached. | spec/README.md |

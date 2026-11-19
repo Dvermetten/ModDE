@@ -81,8 +81,8 @@ implemented in C++ against that spec, with tests derived from it.
 - [x] Write [`dev/spec/`](spec/README.md): one document per module category (exact math, every random draw, parameters by registry name, literature), plus settings/resolution, termination, statistics and presets. *Draft; open points listed in [spec/README.md](spec/README.md).*
 - [x] Build the **parameter registry** [`src/modde/_registry.py`](../src/modde/_registry.py): 43 settings with type, valid range, default rule, activity conditions, ConfigSpace range and group, 0.0.4 name, references. It also holds the derived rules (`n_parents_needed`, `lambda_min`), the 10 presets, and a prototype ConfigSpace builder. Tested by `tests/test_registry.py`, which covers: every sampled configuration is valid (D-C5), the default configuration is classic DE, and every preset is a valid configuration for d ∈ {1, 2, 5, 20, 100}.
 - [x] Define the parameter resolution policy ([spec/settings.md](spec/settings.md) §1: USER / PROBLEM / DEFAULT / DERIVED provenance, errors vs warnings).
-- [ ] **Author review** of the spec, the registry names and the open points (spec/README.md).
-- **M1:** spec and registry reviewed. The C++ work can start.
+- [x] **Author review** of the spec, the registry names and the open points (2026-11-19): points 1–4 accepted; bound-correction references added from the ModDE paper; preset verification deferred (does not block Phase 2).
+- **M1:** spec and registry reviewed. ✅ The C++ work can start.
 
 ### Phase 2: C++ core (WS1)
 - [ ] Core types: `Population`, RNG, `Settings`, `Modules`, `Parameters`, `Stats`.

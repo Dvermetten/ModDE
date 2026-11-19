@@ -66,7 +66,13 @@ Differences from 0.0.4 in the *structure*:
 
 ## Open points from writing the spec
 
-Collected here for the author's review. Each is also marked ⚠️ in its document.
+Collected for the author's review. **Review (2026-11-19):**
+- points 1–4 accepted as written;
+- point 5 resolved: references taken from the ModDE paper and the sources it cites (see bound_correction.md);
+- point 6 deferred: the author will verify the presets later.
+
+Point 4 stays a "to verify" note in crossover.md; the current spec (always
+applied, whole population) is accepted for now.
 
 1. **Renamed / restructured settings** compared with 0.0.4 (migration guide):
    - `lpsr` (bool) → `population_reduction ∈ {NONE, LINEAR}` (room for non-linear schedules in Workstream 4);
@@ -76,5 +82,5 @@ Collected here for the author's review. Each is also marked ⚠️ in its docume
 2. **Constants that stay fixed** (not settings), because they define the module itself: the weighted-F schedule (0.7/0.8/1.2 at t = 0.2/0.4) and the jSO cap thresholds. All other KI-34 constants became settings.
 3. **`F0`/`CR0` also initialise the SHADE memories**, so the paper initial memory values (0.5; jSO 0.3/0.8) are set through presets. Consequence: SHADE with the classic defaults starts its CR memory at 0.9, not 0.5.
 4. **Eigenvector crossover (Guo & Yang 2015):** 0.0.4 applies it in every generation using the covariance of the whole population. As far as I recall, the paper applies it with a probability and possibly on a subset of the population. *To verify*; if confirmed, it is a further paper deviation to decide on.
-5. **References for the bound corrections** (COTN, HVB, EXPC_*, EXPS) are to be filled in by the author.
-6. **Preset details** in [presets.md](presets.md) are from memory of the papers and need checking. JADE-like and jSO-like are marked as approximations: keep them, or drop them?
+5. ~~References for the bound corrections~~: **resolved**. See the references table in [bound_correction.md](bound_correction.md).
+6. **Preset details** in [presets.md](presets.md) are from memory of the papers and need checking. JADE-like and jSO-like are kept as approximations for now. **Deferred:** the author will verify them later. This does not block Phase 2.

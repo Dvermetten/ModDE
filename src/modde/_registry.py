@@ -15,7 +15,7 @@ This module has no dependency on the compiled extension.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Callable, Mapping
 
 # --------------------------------------------------------------------------- types
@@ -103,6 +103,15 @@ REF = {
     "rahnamayan2007": "Rahnamayan, Tizhoosh & Salama, Quasi-oppositional differential evolution (QODE), IEEE CEC 2007.",
     "guo2015": "Guo & Yang, Enhancing differential evolution utilizing eigenvector-based crossover operator, IEEE TEC 19(1), 2015.",
     "vermetten2023": "Vermetten, Caraffini, Kononova & Baeck, Modular differential evolution, GECCO 2023.",
+    # Bound correction (as cited / attributed in vermetten2023 and kononova2022)
+    "biedrzycki2019": "Biedrzycki, Arabas & Jagodzinski, Bound constraints handling in differential evolution: an experimental study, Swarm and Evolutionary Computation 50, 2019.",
+    "kononova2022": "Kononova, Vermetten, Caraffini, Mitran & Zaharie, The importance of being constrained: dealing with infeasible solutions in differential evolution and beyond, arXiv:2203.03512, 2022.",
+    "caraffini2019": "Caraffini, Kononova & Corne, Infeasibility and structural bias in differential evolution, Information Sciences 496, 2019.",
+    "kononova2020a": "Kononova, Caraffini, Wang & Baeck, Can compact optimisation algorithms be structurally biased?, PPSN XVI, 2020.",
+    "kononova2020b": "Kononova, Caraffini, Wang & Baeck, Can single solution optimisation methods be structurally biased?, IEEE CEC 2020.",
+    "vermetten2022c": "Vermetten, van Stein, Kononova & Caraffini, Analysis of structural bias in differential evolution configurations, in: Differential Evolution: From Theory to Practice, Springer, 2022.",
+    "padhye2015": "Padhye, Mittal & Deb, Feasibility preserving constraint-handling strategies for real parameter evolutionary optimization, Computational Optimization and Applications 62, 2015.",
+    "alvarezbenitez2005": "Alvarez-Benitez, Everson & Fieldsend, A MOPSO algorithm based exclusively on Pareto dominance concepts, EMO 2005.",
 }
 
 # --------------------------------------------------------------------------- parameters
@@ -210,7 +219,7 @@ PARAMS: tuple[Param, ...] = (
           "Repair of out-of-bounds coordinates of trial vectors.",
           options=("SATURATE", "NONE", "UNIF_RESAMPLE", "COTN", "TOROIDAL", "MIRROR",
                    "HVB", "EXPC_TARGET", "EXPC_CENTER", "EXPS"),
-          group="modules", references=("vermetten2023",)),
+          group="modules", references=("biedrzycki2019", "kononova2022", "vermetten2023")),
     Param("hvb_alpha", "bound_correction", "float",
           "HVB: weight of the violated bound; y' = α·b + (1 − α)·y_target (KI-34).",
           default=0.5, valid=(0.0, 1.0), tune=(0.05, 0.95), group="module_params",
@@ -271,6 +280,20 @@ PARAMS: tuple[Param, ...] = (
 )
 
 BY_NAME: Mapping[str, Param] = {p.name: p for p in PARAMS}
+
+#: References for individual options of a categorical setting, in addition to
+#: the setting's own ``references``. An empty tuple means "defined by modde".
+OPTION_REFERENCES: Mapping[tuple[str, str], tuple[str, ...]] = {
+    ("bound_correction", "SATURATE"): ("caraffini2019",),
+    ("bound_correction", "UNIF_RESAMPLE"): ("vermetten2022c",),
+    ("bound_correction", "COTN"): ("caraffini2019",),
+    ("bound_correction", "TOROIDAL"): ("caraffini2019",),
+    ("bound_correction", "MIRROR"): ("kononova2020a", "kononova2020b"),
+    ("bound_correction", "HVB"): ("kononova2022", "tanabe2013", "biedrzycki2019"),
+    ("bound_correction", "EXPC_TARGET"): ("alvarezbenitez2005", "padhye2015"),
+    ("bound_correction", "EXPC_CENTER"): (),  # modde variant of EXPC_TARGET with the centre as reference
+    ("bound_correction", "EXPS"): ("padhye2015",),
+}
 
 # --------------------------------------------------------------------------- derived rules
 
@@ -397,6 +420,7 @@ def _build_configspace(dim: int, groups: tuple[str, ...] = GROUPS):
 
     cs = ConfigurationSpace()
     included = []
+    hp: Any
     for p in PARAMS:
         if p.group is None or p.group not in groups:
             continue
@@ -414,7 +438,7 @@ def _build_configspace(dim: int, groups: tuple[str, ...] = GROUPS):
         included.append(p)
 
     for p in included:
-        conds = []
+        conds: list[Any] = []
         for c in p.active_when:
             if c.parent not in cs:
                 continue

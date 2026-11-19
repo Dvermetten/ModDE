@@ -90,6 +90,15 @@ def test_presets_are_valid_configurations(name, dim):
             assert key in config, f"{name}: {key} is inactive in the configuration"
 
 
+def test_references_resolve():
+    used = {r for p in R.PARAMS for r in p.references}
+    used |= {r for refs in R.OPTION_REFERENCES.values() for r in refs}
+    used |= {r for p in R.PRESETS.values() for r in p.references}
+    assert used <= set(R.REF), used - set(R.REF)
+    for (param, option) in R.OPTION_REFERENCES:
+        assert option in R.BY_NAME[param].options, (param, option)
+
+
 def test_parents_needed():
     assert R.n_parents_needed({}) == 3  # DE/rand/1
     assert R.n_parents_needed({"mutation_base": "TARGET", "mutation_reference": "PBEST"}) == 2

@@ -32,4 +32,25 @@ then `y' = b`.
 **Outputs** (for statistics): the corrected trial `u'_i`, the uncorrected `u_i`,
 and a per-individual flag "any coordinate corrected".
 
-⚠️ README open point 5: literature references for COTN, HVB, EXPC_* and EXPS (author).
+## References
+
+The ModDE paper (Vermetten et al., GECCO 2023, §3.4) cites Biedrzycki et al.
+2019 and Kononova et al. 2022 for the bound corrections as a group. The
+per-option attributions below follow Kononova et al. 2022 and Padhye et al.
+2015. Full entries: `REF` / `OPTION_REFERENCES` in the registry.
+
+| Option | Full name | Reference |
+|---|---|---|
+| `SATURATE` | saturation / projection | Caraffini, Kononova & Corne 2019 |
+| `UNIF_RESAMPLE` | uniform resampling | Vermetten et al. 2022c |
+| `COTN` | complete one-sided truncated normal (stochastic counterpart of mirror) | Caraffini, Kononova & Corne 2019 |
+| `TOROIDAL` | toroidal / wrapping | Caraffini, Kononova & Corne 2019 |
+| `MIRROR` | mirror / reflection | Kononova et al. 2020a, 2020b |
+| `HVB` | halfway-to-violated-bound (= SHADE's midpoint-target rule; component-wise projection to the midpoint) | Kononova et al. 2022; Tanabe & Fukunaga 2013; Biedrzycki et al. 2019 |
+| `EXPC_TARGET` | exponentially confined (Exp-C) | Alvarez-Benitez, Everson & Fieldsend 2005; Padhye, Mittal & Deb 2015 |
+| `EXPS` | exponential spread (Exp-S) | Padhye, Mittal & Deb 2015 |
+| `EXPC_CENTER` | exponentially confined towards the centre | modde variant (no external source) |
+
+**Notes:**
+- `hvb_alpha` generalises HVB; `α = 0.5` is the literature version.
+- Padhye et al. define Exp-C/Exp-S with density `∝ exp(|x − x_parent|)` in the original variable units. modde applies them in **normalised** coordinates (rate 1 per unit of `[0, 1]`), as 0.0.4 did. The shape is the same (mass concentrated near the violated bound); the concentration is relative to the domain width.
