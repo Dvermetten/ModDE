@@ -131,7 +131,8 @@ Each operator should be callable from Python on its own, as in modcma.
 - [ ] `common.hpp`: typedefs, RNG engine + distributions, injectable draw source.
 - [ ] `Population` (+ indexing, sorting, resizing, concatenation).
 - [ ] `Modules`, `Settings`, `resolve()` with provenance.
-- [ ] Samplers: Uniform, Gaussian (fix KI-9), Sobol, Halton (reuse modcma's MIT `sobol.cpp`/Halton with attribution?), LHS; opposition + quasi-opposition (KI-37); oversampling (fix KI-4).
+- [ ] Samplers: Uniform, Gaussian (fix KI-9), Sobol, Halton (reuse modcma's MIT `sobol.cpp`/Halton with attribution?), LHS; oppositional initialisation `{NONE, OPPOSITE, QUASI_OPPOSITE}` using `oppositional_initialization_factor` (KI-37, formulas in KNOWN_ISSUES); oversampling (fix KI-4).
+- [ ] Budget start-up check: if the problem already has evaluations, emit a warning (not an error) and keep counting the problem's total, so `evaluations ≤ budget` (D-B3).
 - [ ] Mutation: base {rand, best, target}, reference {none, rand, best, pbest}, **integer** number of difference terms `mutation_n_comps ≥ 0`, validated against λ in `resolve()` (fix KI-1, D-A6), archive term (KI-27), weighted F (KI-24), distinct parents (KI-23).
 - [ ] Crossover: bin, exp; eigen coordinate system.
 - [ ] Bound correction: none, saturate, unif_resample, COTN, toroidal, mirror, hvb, expc_target, expc_center, exps.

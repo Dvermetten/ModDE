@@ -187,7 +187,7 @@ custom functions. Suites include BBOB, CEC2013, CEC2022, PBO, ….
 - **Context:** 0.0.4 stops on `problem.state.evaluations >= budget`, which breaks if a problem is reused without `reset()`, and on `state.optimum_found`. Budget defaults to `1e4 * d`.
 - **Options:** count evaluations internally (recommended; works for callables) vs. read `problem.state.evaluations`. Target: use `state.final_target_found` (ioh's configurable final target) vs `optimum_found`. Is the budget required or defaulted?
 - **Recommendation:** internal counter; use ioh's final target for ioh problems; budget required in `fmin`, and a documented default in the low-level API.
-- **Status:** DECIDED (2026-11-19): **the evaluation budget is counted by the problem**, not by the optimizer, so no evaluation can go uncounted. Consequently **wrapping with ioh is the standard path**: the Python front end wraps a plain callable with `ioh.wrap_problem` (using the given bounds) unless the user opts out. Termination reads `problem.state.evaluations` and the ioh final target (`state.final_target_found`). The budget is required in `fmin`; the low-level default is 10 000·d. The C++ core stays independent of ioh: it receives a callable plus a way to query the evaluation count, so the speed tests can still run without ioh. Open details for the spec: behaviour when a reused problem already has evaluations (warn, or count only evaluations since start?), and measuring ioh's per-evaluation overhead in the D-A19 benchmarks.
+- **Status:** DECIDED (2026-11-19): **the evaluation budget is counted by the problem**, not by the optimizer, so no evaluation can go uncounted. Consequently **wrapping with ioh is the standard path**: the Python front end wraps a plain callable with `ioh.wrap_problem` (using the given bounds) unless the user opts out. Termination reads `problem.state.evaluations` and the ioh final target (`state.final_target_found`). The budget is required in `fmin`; the low-level default is 10 000·d. The C++ core stays independent of ioh: it receives a callable plus a way to query the evaluation count, so the speed tests can still run without ioh. **Reused problems (decided 2026-11-19):** if the problem already has evaluations when a run starts (e.g. when switching between algorithms on the same problem), modde **warns but does not fail**. Counting stays as normal: the budget applies to the problem's *total* evaluation count, so `problem.state.evaluations ≤ budget` always holds. Still to do: measure ioh's per-evaluation overhead in the D-A19 benchmarks.
 
 ### D-B4 🟠 Batch evaluation vs per-evaluation tracking with ioh loggers
 - **Context:** ioh loggers can record attributes of the algorithm object (README example: `logged_attributes=['F', 'CR', 'corrected', …]`). With batch evaluation, the attribute values seen during a batch call are those of the generation, not of the individual.
@@ -287,7 +287,7 @@ add_sigma, add_learning_rates)`:
 - **Context:** modcma makes it a hard dependency.
 - **New consideration (2026-11-19):** D-D2 defines the named presets as **ConfigSpace configurations**, so the presets (a core convenience) now need ConfigSpace. Options: (a) make ConfigSpace a hard dependency (simplest; it is pure Python and light); (b) keep it optional, storing presets internally as plain settings dicts and converting them to `Configuration` objects only when ConfigSpace is installed.
 - **Recommendation (revised):** (a) hard dependency, since presets are a main entry point for users. (b) adds a second representation to keep in sync.
-- **Status:** OPEN
+- **Status:** DECIDED (2026-11-19): (a) **ConfigSpace (≥ 1.0) is a hard dependency.**
 
 ### D-C10 🟢 Other tuners and formats
 - **Decision:** support irace's parameter-file format (not provided by ConfigSpace), and Optuna/Hyperopt adapters?
@@ -444,3 +444,6 @@ add_sigma, add_learning_rates)`:
 | 2026-11-19 | Oppositional generation semantics fixed (after selection, per-dimension bounds, (λ+λ) truncation, inherit F/CR, budgeted, `jump_rate` 0.3). | D-D11 |
 | 2026-11-19 | Closed as covered by earlier decisions: D-D7 (D-A21), D-D8 (KI-23/27), D-D13 (D-A13). | D-D7, D-D8, D-D13 |
 | 2026-11-19 | Budget is counted by the problem; the front end wraps plain callables with ioh by default; ioh becomes a hard dependency; bounds required for plain callables; NONE correction evaluates infeasible points as-is. | D-B1 (amended), D-B2, D-B3, D-B7, D-B11 |
+| 2026-11-19 | ConfigSpace (≥ 1.0) is a hard dependency. | D-C9 |
+| 2026-11-19 | Problem with existing evaluations at start: warn, don't fail; budget applies to the problem's total count (`evaluations ≤ budget`). | D-B3 |
+| 2026-11-19 | Implement quasi-oppositional initialisation using `oppositional_initialization_factor` (KI-37): `oppositional_initialization ∈ {NONE, OPPOSITE, QUASI_OPPOSITE}`, factor scales the opposite point toward the centre. | D-D10, KI-37 |

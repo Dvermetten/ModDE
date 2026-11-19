@@ -76,7 +76,7 @@ These are the main targets of WS3's "no silent override" goal.
 | KI-34 | Hard-coded constants: jDE `tau_F`, `tau_CR`, `F_l=0.1`, `F_u=0.9`; SHADE sampling scales (0.1); pbest range `[2/n, 0.2]`; weighted-F schedule (0.7/0.8/1.2 at 20%/40%); jSO thresholds; HVB `alpha=0.5`; archive rate 2.0 | various |
 | KI-35 | `budget` defaults to `10_000 * d` instead of coming from the problem or caller | [parameters.py:228](../modde/parameters.py#L228) |
 | KI-36 | `F`/`CR` must be passed as numpy arrays (a length-1 array is broadcast). A scalar float raises a type error. Adaptive methods overwrite them after the first generation, without saying so. | [parameters.py:239-246](../modde/parameters.py#L239-L246) |
-| KI-37 | `oppositional_initialization_factor` is declared and documented but **never used** | [parameters.py:152](../modde/parameters.py#L152) |
+| KI-37 | `oppositional_initialization_factor` is declared and documented but **never used**. **Triage (2026-11-19): implement it in the port** as part of quasi-oppositional initialisation: `oppositional_initialization ∈ {NONE, OPPOSITE, QUASI_OPPOSITE}`. With centre `c = (lb+ub)/2`, opposite `x̆ = lb + ub − x` and factor `f`: OPPOSITE gives `c + f·(x̆ − c)` (f = 1: classic opposition); QUASI_OPPOSITE draws each coordinate uniformly between `c` and `c + f·(x̆ − c)` (f = 1: QODE, Rahnamayan et al. 2007). | [parameters.py:152](../modde/parameters.py#L152) |
 | KI-38 | `oversampling_factor`, `oppositional_generation_probability`, `pbest_value`, `memory_size` and `archive_size` are not in `__modules__`, so they are untested | [parameters.py:159-174](../modde/parameters.py#L159-L174) |
 
 ## D. Code health and performance (resolved by the port, listed for completeness)
