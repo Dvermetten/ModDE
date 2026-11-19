@@ -1,5 +1,8 @@
 // Mutation: dev/spec/mutation.md.
 
+#include <algorithm>
+#include <cmath>
+
 #include "modde/operators.hpp"
 
 namespace modde

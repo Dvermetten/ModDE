@@ -1,5 +1,6 @@
 // F / CR control: dev/spec/adaptation.md.
 
+#include <algorithm>
 #include <cmath>
 
 #include "modde/operators.hpp"

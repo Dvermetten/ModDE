@@ -1,5 +1,6 @@
 // Settings resolution: dev/spec/settings.md §1.
 
+#include <algorithm>
 #include <random>
 #include <sstream>
 #include <stdexcept>

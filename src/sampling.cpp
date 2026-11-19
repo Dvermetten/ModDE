@@ -1,6 +1,7 @@
 // Samplers: dev/spec/initialization.md §2.
 
 #include <cmath>
+#include <numeric>
 #include <stdexcept>
 
 #include "modde/sampling.hpp"
