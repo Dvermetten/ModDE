@@ -30,6 +30,16 @@
 
 ::: modde.configspace.config_from_settings
 
+## irace
+
+::: modde.irace.write_irace_files
+
+::: modde.irace.irace_parameters
+
+::: modde.irace.irace_configurations
+
+::: modde.irace.config_from_irace
+
 ## Core objects
 
 `modde.Settings`, `modde.Modules`, the option enums (`modde.MutationBase`, ...)

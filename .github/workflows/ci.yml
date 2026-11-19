@@ -35,3 +35,26 @@ jobs:
 
       - name: Run tests
         run: pytest
+
+  irace-format:
+    name: irace reads the exported files (D-C10)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - uses: r-lib/actions/setup-r@v2
+
+      - name: Install irace
+        run: Rscript -e 'install.packages("irace", repos = "https://cloud.r-project.org")'
+
+      - name: Build and install
+        run: python -m pip install ".[test]"
+
+      - name: Check the irace files with irace itself
+        run: pytest tests/test_irace.py -rs

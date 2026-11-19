@@ -193,18 +193,18 @@ custom functions. Suites include BBOB, CEC2013, CEC2022, PBO, ….
 - **Context:** ioh loggers can record attributes of the algorithm object (README example: `logged_attributes=['F', 'CR', 'corrected', …]`). With batch evaluation, the attribute values seen during a batch call are those of the generation, not of the individual.
 - **Options:** (a) per-individual evaluation when tracking is on (slower, exact); (b) per-generation tracking only; (c) batch evaluation + a C++ hook that updates tracked attributes before each individual (requires per-individual calls into ioh anyway).
 - **Recommendation:** (a): tracking mode switches to per-individual calls. Document the performance cost.
-- **Status:** DEFERRED TO IMPLEMENTATION (2026-11-19): keep this conflict in mind while designing the evaluation path (WS1). Whatever design is chosen must pass the logging validation test in [03_module_validation.md §5.3a](03_module_validation.md#53a-ioh-logging-validation).
+- **Status:** DECIDED (2026-11-19, in implementation): option (a). With `track_evaluations=True` the core calls the objective once per point (even for vectorised objectives) and updates the per-evaluation statistics before each call. Batch evaluation is used otherwise. Tested with an ioh `Analyzer` watching `curr_F`/`corrected` (`tests/test_api.py`, `tests/test_runs.py`); the full logging validation (WS3 §5.3a) runs in Phase 4.
 
 ### D-B5 🟢 Direct C++ linkage with IOHexperimenter
 - **Context:** IOHexperimenter's C++ core is header-only. A C++ driver could benchmark DE without Python overhead.
 - **Options:** never / optional C++ benchmark target / bindings that accept ioh's C++ problem objects directly (zero GIL), which needs a shared ABI with the ioh pybind11 module and is hard.
 - **Recommendation:** an optional C++ benchmark target later. No cross-module C++ object passing.
-- **Status:** OPEN
+- **Status:** DECIDED (2026-11-19): no direct C++ linkage with IOHexperimenter for now; an optional C++ benchmark target may come later (FR-8). No passing of C++ objects across modules.
 
 ### D-B6 🟢 Integer and mixed variables
 - **Context:** ioh has integer problems. modcma added `integer_variables` (rounding + sigma floor).
 - **Recommendation:** out of scope for v1. Keep `Settings` extensible.
-- **Status:** OPEN
+- **Status:** DECIDED (2026-11-19): integer / mixed variables are out of scope for v1 (FR-9); `Settings` stays extensible.
 
 ### D-B7 🟠 Interaction with ioh constraint handling
 - **Context:** ioh problems carry `bounds` with `enforced` / `penalty` behaviour and `add_constraint`. With `bound_correction=NONE`, DE evaluates infeasible points, and what ioh returns depends on its enforcement settings.
@@ -213,7 +213,7 @@ custom functions. Suites include BBOB, CEC2013, CEC2022, PBO, ….
 
 ### D-B8 🟠 Logging and analysis integration
 - **Decision:** ship a ready-made adapter (e.g. `modde.ioh.tracked(optimizer)`, or the optimizer exposing tracked properties directly) so `ioh.logger.Analyzer(...).watch(...)` / `ioh.Experiment(logged_attributes=...)` works without the 0.0.4 wrapper class.
-- **Status:** IMPLEMENTED AS RECOMMENDED (2026-11-19, Phase 3; please confirm): no separate adapter. `modde.ModularDE` exposes the tracked statistics (`curr_F`, `curr_CR`, `corrected`, `CS`, `ED`, `corr_so_far`, `popmean`, `popstd`, `F_memory_mean`, `generation`) as attributes, so `logger.watch(optimizer, [...])` works directly (tested with `ioh.logger.Analyzer`).
+- **Status:** POSTPONED (2026-11-19): a dedicated logging/analysis integration is a post-1.0 feature (FR-7). What exists stays as it is: `modde.ModularDE` exposes its statistics as plain attributes, which ioh loggers can already watch.
 
 ### D-B9 🟠 Benchmark suites for validation
 - **Context:** BBOB, CEC2013 and CEC2022 are available in ioh 0.3.22. CEC2014/2017, where the L-SHADE and jSO results were published, are **not**.
@@ -223,7 +223,7 @@ custom functions. Suites include BBOB, CEC2013, CEC2022, PBO, ….
 ### D-B10 🟢 Maximisation problems
 - **Context:** ioh problems carry `optimization_type`. 0.0.4 assumes minimisation.
 - **Recommendation:** sign-flip internally when `optimization_type == MAX`. Report values in the original sign.
-- **Status:** IMPLEMENTED AS RECOMMENDED (2026-11-19, Phase 3; please confirm): for ioh problems with `optimization_type == MAX`, modde minimises `-f` internally; `best_f` is reported in the original sign. Plain callables are minimised.
+- **Status:** DECIDED (2026-11-19): sign flip for ioh problems with `optimization_type == MAX`; `best_f` in the original sign.
 
 ### D-B11 🟠 ioh as a hard or optional dependency
 - **Recommendation:** keep it as a hard dependency (it is light and the main use case), but the core never imports it, so it can become optional later.
@@ -244,12 +244,12 @@ add_sigma, add_learning_rates)`:
 
 ### D-C1 🟠 ConfigSpace version
 - **Recommendation:** require `ConfigSpace >= 1.0` (the 1.x API). The 0.x API differs (`add_hyperparameter`, etc.).
-- **Status:** OPEN
+- **Status:** DECIDED (2026-11-19): `ConfigSpace >= 1.0` (in `pyproject.toml`).
 
 ### D-C2 🟠 Scope of the generated space
 - **Options:** modules only; modules + numerics, toggled by flags (like modcma's `add_popsize`, …). Which numerics: `lambda0`, `F0`, `CR0`, `memory_size`, `archive_rate`, `p_best`, `lambda_min`, jDE τ's, SHADE scales, …?
 - **Recommendation:** flags per group (`add_popsize`, `add_initial_FCR`, `add_adaptation_params`, …). Each group generated from the registry.
-- **Status:** IMPLEMENTED AS RECOMMENDED (2026-11-19, Phase 3; please confirm): `get_configspace(dim, add_popsize=True, add_initial_FCR=True, add_module_params=True)`; modules are always included.
+- **Status:** DECIDED (2026-11-19): `get_configspace(dim, add_popsize, add_initial_FCR, add_module_params)`; modules always included.
 
 ### D-C3 🟠 Source of truth for the space
 - **Options:** (a) introspect bound enums (modcma); (b) the parameter registry (WS3), which also carries ranges, distributions and active-when conditions; (c) hand-written.
@@ -266,7 +266,7 @@ add_sigma, add_learning_rates)`:
 ### D-C5 🟠 How incompatibilities reach the tuner
 - **Options:** (a) forbidden clauses generated from the interaction matrix; (b) design every combination to be valid (fix or redefine semantics) and use no forbiddens; (c) let resolution errors become crashed runs.
 - **Recommendation:** (b) as the goal, with (a) only for truly impossible combinations. Avoid (c).
-- **Status:** OPEN
+- **Status:** DECIDED (2026-11-19): every combination in the space is valid by design (tested: `test_every_sampled_configuration_is_valid`); forbidden clauses only for truly impossible combinations, none needed so far.
 
 ### D-C6 🟠 Dimension-dependent ranges
 - **Context:** modcma uses absolute `lambda0 ∈ [1, 50·dim]`, so a space is tied to one dimension.
@@ -277,11 +277,11 @@ add_sigma, add_learning_rates)`:
 ### D-C7 🟢 Prior distributions for numerics
 - **Options:** uniform (unbiased) vs normal around the default (modcma) vs log-scale.
 - **Recommendation:** uniform or log-uniform by default. Normal priors only if requested (they bias tuners such as SMAC's initial design).
-- **Status:** OPEN
+- **Status:** DECIDED (2026-11-19): uniform / log-uniform priors (as in the registry); no normal priors.
 
 ### D-C8 🟠 Round-trip API
 - **Decisions:** functions `get_configspace`, `settings_from_config(dim, config, **overrides)`, `settings_from_dict`, and **also** `config_from_settings` (missing in modcma; useful for warm-starting tuners from presets). How a configuration distinguishes "explicitly tuned" from "default": with provenance (D-D1), every configured value is `USER`.
-- **Status:** IMPLEMENTED AS RECOMMENDED (2026-11-19, Phase 3; please confirm): `get_configspace`, `settings_from_config(dim, config, **overrides)`, `settings_from_dict`, `settings_to_dict`, `config_from_settings`, plus `get_presets(dim)` / `preset_settings(name, dim)`. Round trip is tested.
+- **Status:** DECIDED (2026-11-19): `get_configspace`, `settings_from_config`, `settings_from_dict`, `settings_to_dict`, `config_from_settings`, `get_presets`, `preset_settings` (round trip tested).
 
 ### D-C9 🟠 ConfigSpace as a hard or optional dependency
 - **Context:** modcma makes it a hard dependency.
@@ -292,7 +292,7 @@ add_sigma, add_learning_rates)`:
 ### D-C10 🟢 Other tuners and formats
 - **Decision:** support irace's parameter-file format (not provided by ConfigSpace), and Optuna/Hyperopt adapters?
 - **Recommendation:** an irace exporter, if the group uses irace. Otherwise ConfigSpace only.
-- **Status:** IMPLEMENTED AS RECOMMENDED (2026-11-19, Phase 3; please confirm): ConfigSpace only; no irace/Optuna exporters for now.
+- **Status:** DECIDED (2026-11-19): ConfigSpace plus an **irace exporter** (`modde.irace`): parameter file with all conditions, initial-configurations file (default + presets), and `config_from_irace` for target runners. Validated by irace itself in CI (`irace-format` job).
 
 ### D-C11 🟠 Default configuration of the space
 - **Decision:** which algorithm the space's default represents (classic DE/rand/1/bin? L-SHADE-like?). Tied to D-D2.
@@ -357,7 +357,7 @@ add_sigma, add_learning_rates)`:
 
 ### D-D12 🟠 Ask-tell parity
 - **Decision:** must ask-tell produce **identical** trajectories to `run()` for the same seed? Recommended: yes, as a tested invariant.
-- **Status:** IMPLEMENTED AS RECOMMENDED (2026-11-19, Phase 3; please confirm): yes. Ask-tell and `run()` share the same core building blocks and give identical trajectories for the same seed (tested on five configurations, batch and one-by-one).
+- **Status:** DECIDED (2026-11-19): ask-tell gives identical trajectories to `run()` for the same seed (tested).
 
 ### D-D13 🟠 Reproducibility guarantee
 - See D-A13. Also: what changes count as "behaviour-changing" and need a changelog entry and a new regression snapshot.
@@ -365,7 +365,7 @@ add_sigma, add_learning_rates)`:
 
 ### D-D14 🟠 Validation acceptance criteria
 - **Decision:** when a module or preset counts as "validated". Proposed: operator tests pass, invariants hold for N random configurations, and the preset is statistically indistinguishable (or not significantly worse, α = 0.05, ≥ 25 runs) from the reference implementation on the agreed suite.
-- **Status:** OPEN
+- **Status:** DECIDED (2026-11-19): a module or preset counts as validated when (1) its operator-level tests pass, (2) the invariant tests hold over sampled configurations, and (3) for presets, it is not significantly worse than the reference implementation or published results on the agreed suite (≥ 25 runs, α = 0.05).
 
 ---
 
@@ -374,7 +374,7 @@ add_sigma, add_learning_rates)`:
 ### D-E1 🟠 Documentation tooling
 - **Options:** Sphinx (+ autodoc/napoleon, `myst-nb` for notebooks; modcma uses Read the Docs) vs MkDocs Material (+ `mkdocstrings`, `mkdocs-jupyter`).
 - **Constraint:** the API docs must come from nanobind stubs and docstrings. Both handle `.pyi` with some setup.
-- **Status:** IMPLEMENTED AS RECOMMENDED (2026-11-19, Phase 3; please confirm): **MkDocs Material** + `mkdocs-jupyter` (renders and executes the notebooks) + `mkdocstrings` (API reference from docstrings). Chosen for simplicity (Markdown everywhere, one config file); Sphinx + myst-nb would also work if preferred.
+- **Status:** DECIDED (2026-11-19): MkDocs Material + mkdocs-jupyter + mkdocstrings.
 
 ### D-E2 🟢 Hosting
 - **Options:** Read the Docs vs GitHub Pages.
@@ -387,27 +387,27 @@ add_sigma, add_learning_rates)`:
 ### D-E4 🟠 Versioning and naming
 - **Options:** `1.0.0` (signals the rewrite and the breaking API) vs `0.1.0`. Same PyPI name `modde`.
 - **Recommendation:** pre-releases `1.0.0a*` during Phases 3–4, then 1.0.0.
-- **Status:** OPEN
+- **Status:** DECIDED (2026-11-19): version `1.0.0a1` now (pre-releases `1.0.0a*` during Phases 3–4), then 1.0.0. Same PyPI name `modde`. Nothing is published without the author's go-ahead.
 
 ### D-E5 🟢 Repository home
 - **Context:** the repo is `Dvermetten/ModDE`; modcma lives under the `IOHprofiler` org.
 - **Options:** keep it, or move it to `IOHprofiler/ModularDE` for discoverability next to modcma and ioh.
-- **Status:** OPEN
+- **Status:** DECIDED (2026-11-19) (no recommendation existed; most conservative choice): keep `Dvermetten/ModDE` until 1.0; reconsider moving to the IOHprofiler organisation at the 1.0 release.
 
 ### D-E6 🟠 Code reuse from modcma and licensing
 - **Decision:** which modcma C++ code to reuse (Sobol/Halton samplers, bound corrections, `Population`, `ndtr_ndtri.cpp`), and how to attribute it. Both projects are MIT.
 - **Finding (Phase 2, 2026-11-19):** modcma's `src/sobol.cpp` is John Burkardt's code under the **GNU LGPL**, not MIT, so it was not reused. modde has its own Sobol (Joe & Kuo direction numbers, BSD-style licence shipped in `src/modde/_licenses/`) and Halton. **No modcma code is currently used**; everything else was written from the spec.
-- **Status:** OPEN (no reuse so far; decide only if reuse comes up again)
+- **Status:** DECIDED (2026-11-19): no modcma code is reused (its Sobol code is LGPL). Revisit only if reuse comes up.
 
 ### D-E7 🟢 Docstring source for C++ objects
 - **Options:** docstrings written in `bindings.cpp` (single place, appears in stubs) vs Doxygen in headers + Breathe.
 - **Recommendation:** in `bindings.cpp`, generated from the registry where possible.
-- **Status:** IMPLEMENTED AS RECOMMENDED (2026-11-19, Phase 3; please confirm): C++ objects are documented by docstrings in `src/bindings.cpp`, which nanobind turns into the generated stub `modde/_core.pyi` (shipped with `py.typed`). Python API docstrings use the numpy style.
+- **Status:** DECIDED (2026-11-19): C++ docstrings in `src/bindings.cpp` → generated `modde/_core.pyi`; numpy-style docstrings in Python.
 
 ### D-E8 🟢 Test framework
 - **Options:** Python-only tests (pytest via the bindings) vs also C++ unit tests (Catch2/GoogleTest).
 - **Recommendation:** pytest for almost everything; a minimal C++ test target only for things not reachable from Python.
-- **Status:** OPEN
+- **Status:** DECIDED (2026-11-19): pytest for everything; a C++ test target only if something becomes unreachable from Python (none so far).
 
 ---
 
@@ -451,3 +451,5 @@ add_sigma, add_learning_rates)`:
 | 2026-11-19 | Phase 1 spec review: renamed settings, fixed constant schedules, F0/CR0 as SHADE memory init, and the eigen-crossover note accepted. Bound-correction references taken from the ModDE paper; preset verification deferred. M1 reached. | spec/README.md |
 | 2026-11-19 | Docs hosted on GitHub Pages; Jupyter notebooks as getting-started material; a generated page listing all tunable parameters with paper references. | D-E2, D-E3 |
 | 2026-11-19 | Phase 3 implemented the recommendations of D-E1 (MkDocs Material), D-C2, D-C8, D-C10, D-B8, D-B10, D-D12 and D-E7; awaiting confirmation. | Phase 3 |
+| 2026-11-19 | irace exporter added (D-C10); dedicated logging integration postponed (D-B8 → FR-7). | D-C10, D-B8 |
+| 2026-11-19 | Phase 3 recommendations confirmed (D-B10, D-C2, D-C8, D-D12, D-E1, D-E7). Remaining open decisions closed with their recommendations: D-B5, D-B6, D-C1, D-C5, D-C7, D-D14, D-E4 (version 1.0.0a1), D-E5 (keep the repository until 1.0), D-E6, D-E8. | all |

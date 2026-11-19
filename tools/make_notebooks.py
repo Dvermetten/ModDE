@@ -237,6 +237,22 @@ print("default (classic DE):", round(scores[0], 3))
 print("best of the sample:  ", round(min(scores), 3))
 print({k: v for k, v in dict(best).items() if k in ("mutation_base", "crossover", "adaptation_method_F", "lambda0")})
 """),
+    md("""
+## Tuning with irace
+
+For [irace](https://mlopez-ibanez.github.io/irace/), `modde.irace` writes the
+parameter file (with all conditions) and an initial-configurations file with
+the default and all presets. In the target runner, `config_from_irace` turns
+irace's command-line arguments back into a configuration.
+"""),
+    code("""
+import tempfile
+paths = modde.irace.write_irace_files(tempfile.mkdtemp(), dim=5)
+print("".join(paths["parameters"].read_text().splitlines(keepends=True)[:8]))
+
+config = modde.irace.config_from_irace("--mutation_base TARGET --mutation_reference PBEST --pbest_sampling FIXED --pbest_rate 0.1", cs)
+print(config["mutation_base"], config["pbest_rate"])
+"""),
 ]
 
 ASK_TELL = [

@@ -4,7 +4,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "modde"
-version = "1.0.0.dev0"
+version = "1.0.0a1"
 description = "Modular Differential Evolution with a C++ core"
 readme = "README.md"
 license = { file = "LICENCE" }

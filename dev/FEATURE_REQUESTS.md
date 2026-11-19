@@ -12,3 +12,6 @@ for 1.0 should avoid making these harder where that costs little.
 | FR-4 | **Bit-reproducibility across platforms** (own distribution implementations instead of `std::*_distribution`). | D-A13 | Route every random draw through one RNG wrapper, so the distributions can be swapped later. |
 | FR-5 | **New DE modules and variants** (restarts, current-to-pbest-w as in jSO, non-linear population reduction, …). | D-A17 | Covered by Workstream 4 / Phase 6 "Scope extension" in [README.md](README.md). |
 | FR-6 | **macOS and aarch64 wheels / CI.** | D-A18 | 1.0 tests and builds Windows x64 + Linux x86_64. Keep build scripts platform-agnostic. |
+| FR-7 | **Dedicated logging / analysis integration** (e.g. a ready-made ioh logging setup, richer tracked state). | D-B8 (postponed) | For now, `modde.ModularDE` exposes its statistics as plain attributes that ioh loggers can watch. |
+| FR-8 | **C++ benchmark target linked against IOHexperimenter** (profiling and benchmarking without Python overhead). | D-B5 | The core never depends on ioh, so it can be linked from a separate C++ target. |
+| FR-9 | **Integer and mixed-integer variables.** | D-B6 | Keep `Settings` extensible. |

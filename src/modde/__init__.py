@@ -22,6 +22,7 @@ from .asktell import AskTellDE
 from .configspace import (config_from_settings, get_configspace, get_presets, preset_names,
                           preset_settings, settings_from_config)
 from .optimizer import FminResult, ModularDE, fmin, wrap_problem
+from . import irace  # irace export (D-C10)
 
 try:
     __version__ = _metadata.version("modde")
@@ -45,7 +46,7 @@ __all__ = (
     "fmin", "FminResult", "ModularDE", "AskTellDE", "wrap_problem",
     "settings_from_dict", "settings_to_dict",
     "get_configspace", "get_presets", "preset_names", "preset_settings",
-    "settings_from_config", "config_from_settings",
+    "settings_from_config", "config_from_settings", "irace",
     "Settings", "Modules", "Provenance",
     "BaseSampler", "OppositionalInitialization", "MutationBase", "MutationReference",
     "PbestSampling", "CrossoverType", "BoundCorrectionType", "AdaptationF", "AdaptationCR",
