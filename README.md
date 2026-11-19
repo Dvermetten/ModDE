@@ -2,6 +2,16 @@
 
 This work-in-progress repository contains the code used to create a modular version of differential evolution. 
 
+> **Development status:** a C++-backed rewrite is in progress (see [`dev/README.md`](dev/README.md) for the plan).
+> The 0.0.4 pure-Python implementation now lives in `modde.legacy` and is deprecated.
+> The examples below still use it: replace `from modularde import ModularDE` with `from modde.legacy import ModularDE`.
+>
+> Building from source requires a C++17 compiler and the Eigen submodule:
+> ```bash
+> git clone --recursive https://github.com/Dvermetten/ModDE.git
+> cd ModDE && pip install .
+> ```
+
 ## Basic use-case: L-SHADE
 
 To instantiate L-SHADE using modDE and optimize a function (using iohexperimenter), the following code can be used:
