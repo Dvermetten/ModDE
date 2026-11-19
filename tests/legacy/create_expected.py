@@ -6,7 +6,7 @@ import ioh
 import numpy as np
 
 
-from modde import ModularDE, parameters, utils
+from modde.legacy import ModularDE, parameters, utils
 
 
 def run_bbob_function(module, value, fid):

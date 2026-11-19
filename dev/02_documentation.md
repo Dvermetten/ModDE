@@ -1,0 +1,125 @@
+# Workstream 2: Documentation and Getting Started
+
+## Objective
+A new user should be able to:
+1. install `modde` and optimise their own function in **under 5 minutes**;
+2. recreate a well-known DE variant (e.g. L-SHADE) **by name**, without knowing the module flags;
+3. find, for any module, what it does, its parameters and defaults, where it comes from in the literature, and **which modules it does not combine well with**;
+4. set up a benchmarking or tuning experiment by copying a worked example.
+
+## Current state (0.0.4)
+- The README has a single L-SHADE example built from 12 keyword arguments. Its import (`from modularde import ModularDE`) is wrong; it should be `from modde import ModularDE`.
+- Tracking internal state requires a hand-written ~50-line wrapper class (`LSHADE_interface`).
+- The `Parameters` docstring is the only module reference. It is out of date: `adaptation_method` was split into `_F`/`_CR`, and `LHC` and `pbest_value` are missing.
+- No docs site, no API reference, no tutorials.
+
+## Audiences
+
+| Audience | Needs | Primary entry point |
+|----------|-------|---------------------|
+| Practitioner | "Minimise my function", sensible defaults | README quickstart, `fmin` |
+| Benchmarking researcher | Named variants, ioh integration, logging internal parameters | Tutorials 2–4, 7 |
+| Algorithm-configuration researcher | Configuration space, settings ↔ configuration round trip | Tutorial 6, ConfigSpace page |
+| DE researcher | Exact module semantics, interactions, literature | Module reference |
+| Contributor | How to add a module in C++ end to end | Contributor guide |
+
+## Deliverables
+
+### D1. README rewrite
+- One-paragraph pitch and a feature list (modules, C++ speed, ioh + ConfigSpace integration).
+- Install: `pip install modde`.
+- **10-line quickstart** with `fmin` on a plain Python function (classic DE by default, D-D2), followed by a one-line tip: the function is wrapped as an ioh problem automatically, so attaching an ioh logger is all it takes to get logging (link to Tutorial 1).
+- A second snippet: a named configuration (e.g. `get_presets(dim)["LSHADE"]`) on an ioh problem.
+- A table of modules with a link to each module's reference page.
+- Citation (keep the GECCO'23 bibtex) and acknowledgement of modcma.
+
+### D2. Documentation site
+Tooling per D-E1/D-E2. Proposed structure:
+```
+Getting started
+  Installation (incl. building from source with `git clone --recursive`, compiler requirements)
+  Quickstart
+  Concepts: modules, settings, parameters; how a generation is structured
+  Reproducibility (see note below)
+Tutorials (executed in CI)
+  1. Minimise a Python function with fmin. Explain that plain callables are
+     wrapped with ioh.wrap_problem automatically (the problem counts the
+     budget, D-B3), and show what that gives for free: attaching a logger,
+     IOHanalyzer output, tracked attributes. Mention the opt-out.
+  2. Optimise ioh/BBOB problems and log results for IOHanalyzer
+  3. Named DE variants: DE/rand/1/bin, JADE, SHADE, L-SHADE, jDE, jSO-style
+  4. Stepping through the algorithm and tracking internal state (replaces LSHADE_interface)
+  5. Ask-tell: external / parallel evaluation
+  6. Algorithm configuration with ConfigSpace (+ SMAC example)
+  7. A full benchmark experiment with ioh.Experiment
+Module reference (one page per module category, generated from the registry)
+  Initialisation · Mutation · Crossover · Bound correction · Selection ·
+  Archive · F/CR adaptation · Population size · Oppositional operators
+  + Interaction matrix (generated from WS3 results)
+API reference (generated from the .pyi stubs / docstrings)
+Developer guide
+  Architecture · Adding a module (checklist) · Testing · Release process
+Changelog & migration guide (0.0.4 → new)
+```
+
+### D3. Module reference pages
+Each module page uses the same template:
+- **What it does**: one sentence, plus the formula.
+- **Options**: name, description, literature reference.
+- **Parameters introduced**: name, default, derivation rule, valid range, active when.
+- **Interactions**: generated from the interaction matrix (compatible / changes meaning / no effect / incompatible).
+- **Example**: a 3-line snippet.
+- **Implementation notes / deviations from the original paper**, if we keep any (from the KNOWN_ISSUES triage).
+
+The **parameter registry** (WS3) is the single source of truth. Tables on
+these pages, the ConfigSpace and the C++ defaults all come from it, so docs
+cannot drift from code.
+
+### D4. Presets (named configurations, D-D2)
+- The default is **classic DE** (DE/rand/1/bin, F0 = 0.5, CR0 = 0.9), also for `fmin`.
+- Popular configurations are aliases: a dictionary mapping names to **ConfigSpace configurations** of `get_configspace(dim)`, built per dimension (`get_presets(dim)`), since e.g. L-SHADE's λ0 = 18·d depends on `dim`. Candidates: DE/best/1/bin, DE/current-to-pbest/1 (JADE), SHADE, L-SHADE (paper-accurate, using the new L-SHADE adaptation option, D-D10), jDE, jSO-style. The final list is fixed in Phase 1.
+- Each preset is documented with its paper and its equivalent explicit settings, so users learn the module system from it.
+- A preset configuration can be edited and passed straight to `settings_from_config` / `fmin`, or used to warm-start a tuner.
+
+### Reproducibility note (required, D-A13)
+The docs must state the guarantee plainly: **the same seed gives the same
+result on the same platform with the same modde version.** Results may differ
+across operating systems and compilers (MSVC vs GCC vs Clang), and across
+versions when the changelog says so. Results never match 0.0.4 bit for bit
+(different RNG; bug and paper fixes).
+
+### D5. Migration guide
+- Old kwarg → new setting mapping table (`lambda_` → `lambda0`, `F` → `F0`, `CR` → `CR0`, lowercase options → UPPERCASE enums, `adaptation_method_F='shade'` → …).
+- Shape change: populations are `n × d` in the new API (0.0.4: `d × n`).
+- Behavioural changes: every KNOWN_ISSUES item fixed, linking the [paper-deviation reports](../dev/studies/paper_deviations/reports/) for before/after impact.
+- The 0.0.4 implementation stays available as `modde.legacy` with a `DeprecationWarning` and will be removed once the new package is stable (D-A5). Show how to switch old code to the legacy import as a stop-gap.
+
+### D6. Contributor guide: "adding a module"
+A checklist of every place a module touches:
+enum in `modules.hpp` → strategy class + factory → registry entry (params,
+defaults, conditions) → bindings → ConfigSpace (automatic if registry-driven)
+→ spec page → unit tests → interaction-matrix run → docs page (automatic) →
+changelog.
+
+## Quality bar
+- Every code snippet in the docs and the README is executed in CI (doctest or executed notebooks/scripts).
+- Docs build with warnings treated as errors.
+- Every public class and function has a docstring. Bound C++ objects get docstrings in `bindings.cpp` (D-E7).
+- README quickstart runs in < 10 s.
+
+## Tasks
+
+### Phase 3 (skeleton)
+- [ ] Choose tooling (D-E1, D-E2, D-E3). Create `docs/` with the site structure and empty pages.
+- [ ] Wire up API reference generation from stubs/docstrings.
+- [ ] Write Concepts + Quickstart against the alpha API.
+- [ ] CI job: build docs + execute snippets.
+
+### Phase 4–5
+- [ ] Generate module reference pages from the registry.
+- [ ] Generate the interaction-matrix page from WS3 results.
+- [ ] Tutorials 1–7.
+- [ ] Presets pages.
+- [ ] Migration guide, changelog.
+- [ ] README rewrite (last, once the API is frozen).
+- [ ] Contributor guide.

@@ -10,7 +10,7 @@ import unittest.mock
 import numpy as np
 import ioh
 
-from modde import parameters, utils, ModularDE
+from modde.legacy import parameters, utils, ModularDE
 
 
 class TestModularDEMeta(type):
@@ -56,7 +56,7 @@ class TestModularDE(unittest.TestCase, metaclass=TestModularDEMeta):
 
     def __init__(self, args, **kwargs):
         """Initializes the expected function value dictionary."""
-        with open("tests/expected.json", "r") as f:
+        with open(os.path.join(os.path.dirname(__file__), "expected.json"), "r") as f:
             self.bbob2d_per_module = json.load(f)
         super().__init__(args, **kwargs)
 
