@@ -52,9 +52,10 @@ runs are reproducible on the same platform.
 2. crossover()           U from X, V, CR̃                         crossover.md
 3. correct_bounds()      U' from U (+ out-of-bounds mask)         bound_correction.md
 4. evaluate()            f(U'), at most the remaining budget      settings.md
-5. select()              X ← winners; success record R            selection_archive.md
+5. select()              X ← winners; success record R;           selection_archive.md,
+                         jDE commit                               adaptation.md §3
 6. [oppositional jump]   with probability jump_rate               oppositional_generation.md
-7. adapt()               archive ← R; memories ← R; jDE commit;   selection_archive.md,
+7. adapt()               archive ← R; memories ← R;               selection_archive.md,
                          population size schedule                 adaptation.md, population_size.md
 8. check termination                                              settings.md
 ```

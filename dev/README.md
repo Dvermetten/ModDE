@@ -85,10 +85,12 @@ implemented in C++ against that spec, with tests derived from it.
 - **M1:** spec and registry reviewed. ✅ The C++ work can start.
 
 ### Phase 2: C++ core (WS1)
-- [ ] Core types: `Population`, RNG, `Settings`, `Modules`, `Parameters`, `Stats`.
-- [ ] Port each module in this order: samplers → mutation → crossover → bound correction → selection → archive → F/CR adaptation → population-size schedule → oppositional operators → stats.
-- [ ] Operator-level tests for each module as it lands (WS3).
-- **M2:** `ModularDE(settings).run(f)` in C++ reproduces the spec on all modules.
+- [x] Core types: `Population`, `Rng`, `Settings` (+ `resolve()` with provenance and warnings), `Modules`, `Parameters`, `Stats`.
+- [x] All modules implemented from the spec: samplers (own Sobol with Joe & Kuo numbers, own Halton, LHS, truncated Gaussian), (quasi-)oppositional initialisation, oversampling, mutation, crossover (incl. eigen), all bound corrections, selection + success record, archive, SHADE / SHADE_MODIFIED / LSHADE / jDE / jSO caps, linear population reduction, oppositional generation, statistics, exact budget, termination.
+- [x] Split step API exposed to Python (`modde._core.ModularDE`): `initialize`, `sample_parameters`, `mutate`, `crossover`, `correct_bounds`, `evaluate`, `select`, `oppositional_generation`, `adapt`, `step`, `run`, plus state views (n × d).
+- [x] Operator-level tests against the spec (`tests/test_operators.py`, `test_samplers.py`, `test_settings_core.py`) and run-level tests (`test_runs.py`: exact budget, evaluation offset, LPSR schedule, tracking mode, determinism, all presets, invariants over sampled configurations). 418 new tests; 1300 in total.
+- [x] First speed check (details in [01_cpp_backend.md](01_cpp_backend.md)): core overhead 0.5–3 µs per evaluation; end-to-end on ioh f1 vs 0.0.4: L-SHADE 15–33× faster, classic DE 1.5–3×.
+- **M2:** `ModularDE(settings).run(f)` in C++ reproduces the spec on all modules. ✅ (Python front end: Phase 3.)
 
 ### Phase 3: Python API and integrations (WS1)
 - [ ] nanobind bindings + generated `.pyi` stubs.

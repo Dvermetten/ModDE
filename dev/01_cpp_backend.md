@@ -108,6 +108,33 @@ Each operator should be callable from Python on its own, as in modcma.
 - Population layout (D-A9, decided): column-major `d × n` internally (each individual contiguous). The Python API exposes `n × d` everywhere, which is a breaking change from 0.0.4 and is accepted.
 - Expose read-only views of internal state (population, F, CR, archive, memory) for analysis and tracking, without copying where nanobind allows it.
 
+## Phase 2 status (2026-11-19)
+
+All core modules are implemented in C++ against `dev/spec/` and exposed through
+`modde._core` (split step API, n × d state views). Source layout:
+`include/modde/{common,rng,modules,settings,population,sampling,parameters,operators,modde}.hpp`,
+`src/{settings,sampling,sobol_directions,mutation,crossover,bounds,adaptation,modde,bindings}.cpp`.
+`tools/gen_sobol_table.py` regenerates the Sobol table.
+
+**First speed check** (Windows, MSVC 19.39, Python 3.11, one core; ioh BBOB f1, budget 2000·d, seed 1):
+
+| Configuration | d | 0.0.4 | new: Python f, per point | new: vectorised f | new: ioh problem (batch) | speed-up vs 0.0.4 |
+|---|---|---|---|---|---|---|
+| classic DE | 10 | 0.06 s | 0.05 s | 0.01 s | 0.02 s | 3.2× |
+| classic DE | 50 | 0.36 s | 0.46 s | 0.18 s | 0.25 s | 1.5× |
+| L-SHADE (README config) | 10 | 0.43 s | 0.06 s | 0.02 s | 0.03 s | 14.9× |
+| L-SHADE (README config) | 50 | 8.53 s | 0.45 s | 0.20 s | 0.26 s | 33.0× |
+
+- Core-only overhead (objective returns zeros): 0.5–3 µs per evaluation, ≈ 25–40 ns per coordinate, independent of the configuration.
+- 0.0.4's classic DE was already mostly vectorised NumPy, and the evaluation itself is a large share of its runtime, so the gain there is small. The ≈20× target (D-A19) is met for adaptive configurations, not for plain DE. Per D-A19, no complexity was added to chase it. The remaining per-coordinate cost is the crossover's uniform draws and the bound checks; revisit with a profiler in Phase 4 if needed.
+- Batch evaluation (D-A11) is 2–3× faster than one Python call per point, as expected.
+- Note: classic DE differs between the columns' algorithms (0.0.4 CR = 0.5, new default CR0 = 0.9, D-D2); timing is comparable, precision is not.
+
+**Deferred from Phase 2 (by decision or to Phase 3):**
+- GIL release around pure C++ sections (D-A16): not done yet; the objective is always called with the GIL held.
+- Python-overridable hooks (D-A8): `Sampler`, `BoundCorrection` and `Mutation` are virtual base classes, but no trampolines are bound yet.
+- Pickling / serialisation of `Settings`, the public API (`fmin`, presets, ioh wrapping, ConfigSpace), ask-tell, stubs: Phase 3.
+
 ## Build and distribution
 - `pyproject.toml` using `scikit-build-core`, with `nanobind` as a build requirement.
 - `CMakeLists.txt`: `find_package(nanobind CONFIG REQUIRED)`, `nanobind_add_module(_core STABLE_ABI NB_STATIC src/...)`, `nanobind_add_stub(...)` to generate `_core.pyi`.
@@ -128,22 +155,22 @@ Each operator should be callable from Python on its own, as in modcma.
 - [x] Supporting studies (`dev/studies/`) are kept out of the repository (`.gitignore`); they stay local.
 
 ### Phase 2 (after the spec, M1)
-- [ ] `common.hpp`: typedefs, RNG engine + distributions, injectable draw source.
-- [ ] `Population` (+ indexing, sorting, resizing, concatenation).
-- [ ] `Modules`, `Settings`, `resolve()` with provenance.
-- [ ] Samplers: Uniform, Gaussian (fix KI-9), Sobol, Halton (reuse modcma's MIT `sobol.cpp`/Halton with attribution?), LHS; oppositional initialisation `{NONE, OPPOSITE, QUASI_OPPOSITE}` using `oppositional_initialization_factor` (KI-37, formulas in KNOWN_ISSUES); oversampling (fix KI-4).
-- [ ] Budget start-up check: if the problem already has evaluations, emit a warning (not an error) and keep counting the problem's total, so `evaluations ≤ budget` (D-B3).
-- [ ] Mutation: base {rand, best, target}, reference {none, rand, best, pbest}, **integer** number of difference terms `mutation_n_comps ≥ 0`, validated against λ in `resolve()` (fix KI-1, D-A6), archive term (KI-27), weighted F (KI-24), distinct parents (KI-23).
-- [ ] Crossover: bin, exp; eigen coordinate system.
-- [ ] Bound correction: none, saturate, unif_resample, COTN, toroidal, mirror, hvb, expc_target, expc_center, exps.
-- [ ] Selection: one-to-one, returning successful indices and F/CR.
-- [ ] Archive: rate-based size, random removal, LPSR interplay (KI-30).
-- [ ] Adaptation: SHADE (Lehmer mean, KI-20), SHADE-modified, jDE (fix KI-2, KI-22), jSO caps (KI-21).
-- [ ] Population size: constant, LPSR with explicit `lambda_min` (KI-28/33).
-- [ ] Oppositional generation (fix KI-6, KI-7).
-- [ ] Stats: the 0.0.4 tracked set (`curr_F`, `curr_CR`, `corrected`, `CS`, `ED`, `corr_so_far`, `popmean`, `popstd`, `F_Memory_mean`) in one place (`stats.hpp`), readable from Python. Customisable stats come after 1.0 (FR-1, D-A20).
-- [ ] Termination: budget (exact if cheap, KI-8 / D-A21), target, max generations.
-- [ ] `ModularDE` step functions + `run`.
+- [x] `common.hpp` typedefs; `rng.hpp`: one `Rng` class wrapping `std::mt19937_64` + std distributions. *Injectable draws: not needed — operator tests check exact formulas using the recorded parents (`last_parents`) and crafted state instead.*
+- [x] `Population` (+ indexing, sorting, resizing, concatenation).
+- [x] `Modules`, `Settings`, `resolve()` with provenance.
+- [x] Samplers: Uniform, Gaussian (fix KI-9), Sobol, Halton (own implementations: modcma's Sobol is LGPL; Joe & Kuo direction numbers, BSD), LHS; oppositional initialisation `{NONE, OPPOSITE, QUASI_OPPOSITE}` using `oppositional_initialization_factor` (KI-37, formulas in KNOWN_ISSUES); oversampling (fix KI-4).
+- [~] Budget start-up: the core supports an evaluation offset (`stats.evaluations` can be preset; the budget applies to the total, tested). The *warning* is emitted by the Python front end when it wraps the problem (Phase 3).
+- [x] Mutation: base {rand, best, target}, reference {none, rand, best, pbest}, **integer** number of difference terms `mutation_n_comps ≥ 0`, validated against λ in `resolve()` (fix KI-1, D-A6), archive term (KI-27), weighted F (KI-24), distinct parents (KI-23).
+- [x] Crossover: bin, exp; eigen coordinate system.
+- [x] Bound correction: none, saturate, unif_resample, COTN, toroidal, mirror, hvb, expc_target, expc_center, exps.
+- [x] Selection: one-to-one, returning successful indices and F/CR.
+- [x] Archive: rate-based size, random removal, LPSR interplay (KI-30).
+- [x] Adaptation: SHADE (Lehmer mean, KI-20), SHADE-modified, jDE (fix KI-2, KI-22), jSO caps (KI-21).
+- [x] Population size: constant, LPSR with explicit `lambda_min` (KI-28/33).
+- [x] Oppositional generation (fix KI-6, KI-7).
+- [x] Stats: the 0.0.4 tracked set (`curr_F`, `curr_CR`, `corrected`, `CS`, `ED`, `corr_so_far`, `popmean`, `popstd`, `F_Memory_mean`) in one place (`Stats` in `parameters.hpp`), readable from Python. Customisable stats come after 1.0 (FR-1, D-A20).
+- [x] Termination: budget (exact if cheap, KI-8 / D-A21), target, max generations.
+- [x] `ModularDE` step functions + `run`.
 
 ### Phase 3
 - [ ] nanobind bindings for every class/enum, with docstrings.

@@ -40,7 +40,10 @@ If `S = ∅`, the memories and `k` are unchanged. A memory exists only if its pa
 - F: with probability `jde_tau_F`, `F̃_i = jde_F_lower + U(0,1)·jde_F_width`; otherwise `F̃_i = F_i`.
 - CR: with probability `jde_tau_CR`, `CR̃_i ~ U(0, 1)`; otherwise `CR̃_i = CR_i`.
 
-**`adapt()` (commit):** for `i ∈ W` (trial selected), `F_i ← F̃_i` and `CR_i ← CR̃_i`. The others keep their stored values.
+**Commit, at selection (step 5), before anything can reorder the population:**
+for `i ∈ W` (trial selected), `F_i ← F̃_i` and `CR_i ← CR̃_i`. The others keep
+their stored values. *(Phase 2: moved from `adapt()` to selection, because an
+oppositional jump between selection and `adapt()` reorders individuals.)*
 
 ## 4. jSO caps (`use_jso_caps`, KI-21)
 Applied **after** step-0 sampling, using the progress `t` at the start of the generation:

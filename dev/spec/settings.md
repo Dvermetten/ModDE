@@ -64,7 +64,13 @@ Checked after initialisation and after every evaluation batch. The run stops whe
 2. the target is reached: ioh `state.final_target_found`, or best `f ≤ target` for a user target;
 3. `generation ≥ max_generations` (if set).
 
-The steps of the current generation that come after the stop are not executed.
+Trials that were already evaluated are still selected (D-D7). The remaining
+steps of the generation (oppositional jump, `adapt()`) are skipped. The first
+call to `step()` also performs initialisation.
+
+**Exact budget (D-A21, measured in Phase 2):** capping a batch at the remaining
+budget is a single `min()` per batch and costs nothing measurable, so the budget
+is always exact.
 
 ## 4. Statistics (v1 set, D-A20)
 

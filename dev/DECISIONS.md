@@ -396,7 +396,8 @@ add_sigma, add_learning_rates)`:
 
 ### D-E6 🟠 Code reuse from modcma and licensing
 - **Decision:** which modcma C++ code to reuse (Sobol/Halton samplers, bound corrections, `Population`, `ndtr_ndtri.cpp`), and how to attribute it. Both projects are MIT.
-- **Status:** OPEN
+- **Finding (Phase 2, 2026-11-19):** modcma's `src/sobol.cpp` is John Burkardt's code under the **GNU LGPL**, not MIT, so it was not reused. modde has its own Sobol (Joe & Kuo direction numbers, BSD-style licence shipped in `src/modde/_licenses/`) and Halton. **No modcma code is currently used**; everything else was written from the spec.
+- **Status:** OPEN (no reuse so far; decide only if reuse comes up again)
 
 ### D-E7 🟢 Docstring source for C++ objects
 - **Options:** docstrings written in `bindings.cpp` (single place, appears in stubs) vs Doxygen in headers + Breathe.
