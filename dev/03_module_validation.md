@@ -175,9 +175,9 @@ The published L-SHADE and jSO results are on CEC2014 and CEC2017, which ioh
 - [x] Triage KNOWN_ISSUES §B (paper deviations): all move to the paper version (2026-11-19).
 - [x] Verify KI-21 (jSO caps) and KI-28 (L-SHADE N_min) against references.
 - [ ] Before/after impact report per deviation ([studies/paper_deviations/](studies/paper_deviations/)). The paper-version implementations in `harness.py` serve as reference behaviour for the spec.
-- [ ] Write `dev/spec/*.md`.
-- [ ] Build the parameter registry and resolution rules (provenance).
-- [ ] Decide D-D1…D-D14.
+- [x] Write `dev/spec/*.md` (draft, awaiting author review).
+- [x] Build the parameter registry (`src/modde/_registry.py`) and resolution rules (provenance, spec/settings.md).
+- [x] Decide the D-D decisions needed for the spec (D-D1…D-D11, D-D13; D-D12/D-D14 later).
 
 ### Phase 2 (alongside the C++ port)
 - [ ] `tests/reference/`: minimal NumPy reference operators written directly from the spec (not copied from 0.0.4).
