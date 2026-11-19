@@ -41,25 +41,27 @@
 | Issue | Policy fix |
 |-------|-----------|
 | KI-30 `archive_size` overwritten | Replace with `archive_rate` (user value kept). Capacity = `round(rate × current λ)` is a documented schedule. |
-| KI-31 λ default depends on LPSR | Single derived default for `lambda0` (D-D6). Presets set their paper values explicitly. |
-| KI-32 `memory_size=100` default | Default chosen once (D-D4/registry). The L-SHADE preset sets 6 explicitly. |
-| KI-33 LPSR end size derived from mutation | Explicit `lambda_min` setting. Default = max(4, parents needed + 1)? (D-D5). Error if a user value is below the minimum the mutation needs. |
+| KI-31 λ default depends on LPSR | `lambda0` is a true parameter with one default (10·d) for every configuration; LPSR never changes it (D-D6). Presets set their paper values explicitly. |
+| KI-32 `memory_size=100` default | Default 6 for every configuration (D-D4). |
+| KI-33 LPSR end size derived from mutation | Explicit `lambda_min` setting. Default derived as max(4, parents needed + 1) (D-D5). Error if a user value is below the minimum the mutation needs. |
 | KI-34 hard-coded constants | Promoted to settings with registry defaults: jDE τ_F, τ_CR, F_l, F_u; pbest range; SHADE scales; weighted-F schedule; jSO thresholds; HVB α. |
-| KI-35 budget default | From the problem/caller. Default only for bare callables (D-B3). |
-| KI-36 F/CR array typing | `F0`, `CR0` scalars (optionally arrays). Clearly "initial values" when adaptation is on. |
+| KI-35 budget default | The budget is counted **by the problem** (plain callables are wrapped with ioh by default). Required in `fmin`; low-level default 10 000·d (D-B3). |
+| KI-36 F/CR array typing | Scalar `F0`, `CR0` in the Settings; arrays only via the low-level runtime API (D-D9). Clearly "initial values" when adaptation is on. |
 | KI-37 unused factor | Implement quasi-opposition or remove. |
 
 ## 3. Parameter registry (Phase 1 deliverable)
 
-A single machine-readable table (format per D-C3: a C++ table exported to
-Python, or a YAML/Python file that generates C++ defaults). Columns:
+A single Python data module, `src/modde/_registry.py` (D-C3). C++ defaults
+are written by hand, and a test checks that they agree with the registry.
+Columns:
 
 | name | type | range | default rule | active when | provenance rules | tunable? | ConfigSpace distribution | docs text | literature |
 |------|------|-------|--------------|-------------|------------------|----------|--------------------------|-----------|------------|
 
 It generates or validates:
-- the C++ `Settings::resolve()` defaults (or at least a test that the two agree);
-- the ConfigSpace (hyperparameters, conditions, forbiddens);
+- the C++ `Settings::resolve()` defaults (via a test that the two agree);
+- the ConfigSpace (hyperparameters, conditions, forbiddens), which depends on `dim` because `lambda0` is tuned directly (D-C6);
+- the named presets (`get_presets(dim)`, D-D2);
 - the module reference tables in the docs.
 
 ## 4. Module spec (Phase 1 deliverable)
@@ -134,7 +136,7 @@ evaluation path is designed during implementation. Whatever design is chosen
 must pass these checks:
 - With an ioh logger watching tracked attributes (F, CR, corrected, CS, ED, …), every logged row carries the values belonging to **the individual that was evaluated**, not the generation's last or first individual.
 - Do this for every evaluation mode we expose (batch, per-individual, ask-tell), and with oppositional initialisation/generation turned on (extra evaluations outside the normal generation order, cf. KI-14).
-- The logged evaluation count equals the internal counter, and both equal the budget at the end of the run.
+- The problem's evaluation count (which is what counts the budget, D-B3) equals the logged count and equals the budget at the end of the run.
 - The cost of tracking mode is measured and documented (WS1 benchmarks).
 
 ### 5.4 Reference-variant validation

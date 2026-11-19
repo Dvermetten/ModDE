@@ -24,7 +24,7 @@ ioh 0.3.22, ConfigSpace 1.2.2, modde 0.0.4.
 | D-A11 | Objective calling convention | ✅ **DECIDED:** batch default + per-individual fallback; add speed test |
 | D-A13 | RNG and reproducibility guarantee | ✅ **DECIDED:** same seed → same result on the same platform/version only (documented) |
 | D-A18 | Python versions / platforms | ✅ **DECIDED:** Python ≥ 3.10; CI on Windows + Linux, Python 3.11; no `-march=native` |
-| D-B1 | Accepted problem types | ✅ **DECIDED:** any callable + dim + bounds; ioh auto-detected; docs promote `ioh.wrap_problem` for logging |
+| D-B1 | Accepted problem types | ✅ **DECIDED:** any callable + dim + bounds; the front end wraps plain callables with ioh by default (amended via D-B3) |
 | D-D1 | Parameter-conflict policy | ✅ **DECIDED:** user values never overridden; conflicts raise errors; derived values carry provenance |
 | D-D3 | Literature fidelity vs. keep 0.0.4 behaviour | ✅ **DECIDED:** bugs (KI-1…15) are fixed; paper deviations (KI-20…28) move to the paper version, each with a before/after impact report |
 
@@ -175,18 +175,19 @@ custom functions. Suites include BBOB, CEC2013, CEC2022, PBO, ….
 - **Options:** (a) ioh problems only (0.0.4's effective requirement: it reads `meta_data` and `state`); (b) any callable + `dim` + bounds, with ioh problems auto-detected; (c) callables are wrapped into ioh problems via `ioh.wrap_problem`.
 - **Recommendation:** (b). ioh stays a dependency (or optional extra, D-B11), and the core never depends on it.
 - **Status:** DECIDED (2026-11-19): (b). The core accepts any callable + `dim` + bounds, and ioh problems are auto-detected (dimension, bounds, target, optimisation type read from the problem). The core never depends on ioh. **Docs and examples must show that wrapping a custom function with `ioh.wrap_problem` is generally beneficial**, because it enables ioh logging (IOHanalyzer, tracked attributes) at no extra effort. Tutorial 1 shows the bare callable and the wrapped version side by side.
+- **Amended (2026-11-19, via D-B3):** wrapping with `ioh.wrap_problem` becomes the *default* in the Python front end (opt-out possible), so the problem counts the budget. The C++ core still accepts any callable and never depends on ioh.
 
 ### D-B2 🟠 Source of bounds
 - **Context:** 0.0.4 ignores problem bounds (KI-3).
 - **Options:** for ioh problems, always use `problem.bounds` (an explicit user lb/ub is an error, or overrides with a warning?). For bare callables: bounds required, or default `[-5, 5]^d`?
 - **Recommendation:** ioh → problem bounds. User override allowed but recorded as `USER` provenance. Callables → bounds **required** (no silent `[-5, 5]`).
-- **Status:** OPEN
+- **Status:** DECIDED (2026-11-19): ioh problems supply their bounds. User overrides are recorded as `USER` provenance. For plain callables, bounds are **required** (no silent [-5, 5]) and are passed on to the ioh wrapper (D-B3).
 
 ### D-B3 🟠 Budget and target ownership
 - **Context:** 0.0.4 stops on `problem.state.evaluations >= budget`, which breaks if a problem is reused without `reset()`, and on `state.optimum_found`. Budget defaults to `1e4 * d`.
 - **Options:** count evaluations internally (recommended; works for callables) vs. read `problem.state.evaluations`. Target: use `state.final_target_found` (ioh's configurable final target) vs `optimum_found`. Is the budget required or defaulted?
 - **Recommendation:** internal counter; use ioh's final target for ioh problems; budget required in `fmin`, and a documented default in the low-level API.
-- **Status:** OPEN
+- **Status:** DECIDED (2026-11-19): **the evaluation budget is counted by the problem**, not by the optimizer, so no evaluation can go uncounted. Consequently **wrapping with ioh is the standard path**: the Python front end wraps a plain callable with `ioh.wrap_problem` (using the given bounds) unless the user opts out. Termination reads `problem.state.evaluations` and the ioh final target (`state.final_target_found`). The budget is required in `fmin`; the low-level default is 10 000·d. The C++ core stays independent of ioh: it receives a callable plus a way to query the evaluation count, so the speed tests can still run without ioh. Open details for the spec: behaviour when a reused problem already has evaluations (warn, or count only evaluations since start?), and measuring ioh's per-evaluation overhead in the D-A19 benchmarks.
 
 ### D-B4 🟠 Batch evaluation vs per-evaluation tracking with ioh loggers
 - **Context:** ioh loggers can record attributes of the algorithm object (README example: `logged_attributes=['F', 'CR', 'corrected', …]`). With batch evaluation, the attribute values seen during a batch call are those of the generation, not of the individual.
@@ -208,7 +209,7 @@ custom functions. Suites include BBOB, CEC2013, CEC2022, PBO, ….
 ### D-B7 🟠 Interaction with ioh constraint handling
 - **Context:** ioh problems carry `bounds` with `enforced` / `penalty` behaviour and `add_constraint`. With `bound_correction=NONE`, DE evaluates infeasible points, and what ioh returns depends on its enforcement settings.
 - **Decision:** define and document the semantics of `bound_correction=NONE` (evaluate as-is, pass-through to ioh), and whether general constraints are supported at all.
-- **Status:** OPEN
+- **Status:** DECIDED (2026-11-19): with `bound_correction=NONE`, infeasible points are evaluated as-is (whatever the ioh problem's own bound handling does). General constraints are not supported in v1.
 
 ### D-B8 🟠 Logging and analysis integration
 - **Decision:** ship a ready-made adapter (e.g. `modde.ioh.tracked(optimizer)`, or the optimizer exposing tracked properties directly) so `ioh.logger.Analyzer(...).watch(...)` / `ioh.Experiment(logged_attributes=...)` works without the 0.0.4 wrapper class.
@@ -226,7 +227,7 @@ custom functions. Suites include BBOB, CEC2013, CEC2022, PBO, ….
 
 ### D-B11 🟠 ioh as a hard or optional dependency
 - **Recommendation:** keep it as a hard dependency (it is light and the main use case), but the core never imports it, so it can become optional later.
-- **Status:** OPEN
+- **Status:** DECIDED (2026-11-19): **ioh is a hard dependency** (it is the standard evaluation path, D-B3). The C++ core still never includes or links ioh.
 
 ---
 
@@ -254,7 +255,7 @@ add_sigma, add_learning_rates)`:
 - **Options:** (a) introspect bound enums (modcma); (b) the parameter registry (WS3), which also carries ranges, distributions and active-when conditions; (c) hand-written.
 - **Recommendation:** (b). Introspection alone cannot know ranges or conditions.
 - **Sub-decision:** where the registry lives: a C++ table bound to Python, or a Python/YAML file from which the C++ defaults are generated (or against which they are tested).
-- **Status:** OPEN
+- **Status:** DECIDED (2026-11-19): (c). The registry is a single Python data module in the package (`src/modde/_registry.py`; plain Python, so no PyYAML dependency). C++ defaults are written by hand, and a test checks that the C++ defaults, the registry, the ConfigSpace and the generated docs tables agree.
 
 ### D-C4 🟠 Conditional hyperparameters
 - **Context:** many parameters are only meaningful with a module: `memory_size` ↔ SHADE; `archive_rate` ↔ archive; `p_best` ↔ `mutation_reference=pbest`; jDE τ's ↔ jDE; `lambda_min` ↔ LPSR; opposition factor ↔ oppositional init.
@@ -271,7 +272,7 @@ add_sigma, add_learning_rates)`:
 - **Context:** modcma uses absolute `lambda0 ∈ [1, 50·dim]`, so a space is tied to one dimension.
 - **Options:** absolute population size vs. a multiplier of d (e.g. `lambda_factor ∈ [2, 30]`, λ = round(factor·d)), or a log-scale absolute size.
 - **Recommendation:** a multiplier, which transfers across dimensions and suits per-dimension tuning studies. Also allow an absolute value outside the configspace.
-- **Status:** OPEN
+- **Status:** DECIDED (2026-11-19): the ConfigSpace tunes **`lambda0` directly as an integer** (log scale), not as a multiplier of d, because good population sizes need not scale linearly with dimension. The space therefore depends on `dim` (as in modcma: `get_configspace(dim)`). The proposed range is [parents needed + 1, 50·d] with default 10·d, to be fixed in the registry.
 
 ### D-C7 🟢 Prior distributions for numerics
 - **Options:** uniform (unbiased) vs normal around the default (modcma) vs log-scale.
@@ -284,7 +285,8 @@ add_sigma, add_learning_rates)`:
 
 ### D-C9 🟠 ConfigSpace as a hard or optional dependency
 - **Context:** modcma makes it a hard dependency.
-- **Recommendation:** optional extra `pip install modde[tuning]`, imported lazily.
+- **New consideration (2026-11-19):** D-D2 defines the named presets as **ConfigSpace configurations**, so the presets (a core convenience) now need ConfigSpace. Options: (a) make ConfigSpace a hard dependency (simplest; it is pure Python and light); (b) keep it optional, storing presets internally as plain settings dicts and converting them to `Configuration` objects only when ConfigSpace is installed.
+- **Recommendation (revised):** (a) hard dependency, since presets are a main entry point for users. (b) adds a second representation to keep in sync.
 - **Status:** OPEN
 
 ### D-C10 🟢 Other tuners and formats
@@ -294,7 +296,7 @@ add_sigma, add_learning_rates)`:
 
 ### D-C11 🟠 Default configuration of the space
 - **Decision:** which algorithm the space's default represents (classic DE/rand/1/bin? L-SHADE-like?). Tied to D-D2.
-- **Status:** OPEN
+- **Status:** DECIDED (2026-11-19): the ConfigSpace default configuration is classic DE (see D-D2).
 
 ---
 
@@ -309,7 +311,7 @@ add_sigma, add_learning_rates)`:
 - **Context:** the 0.0.4 defaults are uniform init, saturate, rand/1, bin, F=0.5, CR=0.5, λ=10d.
 - **Options:** keep these, classic Storn & Price (F=0.5, CR=0.9), or an adaptive default (e.g. SHADE-like) for out-of-the-box performance.
 - **Recommendation:** decide based on audience. For `fmin` users an adaptive default performs better. For a "baseline" the classic one is clearer. One option: modules default to classic, `fmin` defaults to a preset.
-- **Status:** OPEN
+- **Status:** DECIDED (2026-11-19): the default (all modules at their defaults, and `fmin` without arguments) is **classic DE**: DE/rand/1/bin, F0 = 0.5, CR0 = 0.9, uniform initialisation, saturate bound correction, λ0 = 10·d. **Popular configurations are available as named aliases**: a dictionary mapping names (e.g. `"LSHADE"`, `"SHADE"`, `"JADE"`, `"jDE"`, `"DE/best/1/bin"`, …) to their ConfigSpace realizations (`Configuration` objects of `get_configspace(dim)`), usable directly with `settings_from_config` / `fmin`. Because some preset values depend on `dim` (e.g. L-SHADE's 18·d), the dictionary is built per dimension (e.g. `get_presets(dim)`). Exact preset list is fixed in Phase 1.
 
 ### D-D3 🔴 Literature fidelity vs. 0.0.4 behaviour
 - **Context:** KNOWN_ISSUES §B (KI-20…28): Lehmer mean, jSO caps, jDE success rule, distinct parents, weighted-F scope, `pbest_value` semantics, archive init, archive term, LPSR minimum.
@@ -320,38 +322,38 @@ add_sigma, add_learning_rates)`:
 ### D-D4 🟠 Archive and memory sizing
 - **Options:** archive as absolute size vs rate × λ (JADE: 1.0; L-SHADE: 2.6; 0.0.4: 2.0 forced). Behaviour under LPSR (shrink with λ?). Default `memory_size` (SHADE: H = N; L-SHADE: 6; 0.0.4: 100).
 - **Recommendation:** `archive_rate` (default 1.0 or 2.6?) and capacity tracking current λ; a single `memory_size` default; presets carry paper values.
-- **Status:** OPEN
+- **Status:** DECIDED (2026-11-19): `archive_rate` (capacity = round(rate × current λ), so the archive shrinks with LPSR as in L-SHADE), default 1.0 (JADE). `memory_size` default 6 (L-SHADE). Presets carry paper values.
 
 ### D-D5 🟠 LPSR end population
 - **Options:** derived from the mutation's parent needs (0.0.4) vs explicit `lambda_min` with default 4 (L-SHADE) and validation against parent needs.
 - **Recommendation:** explicit `lambda_min`.
-- **Status:** OPEN
+- **Status:** DECIDED (2026-11-19): explicit `lambda_min` setting. Its default is derived as max(4, parents needed + 1) (`DERIVED` provenance). A user value below what the mutation needs raises an error (D-D1).
 
 ### D-D6 🟠 Population-size specification and default
 - **Options:** absolute `lambda0`, `lambda_factor × d`, or both. Default 10d vs other (e.g. 18d L-SHADE, 25·log(d)·√d jSO). The default must not depend on LPSR (KI-31).
-- **Status:** OPEN
+- **Status:** DECIDED (2026-11-19): **`lambda0` is a true integer parameter** with a single default of 10·d for every configuration. LPSR (or any other module) never changes that default (fixes KI-31); LPSR only uses `lambda0` as its starting size. Presets set their own values (e.g. L-SHADE 18·d). See D-C6 for tuning.
 
 ### D-D7 🟠 Budget enforcement mid-generation
 - See D-A21. Additional question: in a partial final generation, are the evaluated trials still selected? (Yes, for any-time correctness.)
-- **Status:** OPEN
+- **Status:** DECIDED (2026-11-19): covered by D-A21 (exact budget if cheap; overshoot acceptable otherwise).
 
 ### D-D8 🟠 Parent selection rules
 - **Options:** require mutually distinct parents (classic DE) and raise an error if λ is too small, vs allow repeats (0.0.4). Is the archive drawn from P ∪ A or from A only (KI-27)?
 - **Recommendation:** distinct parents; P ∪ A, following JADE.
-- **Status:** OPEN
+- **Status:** DECIDED (2026-11-19): covered by KI-23 and KI-27 (paper versions). Parents are mutually distinct and distinct from the target; the archive term draws from P ∪ A. A population too small for the required distinct parents raises an error (D-D1).
 
 ### D-D9 🟠 F/CR specification API
 - **Options:** scalars only; scalars or per-individual arrays; distributions (e.g. "F ~ U(0.4, 0.9) each generation" as a non-adaptive module).
 - **Recommendation:** scalar `F0`/`CR0`. Arrays only via the low-level API.
-- **Status:** OPEN
+- **Status:** DECIDED (2026-11-19): scalar `F0` and `CR0` in the Settings. Per-individual arrays only through the low-level runtime API.
 
 ### D-D10 🟠 v1 module scope
 - See D-A17. List the modules to drop (if any: e.g. `shade_modified`, `exps`?) and to add.
-- **Status:** OPEN
+- **Status:** DECIDED (2026-11-19): **keep every module option currently implemented** (incl. `shade_modified`, `oversampling_factor`, `eigenvalue_crossover`, all bound corrections). **Add a paper-accurate L-SHADE adaptation option** (e.g. `adaptation_method_CR = LSHADE`): weighted Lehmer mean for the CR memory plus L-SHADE's terminal-value rule (a memory slot whose successful CRs are all 0 becomes terminal, and CR = 0 is used from then on). It makes a faithful L-SHADE preset possible; it is the only option added before 1.0 (an exception to D-A17).
 
 ### D-D11 🟠 Oppositional generation semantics
 - **Decisions:** where it sits in the generation (before/after adapt); whether selection is (λ + λ) truncation; whether it consumes budget (yes) and respects the budget limit; how F/CR/memory follow reordered individuals; whether the jumping probability is a module or a numeric setting.
-- **Status:** OPEN
+- **Status:** DECIDED (2026-11-19): oppositional generation runs after selection and before adaptation. Opposite points use the current population's per-dimension bounds (KI-6 fix). The best λ of population ∪ opposite points are kept. Opposite points inherit F/CR from their source individual. Their evaluations count towards the budget and are cut off at the budget. Configured as an on/off module plus a `jump_rate` setting, default 0.3 (Rahnamayan et al., ODE).
 
 ### D-D12 🟠 Ask-tell parity
 - **Decision:** must ask-tell produce **identical** trajectories to `run()` for the same seed? Recommended: yes, as a tested invariant.
@@ -359,7 +361,7 @@ add_sigma, add_learning_rates)`:
 
 ### D-D13 🟠 Reproducibility guarantee
 - See D-A13. Also: what changes count as "behaviour-changing" and need a changelog entry and a new regression snapshot.
-- **Status:** OPEN
+- **Status:** DECIDED (2026-11-19): covered by D-A13 (same seed → same result on the same platform and version; documented).
 
 ### D-D14 🟠 Validation acceptance criteria
 - **Decision:** when a module or preset counts as "validated". Proposed: operator tests pass, invariants hold for N random configurations, and the preset is statistically indistinguishable (or not significantly worse, α = 0.05, ≥ 25 runs) from the reference implementation on the agreed suite.
@@ -434,3 +436,11 @@ add_sigma, add_learning_rates)`:
 | 2026-11-19 | Exact budget termination if cheap; overshoot otherwise acceptable. | D-A21 |
 | 2026-11-19 | Parameter policy: user values never overridden, conflicts raise errors, provenance recorded. | D-D1 |
 | 2026-11-19 | Any callable accepted (ioh auto-detected); examples show that wrapping with `ioh.wrap_problem` is beneficial for logging. | D-B1, WS2 |
+| 2026-11-19 | Parameter registry: one Python data module (`src/modde/_registry.py`); C++ defaults hand-written and checked by a test. | D-C3 |
+| 2026-11-19 | Keep all current module options; add a paper-accurate L-SHADE adaptation option (Lehmer CR + terminal value). | D-D10 |
+| 2026-11-19 | `lambda0` is a true parameter, default 10·d for every configuration, never changed by LPSR; tuned directly (not as a multiplier) in a dim-dependent ConfigSpace. | D-D6, D-C6 |
+| 2026-11-19 | `archive_rate` default 1.0 (shrinks with λ); `memory_size` default 6; explicit `lambda_min` (default max(4, parents+1)); scalar `F0`/`CR0`. | D-D4, D-D5, D-D9 |
+| 2026-11-19 | Default = classic DE (DE/rand/1/bin, F0 0.5, CR0 0.9), also for `fmin`; popular configurations as named aliases mapping to ConfigSpace configurations, built per dimension. | D-D2, D-C11 |
+| 2026-11-19 | Oppositional generation semantics fixed (after selection, per-dimension bounds, (λ+λ) truncation, inherit F/CR, budgeted, `jump_rate` 0.3). | D-D11 |
+| 2026-11-19 | Closed as covered by earlier decisions: D-D7 (D-A21), D-D8 (KI-23/27), D-D13 (D-A13). | D-D7, D-D8, D-D13 |
+| 2026-11-19 | Budget is counted by the problem; the front end wraps plain callables with ioh by default; ioh becomes a hard dependency; bounds required for plain callables; NONE correction evaluates infeasible points as-is. | D-B1 (amended), D-B2, D-B3, D-B7, D-B11 |

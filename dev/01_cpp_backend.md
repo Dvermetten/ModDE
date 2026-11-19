@@ -101,6 +101,7 @@ Each operator should be callable from Python on its own, as in modcma.
   - Keep a per-individual mode for callables that only accept vectors, and for per-evaluation tracking via the ioh logger (D-B4). The mode is chosen with an explicit `vectorized` flag, not auto-detection (D-A11).
 - Release the GIL inside pure C++ sections (`nb::gil_scoped_release`) so users can run several optimizers in Python threads. No parallelisation inside the core for 1.0 (D-A16).
 - **Budget:** stop exactly at the budget (evaluate only part of the last generation) *if* this costs little compared with allowing overshoot. Measure it; otherwise allow overshoot and leave it to post-processing (D-A21).
+- **Who counts evaluations (D-B3):** the problem does. The Python front end wraps plain callables with `ioh.wrap_problem` by default, and termination reads `problem.state.evaluations` / `state.final_target_found`. The C++ core stays ioh-free: it receives the objective callable plus an "evaluations used" query. The low-level API can pass a plain callable (counted by the core), which the speed tests use to measure ioh's per-evaluation overhead separately.
 
 ### Python ↔ C++ data
 - Eigen dense type casters (`nanobind/eigen/dense.h`) for `Vector` and `Matrix`.
@@ -146,7 +147,7 @@ Each operator should be callable from Python on its own, as in modcma.
 ### Phase 3
 - [ ] nanobind bindings for every class/enum, with docstrings.
 - [ ] Stub generation in the build. Check type hints in an IDE.
-- [ ] `fmin`, `settings_from_dict`, presets.
+- [ ] `fmin` (classic DE by default; wraps plain callables with ioh), `settings_from_dict`, named presets as ConfigSpace configurations per dimension (`get_presets(dim)`, D-D2).
 - [ ] ioh helper (see D-B*).
 - [ ] ConfigSpace helper (see D-C*).
 - [ ] Ask-tell (D-A12).

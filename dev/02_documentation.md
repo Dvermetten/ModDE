@@ -28,8 +28,8 @@ A new user should be able to:
 ### D1. README rewrite
 - One-paragraph pitch and a feature list (modules, C++ speed, ioh + ConfigSpace integration).
 - Install: `pip install modde`.
-- **10-line quickstart** with `fmin` on a plain Python function, followed by a one-line tip that wrapping it with `ioh.wrap_problem` enables logging (link to Tutorial 1).
-- A second snippet: a named preset (`modde.presets.LSHADE`) on an ioh problem.
+- **10-line quickstart** with `fmin` on a plain Python function (classic DE by default, D-D2), followed by a one-line tip: the function is wrapped as an ioh problem automatically, so attaching an ioh logger is all it takes to get logging (link to Tutorial 1).
+- A second snippet: a named configuration (e.g. `get_presets(dim)["LSHADE"]`) on an ioh problem.
 - A table of modules with a link to each module's reference page.
 - Citation (keep the GECCO'23 bibtex) and acknowledgement of modcma.
 
@@ -42,9 +42,10 @@ Getting started
   Concepts: modules, settings, parameters; how a generation is structured
   Reproducibility (see note below)
 Tutorials (executed in CI)
-  1. Minimise a Python function with fmin: bare callable vs the same function
-     wrapped with ioh.wrap_problem, showing what wrapping gains (logging,
-     IOHanalyzer output, tracked attributes) (D-B1)
+  1. Minimise a Python function with fmin. Explain that plain callables are
+     wrapped with ioh.wrap_problem automatically (the problem counts the
+     budget, D-B3), and show what that gives for free: attaching a logger,
+     IOHanalyzer output, tracked attributes. Mention the opt-out.
   2. Optimise ioh/BBOB problems and log results for IOHanalyzer
   3. Named DE variants: DE/rand/1/bin, JADE, SHADE, L-SHADE, jDE, jSO-style
   4. Stepping through the algorithm and tracking internal state (replaces LSHADE_interface)
@@ -74,9 +75,11 @@ The **parameter registry** (WS3) is the single source of truth. Tables on
 these pages, the ConfigSpace and the C++ defaults all come from it, so docs
 cannot drift from code.
 
-### D4. Presets
-- Named configurations exposed in the API and documented with their paper: DE/rand/1/bin, DE/best/1/bin, DE/current-to-pbest/1 (JADE), SHADE, L-SHADE, jDE, jSO-style (scope per D-E4).
-- Each preset's page shows the equivalent explicit settings, so users learn the module system from it.
+### D4. Presets (named configurations, D-D2)
+- The default is **classic DE** (DE/rand/1/bin, F0 = 0.5, CR0 = 0.9), also for `fmin`.
+- Popular configurations are aliases: a dictionary mapping names to **ConfigSpace configurations** of `get_configspace(dim)`, built per dimension (`get_presets(dim)`), since e.g. L-SHADE's λ0 = 18·d depends on `dim`. Candidates: DE/best/1/bin, DE/current-to-pbest/1 (JADE), SHADE, L-SHADE (paper-accurate, using the new L-SHADE adaptation option, D-D10), jDE, jSO-style. The final list is fixed in Phase 1.
+- Each preset is documented with its paper and its equivalent explicit settings, so users learn the module system from it.
+- A preset configuration can be edited and passed straight to `settings_from_config` / `fmin`, or used to warm-start a tuner.
 
 ### Reproducibility note (required, D-A13)
 The docs must state the guarantee plainly: **the same seed gives the same
