@@ -3,7 +3,7 @@
 import unittest
 
 import numpy as np
-from modde import AskTellDE
+from modde.legacy import AskTellDE
 import ioh
 
 class AskTellDETestCase(unittest.TestCase):

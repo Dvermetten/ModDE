@@ -1,0 +1,57 @@
+site_name: modde
+site_description: Modular Differential Evolution with a C++ core
+repo_url: https://github.com/Dvermetten/ModDE
+edit_uri: ""
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - search.highlight
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle: {icon: material/brightness-7, name: Switch to dark mode}
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle: {icon: material/brightness-4, name: Switch to light mode}
+
+hooks:
+  - tools/docs_parameters.py   # generates docs/parameters.md from the registry
+
+plugins:
+  - search
+  - mkdocs-jupyter:
+      execute: true            # notebooks are run on every docs build
+      include_source: true
+      allow_errors: false
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: numpy
+            show_source: false
+            members_order: source
+            show_root_heading: true
+
+markdown_extensions:
+  - admonition
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.highlight
+  - pymdownx.superfences
+
+nav:
+  - Home: index.md
+  - Getting started:
+      - Quickstart: notebooks/01_quickstart.ipynb
+      - Configurations, presets and tuning: notebooks/02_configurations.ipynb
+      - Ask-tell: notebooks/03_ask_tell.ipynb
+  - Concepts: concepts.md
+  - Parameters: parameters.md
+  - API reference: api.md
+  - Reproducibility: reproducibility.md
+  - Migrating from 0.0.4: migration.md
