@@ -91,3 +91,12 @@ These are the main targets of WS3's "no silent override" goal.
 - KI-45: `bound_correction()` both corrects **and evaluates**, which couples two steps.
 - KI-46: Dead code: `vector_target` and `vector_best` correction branches that are not valid options.
 - KI-47: Tests only check reproduction of `expected.json` with one module switched on at a time (2D, 200 evaluations). No combinations, no behavioural assertions. CI runs Python 3.8–3.10 with `actions/*@v2`.
+
+## E. Differences between reference code and papers (found during validation)
+
+Not issues in modde; recorded because they explain differences from published results.
+
+| ID | Finding | Effect | Source |
+|----|---------|--------|--------|
+| KI-48 | Tanabe's L-SHADE code (CEC2014) archives the successful **trial vector**, not the replaced parent: the child is copied into the population before the archive insertion. jSO fixes it. modde follows the paper (parents). In that code a terminal CR memory slot also does not stay terminal (the slot is reset to 0 before the update). | Explains modde's later mid-run convergence vs. the published L-SHADE data; with the trial-vector archive the reference reproduces the published runs (3 of 420 checkpoint cells differ). See 03_module_validation.md §7.4, D-D15. | `LSHADE_CEC2014/lshade.cc:171-187, 199-221` (CEC2014 archive) |
+| KI-49 | CEC2017 F9 (Levy): the optimum is at `o + M⁻¹·1`, not at the shift `o`. The official code's `%Lf` data reads are only correct where `long double = double`. | Relevant for anyone wrapping the CEC2017 code (optimum location, Linux builds). | official `cec17_test_func.cpp` |

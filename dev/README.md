@@ -114,10 +114,10 @@ implemented in C++ against that spec, with tests derived from it.
 - **M4:** the validation results are recorded ([03_module_validation.md](03_module_validation.md) §7) and every interaction is classified. ✅
 
 ### Phase 4b: CEC-suite validation (separate stage)
-- [ ] Wrap CEC2014/CEC2017 implementations with `ioh.wrap_problem` (no integration into ioh). Validate the wrapped functions themselves first.
-- [ ] Run L-SHADE / jSO-style presets under the competition protocol. Compare with published results.
+- [x] Wrap CEC2014/CEC2017 implementations with `ioh.wrap_problem` (no integration into ioh). Validate the wrapped functions themselves first. (Official C code, local only.)
+- [x] Run L-SHADE / jSO-style presets under the competition protocol. Compare with published results.
 - See [03_module_validation.md §5.6](03_module_validation.md#56-cec-suite-validation-phase-4b). Can run in parallel with Phase 5. Not in CI.
-- **M4b:** CEC comparison added to the validation report.
+- **M4b:** CEC comparison added to the validation report ([03_module_validation.md](03_module_validation.md) §7.4). ✅ L-SHADE matches the paper; the gap to the published runs is an archive detail in the original code (KI-48, open D-D15). `jSO-like` lacks four jSO mechanisms (FR-10).
 
 ### Phase 5: Documentation and release (WS2)
 - [ ] Getting-started guide, tutorials, module reference, migration guide.

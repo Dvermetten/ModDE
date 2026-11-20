@@ -219,7 +219,7 @@ custom functions. Suites include BBOB, CEC2013, CEC2022, PBO, ….
 ### D-B9 🟠 Benchmark suites for validation
 - **Context:** BBOB, CEC2013 and CEC2022 are available in ioh 0.3.22. CEC2014/2017, where the L-SHADE and jSO results were published, are **not**.
 - **Options:** validate on available suites only; add CEC2014/2017 via external code (e.g. `wrap_problem` around a third-party implementation); compare against reference implementations instead of published tables.
-- **Status:** DECIDED (2026-11-19): a **separate validation stage** (Phase 4b) runs the presets on CEC suites, wrapping external function implementations with `ioh.wrap_problem`. No explicit integration into ioh. Open sub-decision: which CEC implementation to wrap (see [03_module_validation.md §5.6](03_module_validation.md#56-cec-suite-validation-phase-4b)).
+- **Status:** DECIDED (2026-11-19): a **separate validation stage** (Phase 4b) runs the presets on CEC suites, wrapping external function implementations with `ioh.wrap_problem`. No explicit integration into ioh. Sub-decision (2026-11-20): wrap the **official C code** of the organisers, compiled unmodified, validated before use ([03_module_validation.md §7.4](03_module_validation.md)).
 
 ### D-B10 🟢 Maximisation problems
 - **Context:** ioh problems carry `optimization_type`. 0.0.4 assumes minimisation.
@@ -352,6 +352,11 @@ add_sigma, add_learning_rates)`:
 - See D-A17. List the modules to drop (if any: e.g. `shade_modified`, `exps`?) and to add.
 - **Status:** DECIDED (2026-11-19): **keep every module option currently implemented** (incl. `shade_modified`, `oversampling_factor`, `eigenvalue_crossover`, all bound corrections). **Add a paper-accurate L-SHADE adaptation option** (e.g. `adaptation_method_CR = LSHADE`): weighted Lehmer mean for the CR memory plus L-SHADE's terminal-value rule (a memory slot whose successful CRs are all 0 becomes terminal, and CR = 0 is used from then on). It makes a faithful L-SHADE preset possible; it is the only option added before 1.0 (an exception to D-A17).
 
+### D-D15 🟠 Archive content: replaced parents or successful trials (OPEN)
+- **Context:** Phase 4b (03_module_validation.md §7.4, KI-48). The papers (JADE, SHADE, L-SHADE) archive the replaced **parents**; modde does too. Tanabe's L-SHADE code archives the successful **trial vectors**, and the published CEC2014 L-SHADE results were produced with it. With it, the reference reproduces the published runs almost exactly, and it converges faster mid-run.
+- **Options:** (a) keep the paper behaviour only (current); (b) add an option, e.g. `archive_content ∈ {PARENTS, TRIALS}` (default PARENTS), so the code's behaviour is available and tunable; (c) (b) plus a preset that reproduces the published L-SHADE code.
+- **Recommendation:** (b). It is cheap (one branch at archive insertion), makes the published results reproducible, and is an interesting tunable choice in its own right. It would be a second exception to D-A17.
+
 ### D-D11 🟠 Oppositional generation semantics
 - **Decisions:** where it sits in the generation (before/after adapt); whether selection is (λ + λ) truncation; whether it consumes budget (yes) and respects the budget limit; how F/CR/memory follow reordered individuals; whether the jumping probability is a module or a numeric setting.
 - **Status:** DECIDED (2026-11-19): oppositional generation runs after selection and before adaptation. Opposite points use the current population's per-dimension bounds (KI-6 fix). The best λ of population ∪ opposite points are kept. Opposite points inherit F/CR from their source individual. Their evaluations count towards the budget and are cut off at the budget. Configured as an on/off module plus a `jump_rate` setting, default 0.3 (Rahnamayan et al., ODE).
@@ -430,6 +435,8 @@ add_sigma, add_learning_rates)`:
 | 2026-11-19 | `d × n` internally, `n × d` in Python; breaking changes acceptable. Full split step API exposed. | D-A9, D-A10 |
 | 2026-11-19 | Batch evaluation default + per-individual fallback, with a speed test. Generation-level ask-tell + per-individual wrapper. | D-A11, D-A12 |
 | 2026-11-19 | Reproducibility: same seed → same result on same platform/version only; documented. | D-A13 |
+| 2026-11-20 | CEC suites: wrap the organisers' official C code (unmodified), validated before use. | D-B9 |
+| 2026-11-20 | Regression snapshot compared with tolerance (last-bit differences between builds). | D-A13 |
 | 2026-11-19 | All samplers kept; double precision; no parallelisation in core. | D-A14, D-A15, D-A16 |
 | 2026-11-19 | No new modules in v1; scope extension becomes Workstream 4 / Phase 6. | D-A17 |
 | 2026-11-19 | Python ≥ 3.10; CI on Windows + Linux with Python 3.11. | D-A18 |

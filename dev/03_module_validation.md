@@ -164,11 +164,11 @@ A separate stage after the main validation campaign (decided 2026-11-19, D-B9).
 The published L-SHADE and jSO results are on CEC2014 and CEC2017, which ioh
 0.3.22 does not include.
 - **Approach:** wrap an external implementation of the CEC functions with `ioh.wrap_problem` (setting the bounds and an optimum/offset per function), so the rest of the pipeline (loggers, `ioh.Experiment`, IOHanalyzer) works unchanged. **No integration into ioh itself.**
-- **Open sub-decision:** which implementation to wrap. Candidates: a Python package of CEC suites (e.g. `opfunu`, which should be checked against the official C code) or bindings around the official C/C++ code. First validate the wrapped functions themselves: compare function values at fixed test points with the official implementation.
+- **Implementation (decided 2026-11-20):** the **official C code** of the organisers (github.com/P-N-Suganthan, CEC2014 and CEC2017), compiled unmodified into a DLL and called through ctypes; no third-party port. Validated before use (§7.4).
 - **Protocol:** follow the competition settings of each suite (dimensions, budget = 10000·d, 51 runs, error threshold 1e-8) so results are directly comparable to the published tables.
 - **Scope:** CEC2014 for L-SHADE, CEC2017 for jSO-style. CEC2013/CEC2022 runs (available in ioh) can go in the same report.
 - **Output:** a section in the validation report, plus a comparison table per preset vs published results.
-- **Lives outside the core test suite:** scripts in `benchmarks/cec/` (or a separate repo), optional dependencies, not run in CI.
+- **Lives outside the repository:** `dev/studies/cec/` (local only, like the other studies; the official code carries no licence, so it is downloaded, not redistributed). Not run in CI.
 
 ## 6. Tasks
 
@@ -193,9 +193,9 @@ The published L-SHADE and jSO results are on CEC2014 and CEC2017, which ioh
 - [ ] ioh logging validation (§5.3a).
 
 ### Phase 4b
-- [ ] Choose and validate a CEC2014/2017 implementation (§5.6).
-- [ ] Wrap it with `ioh.wrap_problem`. Run the presets under the competition protocol.
-- [ ] Compare against published results. Add to the validation report.
+- [x] Choose and validate a CEC2014/2017 implementation (§5.6): the official C code (§7.4).
+- [x] Wrap it with `ioh.wrap_problem`. Run the presets under the competition protocol.
+- [x] Compare against published results. Add to the validation report (§7.4).
 
 ## 7. Phase 4 results (2026-11-19)
 
@@ -246,3 +246,58 @@ After a Holm correction only SHADE d = 20 f24 (modde worse) and jDE d = 5 f1 (mo
 SHADE difference does not replicate on 25 fresh seeds (p = 0.057, medians 105.8 vs 104.3). Report and
 code: local only (`dev/studies/reference_variants/`).
 
+### 7.4 CEC2014 / CEC2017 against published results (Phase 4b, 2026-11-20)
+
+**Functions.** The organisers' official C code, compiled unmodified (MSVC) and called through ctypes;
+an `ioh.wrap_problem` version sets bounds [-100, 100]^d and the optimum. Checks before use, all passed:
+the DLL agrees with the official example programs (118 values); `f(x*) = 100·F` for all 284
+function/dimension pairs; batch evaluation equals per-point evaluation; the ioh-wrapped problem equals the
+raw function, and a modde run on it is identical to the batch run. Findings about the official code:
+- **CEC2017 F9 (Levy)** does not have its optimum at the shift vector `o`: its matrix is not orthogonal
+  (condition number 2), so the minimum `z = M(x − o) = 1` is at `x* = o + M⁻¹·1` (inside the bounds,
+  f = 900 exactly).
+- The CEC2017 code reads its data with `%Lf`. That is only correct where `long double` is `double`
+  (MSVC); on GCC/Linux the `%lf` fix from jSO's copy is needed. Apart from this and the deleted F2,
+  jSO's copy is identical to the official code.
+
+**Protocol** as in the competitions: 51 runs, MaxFES = 10000·d, d = 10, 30, 50, error recorded at
+(0.01 … 1.0)·MaxFES, errors below 1e-8 are 0. The reference is the **published raw data** (14 × 51 per
+function, from the competition archives), compared per function with a Mann-Whitney test (α = 0.05,
+`+/=/-` = modde better / no difference / worse; Holm over the functions). 9 000 runs, about 3 hours.
+
+| Comparison | d | + / = / − | Significant after Holm |
+|---|---|---|---|
+| `L-SHADE` vs L-SHADE (CEC2014) | 10 | 1 / 24 / 5 | F22, F29 |
+| | 30 | 3 / 21 / 6 | F9, F10, F18, F30 |
+| | 50 | 6 / 21 / 3 | F6, F10, F17, F23 |
+| `jSO-like` vs jSO (CEC2017, 29 functions) | 10 | 2 / 13 / 14 | 12 functions |
+| | 30 | 1 / 11 / 17 | 10 functions |
+| | 50 | 1 / 9 / 19 | 14 functions |
+
+**L-SHADE: modde implements the paper; the published runs used a different archive.** The final errors
+largely agree, but mid-run modde converged somewhat later on most functions (e.g. CEC2014 F1, d = 10, median
+error at 20 % of the budget: 637 vs. 100). Tanabe's original code (in the CEC2014 archive,
+`LSHADE_CEC2014/lshade.cc`) copies the child into the population *before* archiving, so the archive
+receives the **successful trial vectors** instead of the replaced parents (KI-48). Brest et al. fixed this
+in jSO (`// jSO` comment). Test with modde's own reference implementation (Phase 4, §7.3) in both variants,
+on fresh seeds:
+
+| vs. published L-SHADE | d = 10 (30 functions): final + / = / −; anytime cells different | d = 30 (8 functions) |
+|---|---|---|
+| modde `L-SHADE` | 1 / 24 / 5; 47 of 420 | 1 / 4 / 3; 36 of 112 |
+| reference, paper archive (parents) | 0 / 24 / 6; 48 of 420 | 1 / 4 / 3; 31 of 112 |
+| reference, Tanabe's code (children archived) | 1 / 25 / 4; **3 of 420** | 1 / 7 / 0; **3 of 112** |
+| modde vs. reference (paper archive) | 0 / 29 / 1; **0 of 420** | 0 / 8 / 0; **0 of 112** |
+
+So modde behaves exactly like the paper-faithful reference, and the archive detail accounts for the
+whole anytime gap to the published data. **The L-SHADE preset is validated as an implementation of the
+paper** (D-D14). Whether to offer the code's archive variant as an option is open (D-D15).
+
+**jSO-like is an approximation, as documented**, and does worse than jSO. Reading jSO's code shows four
+missing mechanisms rather than the two noted in the preset: the memory slot fixed at 0.9, the linearly
+decreasing p (0.25 → 0.125), **averaging each new memory value with the old one** (`(Lehmer + old)/2`)
+and **pbest ≠ target during the first half**. A faithful jSO preset needs these modules (FR-10, Phase 6).
+
+Scripts, data and generated reports: `dev/studies/cec/` (local only): `build.bat`, `cec.py`,
+`validate_functions.py`, `study.py`, `analyze.py` (→ `reports/README.md`), `check_archive.py`,
+`archive_analysis.py` (→ `reports/archive_check.txt`).
