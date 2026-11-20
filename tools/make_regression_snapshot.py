@@ -2,8 +2,10 @@
 
 The snapshot stores the final best value of every preset and every single
 non-default module option on BBOB f1-f24 (d = 2, budget 200, seed 42). The test
-`tests/test_regression.py` compares against it exactly (same seed, same
-platform -> same result, D-A13), so any behaviour change is noticed.
+`tests/test_regression.py` compares against it with a small tolerance (relative
+1e-6, at most 6 of 24 functions per case may differ: last-bit differences between
+compiler versions and CPUs can break ties on plateaus, D-A13), so any behaviour
+change is noticed.
 
 Regenerate deliberately, after an intended behaviour change, and mention it in
 the changelog:  python tools/make_regression_snapshot.py

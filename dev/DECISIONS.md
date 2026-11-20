@@ -118,6 +118,7 @@ ioh 0.3.22, ConfigSpace 1.2.2, modde 0.0.4.
 - **Recommendation:** per-instance engine (mt19937_64 or PCG64) and guarantee (2) within a minor version. Results change only in changelog-announced releases.
 - **Sub-decision:** how QMC samplers (Sobol/Halton) are scrambled and seeded. modcma has a C++ Sobol (`src/sobol.cpp`) and Halton, MIT licensed and potentially reusable with attribution (D-E6).
 - **Status:** DECIDED (2026-11-19): guarantee (1): same seed gives the same result on the same platform and version. No promise across platforms, so `std` distributions may be used. Per-instance engine. **Docs must state this guarantee** (see 02_documentation.md, Reproducibility). Bit-reproducibility across platforms is a possible later request (FEATURE_REQUESTS.md).
+- **Amendment (2026-11-20):** "same platform" is not enough for bit-identical results. The first CI run of the Windows snapshot (local MSVC 19.39 vs. the CI's newer MSVC) failed. Last-bit differences (compiler version, CPU-dependent C runtime math) break selection ties on plateaus (BBOB f7). The regression test therefore compares with a tolerance (relative 1e-6, at most 6 of 24 functions per case; ulp noise causes at most 4, a real behaviour change at least 20), and the docs state that bit-identical results need the same build on the same machine.
 
 ### D-A14 🟠 Initialisation samplers
 - **Context:** 0.0.4 offers gaussian, sobol, halton, uniform, LHC (via scipy). The Gaussian sampler can leave the bounds (KI-9).
