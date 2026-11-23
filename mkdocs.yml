@@ -21,6 +21,7 @@ theme:
 hooks:
   - tools/docs_parameters.py   # generates docs/parameters.md from the registry
   - tools/docs_interactions.py # generates docs/interactions.md from docs/data/
+  - tools/docs_modules.py      # fills the generated tables of docs/modules/ and docs/presets.md
 
 plugins:
   - search
@@ -44,16 +45,43 @@ markdown_extensions:
       permalink: true
   - pymdownx.highlight
   - pymdownx.superfences
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.tabbed:
+      alternate_style: true
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js
 
 nav:
   - Home: index.md
   - Getting started:
+      - Installation: installation.md
       - Quickstart: notebooks/01_quickstart.ipynb
+      - Concepts: concepts.md
+  - Tutorials:
       - Configurations, presets and tuning: notebooks/02_configurations.ipynb
       - Ask-tell: notebooks/03_ask_tell.ipynb
-  - Concepts: concepts.md
+      - Benchmarking with ioh: notebooks/04_benchmarking.ipynb
+      - Inside a run: notebooks/05_tracking.ipynb
+  - Modules:
+      - Overview: modules/index.md
+      - Initialisation: modules/initialization.md
+      - Mutation: modules/mutation.md
+      - Crossover: modules/crossover.md
+      - Bound correction: modules/bound_correction.md
+      - Selection and archive: modules/selection_archive.md
+      - F and CR control: modules/adaptation.md
+      - Population size: modules/population_size.md
+      - Oppositional generation: modules/oppositional_generation.md
+      - Module interactions: interactions.md
+  - Presets: presets.md
   - Parameters: parameters.md
-  - Module interactions: interactions.md
   - API reference: api.md
-  - Reproducibility: reproducibility.md
-  - Migrating from 0.0.4: migration.md
+  - About:
+      - Validation: validation.md
+      - Reproducibility: reproducibility.md
+      - Migrating from 0.0.4: migration.md
+      - Changelog: changelog.md
+      - Contributing: contributing.md

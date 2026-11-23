@@ -26,7 +26,7 @@ classifiers = [
 
 [project.optional-dependencies]
 test = ["pytest>=7"]
-docs = ["mkdocs-material>=9.5", "mkdocs-jupyter>=0.24", "mkdocstrings[python]>=0.25", "ipykernel"]
+docs = ["mkdocs-material>=9.5", "mkdocs-jupyter>=0.24", "mkdocstrings[python]>=0.25", "ipykernel", "matplotlib"]
 
 [project.urls]
 Repository = "https://github.com/Dvermetten/ModDE"

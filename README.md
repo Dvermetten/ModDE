@@ -1,120 +1,113 @@
-# Modular DE 
+# modde: Modular Differential Evolution
 
-This work-in-progress repository contains the code used to create a modular version of differential evolution. 
+modde builds Differential Evolution (DE) variants from interchangeable
+**modules**: initialisation, mutation, crossover, bound correction, parameter
+adaptation, population size control and more. Classic DE, JADE, SHADE,
+L-SHADE, jDE and thousands of combinations no paper has tried are all
+configurations of the same algorithm.
 
-> **Development status:** a C++-backed rewrite is in progress (see [`dev/README.md`](dev/README.md) for the plan).
-> Documentation of the new API, with getting-started notebooks and a reference of all parameters:
-> https://dvermetten.github.io/ModDE/ (published from `master`).
-> The 0.0.4 pure-Python implementation now lives in `modde.legacy` and is deprecated.
-> The examples below still use it: replace `from modularde import ModularDE` with `from modde.legacy import ModularDE`.
->
-> Building from source requires a C++17 compiler and the Eigen submodule:
-> ```bash
-> git clone --recursive https://github.com/Dvermetten/ModDE.git
-> cd ModDE && pip install .
-> ```
+- **Fast:** the algorithm runs in C++; the interface is Python.
+- **Faithful:** every module follows its paper, and the presets are validated against independent implementations and published results.
+- **Configurable:** every module and parameter is part of a configuration space for algorithm configuration (ConfigSpace, irace).
+- **Benchmark-ready:** built on [IOHexperimenter](https://iohprofiler.github.io/): any function becomes an ioh problem, so logging for IOHanalyzer, including modde's internal state, works out of the box.
 
-## Basic use-case: L-SHADE
+**Documentation:** https://dvermetten.github.io/ModDE/
 
-To instantiate L-SHADE using modDE and optimize a function (using iohexperimenter), the following code can be used:
+## Installation
+
+```bash
+pip install modde
+```
+
+Python 3.10 or newer. Wheels are available for Windows and Linux; elsewhere, pip
+builds from source with a C++17 compiler (see the
+[installation guide](https://dvermetten.github.io/ModDE/installation/)).
+
+## Quickstart
 
 ```python
-from modularde import ModularDE
-import ioh
 import numpy as np
+import modde
 
-f = ioh.get_problem(23, 1, 5)
-lshade = ModularDE(f, base_sampler='uniform', mutation_base='target', mutation_reference='pbest', bound_correction='expc_center', crossover='bin', lpsr=True, lambda_ = 18*5, memory_size = 6, use_archive=True, init_stats=True, adaptation_method_F='shade', adaptation_method_CR='shade')
-lshade.run()
+def sphere(x):
+    return float(np.sum(x ** 2))
+
+result = modde.fmin(sphere, budget=10_000, dim=10, lb=-5, ub=5)
+print(result.f, result.x)
 ```
 
-To perform a larger benchmark experiment which includes tracking of internal parameters, the following can be used (note that running the full experiment with detailed tracking will use a significant amount of storage):
+Without further settings this runs classic DE/rand/1/bin. Your function is
+wrapped as an ioh problem automatically: the problem counts the budget, and an
+ioh logger can be attached to record the run
+([Quickstart](https://dvermetten.github.io/ModDE/notebooks/01_quickstart/)).
+
+Well-known variants are available by name, here on a BBOB problem from ioh:
 
 ```python
-class LSHADE_interface():
-    def __init__(self, bound_corr):
-        self.bound_corr = bound_corr
-        self.lshade = None
-        
-    def __call__(self, f):
-        self.lshade = ModularDE(f, base_sampler='uniform', mutation_base='target', mutation_reference='pbest', bound_correction = self.bound_corr, crossover='bin', lpsr=True, lambda_ = 18*f.meta_data.n_variables, memory_size = 6, use_archive=True, init_stats = True, adaptation_method_F='shade', adaptation_method_CR='shade')
-        self.lshade.run()
-        
-    @property
-    def F(self):
-        if self.lshade is None:
-            return 0
-        return self.lshade.parameters.stats.curr_F
-    
-    @property
-    def CR(self):
-        if self.lshade is None:
-            return 0
-        return self.lshade.parameters.stats.curr_CR
+import ioh
+import modde
 
-    @property
-    def CS(self):
-        if self.lshade is None:
-            return 0
-        return self.lshade.parameters.stats.CS
-    
-    @property
-    def ED(self):
-        if self.lshade is None:
-            return 0
-        return self.lshade.parameters.stats.ED
-    
-    @property
-    def cumulative_corrected(self):
-        if self.lshade is None:
-            return 0
-        return self.lshade.parameters.stats.corr_so_far
-    
-    @property
-    def corrected(self):
-        if self.lshade is None:
-            return 0
-        return self.lshade.parameters.stats.corrected
-        
-obj = LSHADE_interface('saturate')
-
-exp = ioh.Experiment(algorithm = obj, #Set the optimization algorithm
-  fids = range(1,25), iids = [1,2,3,4,5], dims = [5,30], reps = 5, problem_type = 'Real', #Problem definitions
-  njobs = 12, logger_triggers = [ioh.logger.trigger.ALWAYS],#Enable paralellization
-  logged = True, folder_name = f'L-SHADE_sat', algorithm_name = f'L-SHADE', store_positions = True, #Logging specifications
-  experiment_attributes = {'SDIS' : 'Saturate'}, logged_attributes = ['corrected', 'cumulative_corrected', 'F', 'CR', 'CS', 'ED'], #Attribute tracking
-  merge_output = True, zip_output = True, remove_data = True #Only keep data as a single zip-file
-)
-
-exp()
+problem = ioh.get_problem(15, instance=1, dimension=10)     # BBOB f15, Rastrigin
+opt = modde.ModularDE(problem, budget=100_000, preset="L-SHADE", seed=1).run()
+print(opt.best_f - problem.optimum.y)
 ```
-## Note for version 0.0.4:
-With the latest update, the internal seeding has been updated. However, the halton sampler's output depends on the used scipy version. Version 1.11 is highly recommended, but 1.10 also works but leads to slightly different behaviour for this sampler only. 
 
-## Citation information
+Or choose the modules yourself:
 
-If you use this package, please consider to cite this paper:
+```python
+import ioh
+import modde
 
+problem = ioh.get_problem(15, instance=1, dimension=10)
+opt = modde.ModularDE(problem, budget=100_000, mutation_base="TARGET", mutation_reference="PBEST",
+                      use_archive=True, adaptation_method_F="SHADE", adaptation_method_CR="SHADE",
+                      bound_correction="MIRROR").run()
 ```
-@inproceedings{DBLP:conf/gecco/VermettenCKB23,
-  author       = {Diederick Vermetten and
-                  Fabio Caraffini and
-                  Anna V. Kononova and
-                  Thomas B{\"{a}}ck},
-  editor       = {Sara Silva and
-                  Lu{\'{\i}}s Paquete},
-  title        = {Modular Differential Evolution},
-  booktitle    = {Proceedings of the Genetic and Evolutionary Computation Conference,
-                  {GECCO} 2023, Lisbon, Portugal, July 15-19, 2023},
-  pages        = {864--872},
-  publisher    = {{ACM}},
-  year         = {2023},
-  url          = {https://doi.org/10.1145/3583131.3590417},
-  doi          = {10.1145/3583131.3590417},
-  timestamp    = {Fri, 21 Jul 2023 22:25:47 +0200},
-  biburl       = {https://dblp.org/rec/conf/gecco/VermettenCKB23.bib},
-  bibsource    = {dblp computer science bibliography, https://dblp.org}
+
+## Modules
+
+| Module | Options |
+|---|---|
+| [Initialisation](https://dvermetten.github.io/ModDE/modules/initialization/) | uniform, Gaussian, Sobol, Halton, LHS; (quasi-)opposition; oversampling |
+| [Mutation](https://dvermetten.github.io/ModDE/modules/mutation/) | rand / best / target base; '-to-rand/best/pbest' term; any number of difference vectors; weighted F |
+| [Crossover](https://dvermetten.github.io/ModDE/modules/crossover/) | binomial, exponential; eigenvector crossover |
+| [Bound correction](https://dvermetten.github.io/ModDE/modules/bound_correction/) | saturation, resampling, COTN, toroidal, mirror, midpoint (HVB), exponential variants |
+| [Selection and archive](https://dvermetten.github.io/ModDE/modules/selection_archive/) | external archive of parents or successful trials |
+| [F and CR control](https://dvermetten.github.io/ModDE/modules/adaptation/) | constant, SHADE, L-SHADE, jDE; jSO limits |
+| [Population size](https://dvermetten.github.io/ModDE/modules/population_size/) | constant, linear reduction |
+| [Oppositional generation](https://dvermetten.github.io/ModDE/modules/oppositional_generation/) | generation jumping |
+
+Presets: `DE`, `DE/best/1/bin`, `DE/rand/2/bin`, `DE/current-to-best/1/bin`,
+`jDE`, `ODE`, `SHADE`, `L-SHADE`, `JADE-like`, `jSO-like`
+([details](https://dvermetten.github.io/ModDE/presets/)).
+
+## Upgrading from 0.0.4
+
+Version 1.0 is a rewrite with a new interface; the old implementation remains
+available as `modde.legacy` for now. See the
+[migration guide](https://dvermetten.github.io/ModDE/migration/).
+
+## Citation
+
+If you use modde, please cite:
+
+```bibtex
+@inproceedings{vermetten2023modular,
+  author    = {Diederick Vermetten and Fabio Caraffini and Anna V. Kononova and Thomas B{\"{a}}ck},
+  title     = {Modular Differential Evolution},
+  booktitle = {Proceedings of the Genetic and Evolutionary Computation Conference, {GECCO} 2023},
+  pages     = {864--872},
+  publisher = {{ACM}},
+  year      = {2023},
+  doi       = {10.1145/3583131.3590417}
 }
 ```
 
-The design of this package is heavily based on the Modular CMA-ES package, created by Jacob de Nobel: https://github.com/IOHprofiler/ModularCMAES
+The design of this package follows the
+[Modular CMA-ES](https://github.com/IOHprofiler/ModularCMAES) package by Jacob de Nobel.
+
+## Licence
+
+MIT; see [LICENCE](LICENCE). modde uses [Eigen](https://eigen.tuxfamily.org)
+(MPL 2.0), [nanobind](https://github.com/wjakob/nanobind) (BSD) and the Sobol
+direction numbers of Joe & Kuo (BSD-style; licence in `src/modde/_licenses/`).

@@ -304,6 +304,8 @@ OPTION_REFERENCES: Mapping[tuple[str, str], tuple[str, ...]] = {
     ("bound_correction", "EXPC_TARGET"): ("alvarezbenitez2005", "padhye2015"),
     ("bound_correction", "EXPC_CENTER"): (),  # modde variant of EXPC_TARGET with the centre as reference
     ("bound_correction", "EXPS"): ("padhye2015",),
+    ("archive_content", "PARENTS"): ("zhang2009", "tanabe2013", "tanabe2014"),
+    ("archive_content", "TRIALS"): ("tanabe2014",),  # the code of the L-SHADE paper, not its text (D-D15)
 }
 
 # --------------------------------------------------------------------------- derived rules

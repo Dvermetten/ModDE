@@ -122,10 +122,11 @@ changelog.
 - [ ] CI job: build docs + execute snippets.
 
 ### Phase 4–5
-- [ ] Generate module reference pages from the registry.
-- [ ] Generate the interaction-matrix page from WS3 results.
-- [ ] Tutorials 1–7.
-- [ ] Presets pages.
-- [ ] Migration guide, changelog.
-- [ ] README rewrite (last, once the API is frozen).
-- [ ] Contributor guide.
+- [x] Generate module reference pages from the registry (hand-written explanations, generated tables: `tools/docs_modules.py`).
+- [x] Generate the interaction-matrix page from WS3 results (plus per-module summaries on the module pages).
+- [x] Tutorials 1–7: 1, 2 and 4 in the Quickstart; 3 and 6 in Configurations; 5 Ask-tell; 2 and 7 in depth in Benchmarking (04); 4 in depth in Inside a run (05). A SMAC example is not included (irace and a plain tuning loop are).
+- [x] Presets page.
+- [x] Migration guide, changelog (`docs/changelog.md`).
+- [x] README rewrite.
+- [x] Contributor guide (`docs/contributing.md`).
+- [x] Snippet execution in CI: `tests/test_docs_snippets.py` (docs pages + README); notebooks run in the docs build.

@@ -17,12 +17,8 @@ algorithm. The computation runs in C++; the interface is Python.
 pip install modde
 ```
 
-Building from source needs a C++17 compiler and the Eigen submodule:
-
-```bash
-git clone --recursive https://github.com/Dvermetten/ModDE.git
-cd ModDE && pip install .
-```
+Wheels are available for Windows and Linux; on other platforms pip builds from
+source, which needs a C++17 compiler. See [Installation](installation.md).
 
 ## Quickstart
 
@@ -52,9 +48,13 @@ modde.fmin(sphere, budget=5000, dim=10, lb=-5, ub=5, preset="L-SHADE")
 ## Where to go next
 
 - [**Quickstart**](notebooks/01_quickstart.ipynb): `fmin`, ioh problems, logging, stepping through a run.
-- [**Configurations, presets and tuning**](notebooks/02_configurations.ipynb): settings, named variants, the configuration space.
-- [**Ask-tell**](notebooks/03_ask_tell.ipynb): evaluate points yourself, e.g. in parallel.
-- [**Parameters**](parameters.md): every module and parameter, with tuning ranges and references.
+- **Tutorials:** [configurations, presets and tuning](notebooks/02_configurations.ipynb),
+  [ask-tell](notebooks/03_ask_tell.ipynb), [benchmarking with ioh](notebooks/04_benchmarking.ipynb),
+  [inside a run](notebooks/05_tracking.ipynb).
+- [**Modules**](modules/index.md): what each module does, with formulas, options and interactions.
+- [**Presets**](presets.md): the named DE variants and their settings.
+- [**Parameters**](parameters.md): every setting on one page, with tuning ranges and references.
+- [**Migrating from 0.0.4**](migration.md).
 
 ## Citation
 

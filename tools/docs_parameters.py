@@ -5,7 +5,19 @@ this page is regenerated on every docs build and can never drift from the code.
 """
 from __future__ import annotations
 
+import re
 from pathlib import Path
+
+# Internal cross-references of the development notes (KI-27, D-D15, FR-10) mean
+# nothing to readers of the documentation; they are removed from registry texts.
+_ID = r"(?:(?:KI|FR)-\d+|D-[A-E]\d+)"
+_ONLY_IDS = re.compile(rf"\s*\(\s*{_ID}(?:\s*[,;]\s*{_ID})*(?:\s+fixed)?\s*\)")
+_TRAILING_IDS = re.compile(rf"\s*[,;]\s*{_ID}(?:\s*[,;]\s*{_ID})*")
+
+
+def public(text: str) -> str:
+    """Registry text without the development notes' issue / decision IDs."""
+    return _TRAILING_IDS.sub("", _ONLY_IDS.sub("", text))
 
 CATEGORIES = {
     "settings": "Problem and run",
@@ -20,14 +32,16 @@ CATEGORIES = {
 }
 
 
-def _ref_link(key: str, R) -> str:
-    """Short label such as 'Tanabe & Fukunaga 2013' or 'Kononova et al. 2020a'."""
+def _ref_link(key: str, R, base: str = "") -> str:
+    """Short label such as 'Tanabe & Fukunaga 2013' or 'Kononova et al. 2020a'.
+
+    ``base`` is the page holding the reference list ("" = this page)."""
     first = R.REF[key].split(",")[0].strip()
     if "&" not in first and "et al" not in first:
         first += " et al."
     digits = "".join(ch for ch in key if ch.isdigit())
     suffix = key[len(key.rstrip("abcdefghijklmnopqrstuvwxyz")):] if key[-1].isalpha() else ""
-    return f"[{first} {digits}{suffix}](#ref-{key})"
+    return f"[{first} {digits}{suffix}]({base}#ref-{key})"
 
 
 def _fmt(value) -> str:
@@ -70,6 +84,32 @@ def _active(p) -> str:
         f"`{c.parent}` = " + " / ".join(f"`{v}`" for v in c.values) for c in p.active_when)
 
 
+def param_section(p, R, base: str = "", level: str = "###") -> list[str]:
+    """Documentation block of one parameter: heading, description, property table, options."""
+    lines = ["", f"{level} `{p.name}`", "", public(p.doc), ""]
+    rows = [("Type", p.kind), ("Default", _default(p))]
+    if p.kind not in ("categorical", "bool"):
+        rows.append(("Valid range", _range(p, "valid")))
+    tunable = p.is_module and p.group is not None or p.tune is not None
+    rows.append(("Tuning range", (("options" if p.kind in ("categorical", "bool")
+                                   else _range(p, "tune")) if tunable else "not tuned")))
+    rows.append(("Active when", _active(p)))
+    if p.replaces:
+        rows.append(("Replaces (0.0.4)", f"`{public(p.replaces)}`"))
+    if p.references:
+        rows.append(("References", "; ".join(_ref_link(r, R, base) for r in p.references)))
+    lines += ["| | |", "|---|---|"] + [f"| {k} | {v} |" for k, v in rows]
+    if p.kind == "categorical":
+        lines += ["", "| Option | References |", "|---|---|"]
+        for option in p.options:
+            refs = R.OPTION_REFERENCES.get((p.name, option))
+            text = "–" if refs is None else ("defined by modde" if not refs else
+                                             "; ".join(_ref_link(r, R, base) for r in refs))
+            default = " (default)" if option == p.options[0] else ""
+            lines.append(f"| `{option}`{default} | {text} |")
+    return lines
+
+
 def render() -> str:
     from modde import _registry as R
 
@@ -103,27 +143,7 @@ def render() -> str:
         params = [p for p in R.PARAMS if p.category == category]
         lines += ["", f"## {title}"]
         for p in params:
-            lines += ["", f"### `{p.name}`", "", p.doc, ""]
-            rows = [("Type", p.kind), ("Default", _default(p))]
-            if p.kind not in ("categorical", "bool"):
-                rows.append(("Valid range", _range(p, "valid")))
-            tunable = p.is_module and p.group is not None or p.tune is not None
-            rows.append(("Tuning range", (("options" if p.kind in ("categorical", "bool")
-                                           else _range(p, "tune")) if tunable else "not tuned")))
-            rows.append(("Active when", _active(p)))
-            if p.replaces:
-                rows.append(("Replaces (0.0.4)", f"`{p.replaces}`"))
-            if p.references:
-                rows.append(("References", "; ".join(_ref_link(r, R) for r in p.references)))
-            lines += ["| | |", "|---|---|"] + [f"| {k} | {v} |" for k, v in rows]
-            if p.kind == "categorical":
-                lines += ["", "| Option | References |", "|---|---|"]
-                for option in p.options:
-                    refs = R.OPTION_REFERENCES.get((p.name, option))
-                    text = "–" if refs is None else ("defined by modde" if not refs else
-                                                     "; ".join(_ref_link(r, R) for r in refs))
-                    default = " (default)" if option == p.options[0] else ""
-                    lines.append(f"| `{option}`{default} | {text} |")
+            lines += param_section(p, R)
 
     lines += ["", "## Presets", "",
               "Named configurations, available as ConfigSpace configurations via "
@@ -132,7 +152,7 @@ def render() -> str:
     for name, preset in R.PRESETS.items():
         refs = "; ".join(_ref_link(r, R) for r in preset.references)
         lines.append(f"| `{name}` | {'yes' if preset.exact else 'approximate'} | {refs} | "
-                     f"{preset.doc} {preset.notes} |")
+                     f"{public(preset.doc)} {public(preset.notes)} |")
 
     lines += ["", "## References", ""]
     for key, text in R.REF.items():
