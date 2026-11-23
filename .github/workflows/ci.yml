@@ -11,8 +11,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # D-A18: Windows x64 + Linux x86_64, Python 3.11 (matches the main dev machine)
-        os: [ubuntu-latest, windows-latest]
+        # D-A18: Windows x64, Linux x86_64, macOS arm64; Python 3.11 (matches the main dev machine)
+        os: [ubuntu-latest, windows-latest, macos-latest]
         python-version: ["3.11"]
 
     steps:

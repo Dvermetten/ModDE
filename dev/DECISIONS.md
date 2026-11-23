@@ -146,6 +146,7 @@ ioh 0.3.22, ConfigSpace 1.2.2, modde 0.0.4.
 - **Context:** 0.0.4 CI tests 3.8–3.10. modcma requires ≥ 3.8 and builds Linux wheels with `-march=native`, which can make wheels crash on older CPUs.
 - **Recommendation:** Python ≥ 3.9 (or ≥ 3.10; 3.8 is end-of-life); abi3 wheels for ≥ 3.12; Linux x86_64 + aarch64, Windows x64, macOS arm64 (x86_64 optional); **no** `-march=native` in distributed wheels (opt-in CMake flag for local builds).
 - **Status:** DECIDED (2026-11-19): Python **≥ 3.10**. CI tests for now on **Windows x64 (windows-latest) and Linux x86_64 (ubuntu-latest), Python 3.11**, matching the main development machine (Windows 11, Python 3.11). Wheels are built for these two platforms first; macOS and aarch64 come later. No `-march=native` / host-specific flags in distributed wheels. abi3 wheels for Python ≥ 3.12 when wheel publishing starts.
+- **Amendment (2026-11-23, author):** **macOS wheels before 1.0**: arm64 (macos-14, deployment target 11.0) and x86_64 (macos-15-intel, target 10.15), each built natively. CI tests also on macos-latest. Linux aarch64 stays FR-6.
 
 ### D-A19 🟠 Performance targets
 - **Decision:** what counts as "fast enough"? Proposed metrics: overhead per evaluation (μs) on sphere with batch eval, for d ∈ {10, 100} and λ = 10d; speed-up vs 0.0.4. Proposed target: ≥ 20× speed-up over 0.0.4 for the default configuration at d = 10.
@@ -439,6 +440,7 @@ add_sigma, add_learning_rates)`:
 | 2026-11-20 | CEC suites: wrap the organisers' official C code (unmodified), validated before use. | D-B9 |
 | 2026-11-20 | Regression snapshot compared with tolerance (last-bit differences between builds). | D-A13 |
 | 2026-11-23 | New module `archive_content` (PARENTS / TRIALS); second exception to D-A17. | D-D15 |
+| 2026-11-23 | macOS wheels (arm64 + x86_64) and macOS CI before 1.0. | D-A18 |
 | 2026-11-19 | All samplers kept; double precision; no parallelisation in core. | D-A14, D-A15, D-A16 |
 | 2026-11-19 | No new modules in v1; scope extension becomes Workstream 4 / Phase 6. | D-A17 |
 | 2026-11-19 | Python ≥ 3.10; CI on Windows + Linux with Python 3.11. | D-A18 |

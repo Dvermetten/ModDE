@@ -19,7 +19,7 @@ configurations of the same algorithm.
 pip install modde
 ```
 
-Python 3.10 or newer. Wheels are available for Windows and Linux; elsewhere, pip
+Python 3.10 or newer. Wheels are available for Windows, Linux and macOS (Apple Silicon and Intel); elsewhere, pip
 builds from source with a C++17 compiler (see the
 [installation guide](https://dvermetten.github.io/ModDE/installation/)).
 

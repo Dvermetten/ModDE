@@ -17,7 +17,7 @@ algorithm. The computation runs in C++; the interface is Python.
 pip install modde
 ```
 
-Wheels are available for Windows and Linux; on other platforms pip builds from
+Wheels are available for Windows, Linux and macOS; on other platforms pip builds from
 source, which needs a C++17 compiler. See [Installation](installation.md).
 
 ## Quickstart

@@ -20,7 +20,9 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: C++",
     "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
     "Topic :: Scientific/Engineering :: Mathematics",
 ]
 
@@ -58,3 +60,8 @@ archs = ["x86_64"]
 
 [tool.cibuildwheel.windows]
 archs = ["AMD64"]
+
+[tool.cibuildwheel.macos]
+# native architecture of the runner: arm64 on macos-14, x86_64 on macos-15-intel
+# (deployment target set per runner in .github/workflows/wheels.yml)
+archs = ["native"]

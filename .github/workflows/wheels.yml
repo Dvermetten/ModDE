@@ -12,7 +12,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        # macOS: one native runner per architecture (the build imports the module
+        # to generate type stubs, so cross-compiling x86_64 on arm64 is avoided).
+        include:
+          - os: ubuntu-latest
+          - os: windows-latest
+          - os: macos-14            # Apple Silicon (arm64)
+            macos_target: "11.0"
+          - os: macos-15-intel      # Intel (x86_64)
+            macos_target: "10.15"
 
     steps:
       - uses: actions/checkout@v4
@@ -22,6 +30,8 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.22.0
         # Configuration lives in [tool.cibuildwheel] in pyproject.toml
+        env:
+          MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos_target }}
 
       - uses: actions/upload-artifact@v4
         with:

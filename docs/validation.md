@@ -11,7 +11,7 @@ against that specification (for example: the parents of a donor are distinct,
 p-best draws from the right top fraction, the archive never exceeds its
 capacity, the budget is never exceeded), run invariants over randomly sampled
 configurations, and compare every preset and module option with a regression
-snapshot. They run on Windows and Linux for every change.
+snapshot. They run on Windows, Linux and macOS for every change.
 
 ## 2. Logging
 

@@ -5,7 +5,7 @@ pip install modde
 ```
 
 modde needs Python 3.10 or newer. Binary wheels are provided for Windows
-(x64) and Linux (x86_64). On other platforms pip builds modde from source,
+(x64), Linux (x86_64) and macOS (Apple Silicon, and Intel from macOS 10.15). On other platforms pip builds modde from source,
 which needs a C++ compiler (see below).
 
 The dependencies are installed automatically: NumPy, SciPy,
@@ -24,7 +24,7 @@ print(modde.__version__)
 
 Requirements:
 
-- a C++17 compiler (tested with MSVC 2022 on Windows and GCC on Ubuntu);
+- a C++17 compiler (tested with MSVC 2022 on Windows, GCC on Ubuntu and Apple Clang on macOS);
 - CMake 3.18 or newer (installed automatically by the build if missing).
 
 The C++ core uses [Eigen](https://eigen.tuxfamily.org) (a git submodule) and
