@@ -36,3 +36,32 @@ def make_de(dim=5, lb=-5.0, ub=5.0, seed=1, **kwargs):
 @pytest.fixture
 def de_factory():
     return make_de
+
+
+# ------------------------------------------------------------------ CI annotations
+# On GitHub Actions, report every failing test as an error annotation. Unlike the
+# job log, annotations can be read without admin rights on the repository.
+
+def _escape(text: str) -> str:
+    return text.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+
+
+def _escape_property(text: str) -> str:
+    return _escape(text).replace(":", "%3A").replace(",", "%2C")
+
+
+def pytest_terminal_summary(terminalreporter):
+    import os
+
+    if not os.environ.get("GITHUB_ACTIONS"):
+        return
+    failed = terminalreporter.stats.get("failed", []) + terminalreporter.stats.get("error", [])
+    for report in failed[:9]:
+        lines = [line for line in report.longreprtext.splitlines() if line.startswith("E ")]
+        message = "\n".join(lines[-15:]) or report.longreprtext[-1500:]
+        path = report.location[0] if report.location else ""
+        terminalreporter.write_line(
+            f"::error file=tests/{os.path.basename(path)},title={_escape_property(report.nodeid)}::{_escape(message[:3000])}")
+    if failed:
+        ids = "\n".join(r.nodeid for r in failed)
+        terminalreporter.write_line(f"::error title={len(failed)} failed tests::{_escape(ids[:4000])}")
