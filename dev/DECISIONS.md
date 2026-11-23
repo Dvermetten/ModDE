@@ -352,10 +352,11 @@ add_sigma, add_learning_rates)`:
 - See D-A17. List the modules to drop (if any: e.g. `shade_modified`, `exps`?) and to add.
 - **Status:** DECIDED (2026-11-19): **keep every module option currently implemented** (incl. `shade_modified`, `oversampling_factor`, `eigenvalue_crossover`, all bound corrections). **Add a paper-accurate L-SHADE adaptation option** (e.g. `adaptation_method_CR = LSHADE`): weighted Lehmer mean for the CR memory plus L-SHADE's terminal-value rule (a memory slot whose successful CRs are all 0 becomes terminal, and CR = 0 is used from then on). It makes a faithful L-SHADE preset possible; it is the only option added before 1.0 (an exception to D-A17).
 
-### D-D15 🟠 Archive content: replaced parents or successful trials (OPEN)
+### D-D15 🟢 Archive content: replaced parents or successful trials
 - **Context:** Phase 4b (03_module_validation.md §7.4, KI-48). The papers (JADE, SHADE, L-SHADE) archive the replaced **parents**; modde does too. Tanabe's L-SHADE code archives the successful **trial vectors**, and the published CEC2014 L-SHADE results were produced with it. With it, the reference reproduces the published runs almost exactly, and it converges faster mid-run.
 - **Options:** (a) keep the paper behaviour only (current); (b) add an option, e.g. `archive_content ∈ {PARENTS, TRIALS}` (default PARENTS), so the code's behaviour is available and tunable; (c) (b) plus a preset that reproduces the published L-SHADE code.
 - **Recommendation:** (b). It is cheap (one branch at archive insertion), makes the published results reproducible, and is an interesting tunable choice in its own right. It would be a second exception to D-A17.
+- **Status:** DECIDED (2026-11-23): **(b)**. Module `archive_content ∈ {PARENTS, TRIALS}`, default `PARENTS`, active when `use_archive`; tunable (group `modules`). Second exception to D-A17. The `L-SHADE` preset stays paper-accurate (PARENTS); `preset="L-SHADE", archive_content="TRIALS"` reproduces Tanabe's code (03_module_validation.md §7.4).
 
 ### D-D11 🟠 Oppositional generation semantics
 - **Decisions:** where it sits in the generation (before/after adapt); whether selection is (λ + λ) truncation; whether it consumes budget (yes) and respects the budget limit; how F/CR/memory follow reordered individuals; whether the jumping probability is a module or a numeric setting.
@@ -437,6 +438,7 @@ add_sigma, add_learning_rates)`:
 | 2026-11-19 | Reproducibility: same seed → same result on same platform/version only; documented. | D-A13 |
 | 2026-11-20 | CEC suites: wrap the organisers' official C code (unmodified), validated before use. | D-B9 |
 | 2026-11-20 | Regression snapshot compared with tolerance (last-bit differences between builds). | D-A13 |
+| 2026-11-23 | New module `archive_content` (PARENTS / TRIALS); second exception to D-A17. | D-D15 |
 | 2026-11-19 | All samplers kept; double precision; no parallelisation in core. | D-A14, D-A15, D-A16 |
 | 2026-11-19 | No new modules in v1; scope extension becomes Workstream 4 / Phase 6. | D-A17 |
 | 2026-11-19 | Python ≥ 3.10; CI on Windows + Linux with Python 3.11. | D-A18 |

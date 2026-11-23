@@ -315,8 +315,12 @@ namespace modde
 
         if (m.use_archive)
         {
+            // PARENTS: the replaced parents (papers); TRIALS: the successful trial vectors
+            // (Tanabe's L-SHADE code, KI-48, D-D15). U_corrected is unchanged since select().
             for (Index j = 0; j < p.success.replaced.cols(); ++j)
-                p.archive.members.emplace_back(p.success.replaced.col(j));
+                p.archive.members.emplace_back(m.archive_content == ArchiveContent::TRIALS
+                                                   ? Vector(p.U_corrected.col(p.success.S[static_cast<size_t>(j)]))
+                                                   : Vector(p.success.replaced.col(j)));
             p.trim_archive();
         }
 

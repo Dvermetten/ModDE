@@ -1,6 +1,6 @@
 # Selection, success record and archive
 
-Parameters: `use_archive`, `archive_rate`.
+Parameters: `use_archive`, `archive_content`, `archive_rate`.
 
 ## 1. One-to-one selection
 For each `i` (minimisation):
@@ -22,7 +22,9 @@ Fixed at selection time, so later reordering cannot misalign it (KI-7):
 
 ## 3. Archive (`use_archive`)
 - Starts empty (KI-26).
-- In `adapt()`: insert the replaced parents of `S` (`|S|` vectors).
+- In `adapt()`: insert `|S|` vectors, depending on `archive_content` (D-D15):
+  - `PARENTS` (default): the replaced parents `x_i`, `i ∈ S` (JADE, SHADE, L-SHADE papers).
+  - `TRIALS`: the successful (bound-corrected) trial vectors `u'_i`, `i ∈ S`. This is what Tanabe's L-SHADE code does, and what produced the published CEC2014 L-SHADE results (KI-48).
 - **Capacity** `c = round(archive_rate · λ)`, with `λ` the current population size (D-D4). Whenever `|A| > c` (after insertion, or after `λ` shrinks under population reduction), remove members chosen uniformly at random until `|A| = c`.
 - Only vectors are stored (no fitness is needed).
 - `archive_rate` replaces 0.0.4's `archive_size`, which was always overwritten with `2·λ` (KI-30).

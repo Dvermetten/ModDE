@@ -309,6 +309,26 @@ def test_archive_insertion_and_capacity():
     assert de.archive.shape == (5, 5)
 
 
+@pytest.mark.parametrize("content", ["PARENTS", "TRIALS"])
+def test_archive_content(content):
+    """D-D15: PARENTS archives the replaced parents, TRIALS the successful trial vectors (KI-48)."""
+    de = initialized(lambda0=10, use_archive=True, archive_content=content)
+    de.sample_parameters()
+    de.mutate()
+    de.crossover()
+    old_X = de.population
+    de.trials = 0.5 * old_X  # in bounds, different from the parents
+    de.correct_bounds()
+    f_trial = de.fitness.copy()
+    f_trial[:3] -= 1.0  # three successes
+    f_trial[3:] += 1.0
+    de.trial_fitness = f_trial
+    de.select()
+    de.adapt()
+    expected = old_X[:3] if content == "PARENTS" else 0.5 * old_X[:3]
+    np.testing.assert_allclose(np.sort(de.archive, axis=0), np.sort(expected, axis=0))
+
+
 # ---------------------------------------------------------------- oppositional generation
 
 

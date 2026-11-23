@@ -44,6 +44,12 @@ namespace modde
         FIXED
     };
 
+    enum class ArchiveContent
+    {
+        PARENTS,
+        TRIALS
+    };
+
     enum class CrossoverType
     {
         BIN,
@@ -97,6 +103,7 @@ namespace modde
         PbestSampling pbest_sampling = PbestSampling::RANDOM;
         bool mutation_use_weighted_F = false;
         bool use_archive = false;
+        ArchiveContent archive_content = ArchiveContent::PARENTS;
         CrossoverType crossover = CrossoverType::BIN;
         bool eigenvalue_crossover = false;
         BoundCorrectionType bound_correction = BoundCorrectionType::SATURATE;

@@ -12,7 +12,7 @@
 
 namespace modde
 {
-    //! External archive of replaced parents (spec/selection_archive.md §3).
+    //! External archive of replaced parents or successful trials (spec/selection_archive.md §3).
     struct Archive
     {
         std::vector<Vector> members;

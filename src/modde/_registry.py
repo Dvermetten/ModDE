@@ -206,8 +206,13 @@ PARAMS: tuple[Param, ...] = (
           "jSO weighted F on the '-to-X' term only: 0.7F / 0.8F / 1.2F by budget progress (KI-24).",
           default=False, group="modules", references=("brest2017",)),
     Param("use_archive", "archive", "bool",
-          "External archive of replaced parents; the second vector of the first difference term is drawn from P ∪ A (KI-27).",
+          "External archive (of replaced parents by default, see archive_content); the second vector of the first difference term is drawn from P ∪ A (KI-27).",
           default=False, group="modules", references=("zhang2009",)),
+    Param("archive_content", "archive", "categorical",
+          "What enters the archive: the replaced PARENTS (JADE/SHADE/L-SHADE papers) or the successful "
+          "TRIALS (Tanabe's L-SHADE code, which produced the published CEC2014 results; KI-48, D-D15).",
+          options=("PARENTS", "TRIALS"), group="modules",
+          active_when=(Condition("use_archive", (True,)),), references=("zhang2009", "tanabe2014")),
     Param("archive_rate", "archive", "float", "Archive capacity = round(rate · current λ) (D-D4).",
           default=1.0, valid=(0.0, None), tune=(0.5, 3.0), group="module_params",
           active_when=(Condition("use_archive", (True,)),), replaces="archive_size (was overwritten, KI-30)",
@@ -392,7 +397,10 @@ PRESETS: Mapping[str, Preset] = {
                           "use_archive": True, "archive_rate": 2.6,
                           "adaptation_method_F": "SHADE", "adaptation_method_CR": "LSHADE",
                           "memory_size": 6, "F0": 0.5, "CR0": 0.5, "bound_correction": "HVB"},
-               references=("tanabe2014",)),
+               references=("tanabe2014",),
+               notes="Archives the replaced parents, as in the paper. The authors' code, which produced the "
+                     "published CEC2014 results, archives the successful trials: add "
+                     "archive_content=\"TRIALS\" to reproduce it (KI-48)."),
         Preset("JADE-like", "Approximation of JADE with the available modules.",
                lambda d: {"lambda0": 100, "mutation_base": "TARGET", "mutation_reference": "PBEST",
                           "pbest_sampling": "FIXED", "pbest_rate": 0.05, "use_archive": True,
@@ -412,7 +420,8 @@ PRESETS: Mapping[str, Preset] = {
                           "bound_correction": "HVB"},
                exact=False, references=("brest2017",),
                notes="Missing: jSO's linearly decreasing p (0.25 → 0.125; approximated by its mean "
-                     "0.17) and the memory slot fixed at 0.9."),
+                     "0.17), the memory slot fixed at 0.9, averaging new memory values with the old ones, "
+                     "and pbest ≠ target in the first half (FR-10)."),
     )
 }
 

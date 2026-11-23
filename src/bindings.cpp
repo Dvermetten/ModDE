@@ -117,6 +117,7 @@ NB_MODULE(_core, m)
     bind_enum<MutationBase>(m, "MutationBase", {{"RAND", MutationBase::RAND}, {"BEST", MutationBase::BEST}, {"TARGET", MutationBase::TARGET}});
     bind_enum<MutationReference>(m, "MutationReference", {{"NONE", MutationReference::NONE}, {"RAND", MutationReference::RAND}, {"BEST", MutationReference::BEST}, {"PBEST", MutationReference::PBEST}});
     bind_enum<PbestSampling>(m, "PbestSampling", {{"RANDOM", PbestSampling::RANDOM}, {"FIXED", PbestSampling::FIXED}});
+    bind_enum<ArchiveContent>(m, "ArchiveContent", {{"PARENTS", ArchiveContent::PARENTS}, {"TRIALS", ArchiveContent::TRIALS}});
     bind_enum<CrossoverType>(m, "CrossoverType", {{"BIN", CrossoverType::BIN}, {"EXP", CrossoverType::EXP}});
     bind_enum<BoundCorrectionType>(m, "BoundCorrectionType", {{"SATURATE", BoundCorrectionType::SATURATE}, {"NONE", BoundCorrectionType::NONE}, {"UNIF_RESAMPLE", BoundCorrectionType::UNIF_RESAMPLE}, {"COTN", BoundCorrectionType::COTN}, {"TOROIDAL", BoundCorrectionType::TOROIDAL}, {"MIRROR", BoundCorrectionType::MIRROR}, {"HVB", BoundCorrectionType::HVB}, {"EXPC_TARGET", BoundCorrectionType::EXPC_TARGET}, {"EXPC_CENTER", BoundCorrectionType::EXPC_CENTER}, {"EXPS", BoundCorrectionType::EXPS}});
     bind_enum<AdaptationF>(m, "AdaptationF", {{"NONE", AdaptationF::NONE}, {"SHADE", AdaptationF::SHADE}, {"SHADE_MODIFIED", AdaptationF::SHADE_MODIFIED}, {"JDE", AdaptationF::JDE}});
@@ -135,6 +136,7 @@ NB_MODULE(_core, m)
         .def_rw("pbest_sampling", &Modules::pbest_sampling)
         .def_rw("mutation_use_weighted_F", &Modules::mutation_use_weighted_F)
         .def_rw("use_archive", &Modules::use_archive)
+        .def_rw("archive_content", &Modules::archive_content)
         .def_rw("crossover", &Modules::crossover)
         .def_rw("eigenvalue_crossover", &Modules::eigenvalue_crossover)
         .def_rw("bound_correction", &Modules::bound_correction)
