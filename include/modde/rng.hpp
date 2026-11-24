@@ -46,12 +46,16 @@ namespace modde
         //! 64 random bits.
         std::uint64_t bits() { return engine_(); }
 
-        //! Random permutation of {0, ..., n - 1}.
+        //! Random permutation of {0, ..., n - 1} (Fisher-Yates).
+        //! Written out instead of std::shuffle: the algorithm of std::shuffle is
+        //! implementation-defined and changed between MSVC releases, which made
+        //! seeded runs differ between compiler versions.
         Indices permutation(Index n)
         {
             Indices p(static_cast<size_t>(n));
             std::iota(p.begin(), p.end(), Index{0});
-            std::shuffle(p.begin(), p.end(), engine_);
+            for (Index i = n - 1; i > 0; --i)
+                std::swap(p[static_cast<size_t>(i)], p[static_cast<size_t>(randint(i + 1))]);
             return p;
         }
 

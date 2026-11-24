@@ -441,6 +441,7 @@ add_sigma, add_learning_rates)`:
 | 2026-11-20 | Regression snapshot compared with tolerance (last-bit differences between builds). | D-A13 |
 | 2026-11-23 | New module `archive_content` (PARENTS / TRIALS); second exception to D-A17. | D-D15 |
 | 2026-11-23 | macOS wheels (arm64 + x86_64) and macOS CI before 1.0. | D-A18 |
+| 2026-11-24 | Random permutations by explicit Fisher-Yates instead of `std::shuffle` (its algorithm changed between MSVC releases: Windows CI failed on HALTON/LHS). The standard distributions stay (FR-4). | D-A13 |
 | 2026-11-19 | All samplers kept; double precision; no parallelisation in core. | D-A14, D-A15, D-A16 |
 | 2026-11-19 | No new modules in v1; scope extension becomes Workstream 4 / Phase 6. | D-A17 |
 | 2026-11-19 | Python ≥ 3.10; CI on Windows + Linux with Python 3.11. | D-A18 |
