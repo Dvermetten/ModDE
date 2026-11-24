@@ -1,0 +1,36 @@
+module,option,cls,mean_delta_auc,better_cells,worse_cells
+base_sampler,GAUSSIAN,neutral,0.009782289352522627,0,0
+base_sampler,SOBOL,neutral,-0.0009494027496055904,0,0
+base_sampler,HALTON,neutral,0.0005001569593354582,0,0
+base_sampler,LHS,neutral,-0.0020765921311053145,0,0
+oppositional_initialization,OPPOSITE,neutral,-0.0029729707975144027,0,0
+oppositional_initialization,QUASI_OPPOSITE,neutral,0.004793497858913678,0,0
+mutation_base,BEST,better,0.029628690556682442,2,0
+mutation_base,TARGET,worse,-0.03269291912167165,0,4
+mutation_reference,RAND,worse,-0.024335438198267802,0,4
+mutation_reference,BEST,worse,-0.017774236131234095,0,2
+mutation_reference,PBEST,neutral,-0.016322362278244622,0,1
+mutation_n_comps,0,worse,-0.04466448935896197,0,3
+mutation_n_comps,2,worse,-0.017810155671463983,0,2
+mutation_use_weighted_F,True,no effect,0.0,0,0
+use_archive,True,neutral,-0.004375643935735212,0,0
+crossover,EXP,neutral,-0.0043284555201390865,0,0
+eigenvalue_crossover,True,neutral,-0.0019829196046234577,0,0
+bound_correction,NONE,neutral,-0.002492836214945745,0,0
+bound_correction,UNIF_RESAMPLE,neutral,0.003683010560546062,0,0
+bound_correction,COTN,neutral,0.008509711355806701,0,0
+bound_correction,TOROIDAL,neutral,-0.002201153449885695,0,0
+bound_correction,MIRROR,neutral,0.003975598860233753,0,0
+bound_correction,HVB,neutral,0.004413173315303132,0,0
+bound_correction,EXPC_TARGET,neutral,0.003811294632795652,0,0
+bound_correction,EXPC_CENTER,neutral,0.0036584605106410413,0,0
+bound_correction,EXPS,neutral,0.007724814063556462,1,0
+adaptation_method_F,SHADE,neutral,-0.007708615055217477,0,1
+adaptation_method_F,SHADE_MODIFIED,neutral,-0.005234895682410885,0,1
+adaptation_method_F,JDE,neutral,-0.0018434672719662556,1,0
+adaptation_method_CR,SHADE,neutral,-0.00635111803342026,0,0
+adaptation_method_CR,LSHADE,neutral,-0.007146579896326347,0,0
+adaptation_method_CR,JDE,neutral,-0.007114282494607033,0,0
+use_jso_caps,True,no effect,0.0,0,0
+population_reduction,LINEAR,neutral,0.006395791075050716,1,0
+oppositional_generation,True,neutral,-0.0035200143275701066,0,0

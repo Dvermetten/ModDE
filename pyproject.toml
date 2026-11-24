@@ -1,0 +1,67 @@
+[build-system]
+requires = ["scikit-build-core>=0.10", "nanobind>=2.0"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "modde"
+version = "1.0.0a1"
+description = "Modular Differential Evolution with a C++ core"
+readme = "README.md"
+license = { file = "LICENCE" }
+authors = [{ name = "Diederick Vermetten" }]
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.23",
+    "scipy>=1.10.1",
+    "ioh>=0.3.14",
+    "ConfigSpace>=1.0",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: C++",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=7"]
+docs = ["mkdocs-material>=9.5", "mkdocs-jupyter>=0.24", "mkdocstrings[python]>=0.25", "ipykernel", "matplotlib"]
+
+[project.urls]
+Repository = "https://github.com/Dvermetten/ModDE"
+Documentation = "https://dvermetten.github.io/ModDE/"
+
+[tool.scikit-build]
+minimum-version = "build-system.requires"
+build-dir = "build/{wheel_tag}"
+# src layout: the Python package lives in src/modde, C++ sources in src/*.cpp
+wheel.packages = ["src/modde"]
+# Stable ABI (abi3) wheels for Python >= 3.12; regular wheels for 3.10 / 3.11.
+wheel.py-api = "cp312"
+# Ship only Eigen's headers + licence files, and no planning documents.
+sdist.exclude = ["external/eigen/*", "dev", "build", "dist", "src/modde/**/__pycache__"]
+sdist.include = ["external/eigen/Eigen", "external/eigen/COPYING*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.cibuildwheel]
+build = "cp310-* cp311-* cp312-*"
+skip = "*-win32 *-manylinux_i686 *musllinux* pp*"
+test-extras = ["test"]
+test-command = "pytest {project}/tests/test_core.py"
+
+[tool.cibuildwheel.linux]
+archs = ["x86_64"]
+
+[tool.cibuildwheel.windows]
+archs = ["AMD64"]
+
+[tool.cibuildwheel.macos]
+# native architecture of the runner: arm64 on macos-14, x86_64 on macos-15-intel
+# (deployment target set per runner in .github/workflows/wheels.yml)
+archs = ["native"]

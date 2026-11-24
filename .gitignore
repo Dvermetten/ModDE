@@ -1,0 +1,33 @@
+# Build artefacts
+build/
+dist/
+wheelhouse/
+*.egg-info/
+_skbuild/
+*.so
+*.pyd
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Notebooks / scratch
+.ipynb_checkpoints/
+Untitled*.ipynb
+
+# IDE
+.vscode/
+.idea/
+
+# Supporting studies (raw data, reports, study scripts) are kept locally only,
+# not in the repository.
+dev/studies/
+
+# Documentation build output (docs/parameters.md is generated from the registry)
+site/
+docs/parameters.md
+docs/interactions.md
+.cache/
