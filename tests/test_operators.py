@@ -164,13 +164,13 @@ def test_corrections_stay_in_bounds_and_leave_feasible_coordinates(method):
     assert np.all((Uc >= -5) & (Uc <= 5))
     inside = (U >= -5) & (U <= 5)
     np.testing.assert_array_equal(Uc[inside], U[inside])
-    assert de.corrected == list(np.any(~inside, axis=1))
+    assert de.corrected_mask == list(np.any(~inside, axis=1))
 
 
 def test_none_leaves_everything():
     de, U = corrected("NONE")
     np.testing.assert_array_equal(de.trials_corrected, U)
-    assert not any(de.corrected)
+    assert not any(de.corrected_mask)
 
 
 def _normalised(x):

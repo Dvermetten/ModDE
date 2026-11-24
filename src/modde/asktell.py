@@ -9,12 +9,13 @@ from typing import Any
 import numpy as np
 
 from . import _core
-from ._settings import settings_from_dict
-from .configspace import preset_settings
+from ._common import (TrackedMixin, as_int, check_settings_alone, collect_values, emit_warnings,
+                      warn_nan)
+from ._settings import _MODULE_FIELDS, settings_from_dict
 
 
-class AskTellDE:
-    """Modular DE with external evaluation.
+class AskTellDE(TrackedMixin):
+    """Modular DE with external evaluation (minimisation).
 
     >>> at = AskTellDE(dim=5, lb=-5, ub=5, budget=1000)
     >>> while not at.stop:
@@ -22,25 +23,43 @@ class AskTellDE:
     ...     at.tell([f(x) for x in X])          # their values, same order
 
     Or one point at a time: ``i, x = at.ask_one(); at.tell_one(i, f(x))``.
-    The budget is counted by the optimizer (there is no problem object).
+    Use one of the two styles per batch.
+
+    - The budget (default ``10000 * dim``) is counted by the optimizer. Near its end,
+      ``ask()`` returns fewer points than the population size.
+    - A batch can be trial vectors or, with oppositional generation, opposite points;
+      both are simply evaluated and told.
+    - ``ask()`` raises ``StopIteration`` once the run is finished (check ``stop``).
+    - The optimizer minimises; to maximise, tell ``-f``.
+    - NaN values are treated as +inf (with a warning).
+
+    Settings as for :class:`ModularDE`: ``preset`` or ``config``, plus keyword
+    settings, or complete core ``settings`` (then ``dim``, ``lb`` and ``ub`` come from
+    them and nothing else may be given).
     """
 
-    def __init__(self, dim: int, lb: Any, ub: Any, *, budget: int | None = None,
-                 preset: str | None = None, config: Any = None,
+    def __init__(self, dim: int | None = None, lb: Any = None, ub: Any = None, *,
+                 budget: int | None = None, preset: str | None = None, config: Any = None,
                  settings: _core.Settings | None = None, **kwargs: Any) -> None:
-        if settings is None:
-            values: dict[str, Any] = {}
-            if preset is not None:
-                values.update(preset_settings(preset, dim))
-            if config is not None:
-                values.update(dict(config))
-            values.update(kwargs)
+        object.__setattr__(self, "_state", {})
+        preset_only: set[str] = set()
+        user_modules: set[str] = set()
+        if settings is not None:
+            check_settings_alone(lb=lb, ub=ub, budget=budget, preset=preset, config=config,
+                                 **{"keyword settings": kwargs})
+            if dim is not None and as_int("dim", dim) != settings.dim:
+                raise ValueError(f"dim = {dim} does not match settings.dim = {settings.dim}")
+        else:
+            if dim is None or lb is None or ub is None:
+                raise ValueError("dim, lb and ub are required")
+            dim = as_int("dim", dim, minimum=1)
+            values, preset_only = collect_values(dim, preset, config, kwargs)
+            user_modules = {k for k in (set(kwargs) | set(dict(config or {}))) if k in _MODULE_FIELDS}
             if budget is not None:
-                values["budget"] = int(budget)
+                values["budget"] = as_int("budget", budget, minimum=1)
             settings = settings_from_dict(dim, lb=lb, ub=ub, **values)
         self.core = _core.ModularDE(settings)
-        for message in self.core.settings.warnings:
-            warnings.warn(message, UserWarning, stacklevel=2)
+        emit_warnings(self.core, preset_only, user_modules)
         self._pending: tuple[str, np.ndarray, Any] | None = None
         self._single: dict[str, Any] | None = None
 
@@ -87,15 +106,14 @@ class AskTellDE:
             raise ValueError(f"expected {len(points)} values, got {len(f)}")
         core = self.core
         self._pending = None
+        self._single = None  # a batch told as a whole ends any one-at-a-time state
 
         if kind == "init":
             core.record_evaluations(points, f)
             full = np.full(len(extra), np.inf)
             full[: len(f)] = f
             core.finish_initialization(extra, full)
-            return
-
-        if kind == "trials":
+        elif kind == "trials":
             core.tell_trials(f)
             core.select()
             if not core.break_conditions():
@@ -103,17 +121,17 @@ class AskTellDE:
                     O = core.opposites
                     k = core.evaluable(len(O))
                     self._pending = ("opposition", O[:k], None)
+                    warn_nan(core, self._state)
                     return  # adapt() follows after the opposite points are told
                 core.adapt()
             core.update_stats()
-            return
-
-        # kind == "opposition"
-        core.record_evaluations(points, f)
-        core.finish_opposition(f)
-        if not core.break_conditions():
-            core.adapt()
-        core.update_stats()
+        else:  # opposition
+            core.record_evaluations(points, f)
+            core.finish_opposition(f)
+            if not core.break_conditions():
+                core.adapt()
+            core.update_stats()
+        warn_nan(core, self._state)
 
     # ------------------------------------------------------------------ one point at a time
 
@@ -121,10 +139,12 @@ class AskTellDE:
         """``(index, x)`` of the next point. Points are matched by index, not by value."""
         if self._single is None:
             X = self.ask()
-            self._single = {"X": X, "f": np.full(len(X), np.nan), "next": 0}
+            self._single = {"X": X, "f": np.zeros(len(X)), "told": np.zeros(len(X), dtype=bool), "next": 0}
         s = self._single
         if s["next"] >= len(s["X"]):
-            raise RuntimeError("all points of this batch were asked; tell their values first")
+            missing = [int(i) for i in np.flatnonzero(~s["told"])]
+            raise RuntimeError(f"all points of this batch were asked; tell the values of indices "
+                               f"{missing} first")
         i = s["next"]
         s["next"] += 1
         return i, s["X"][i].copy()
@@ -136,28 +156,35 @@ class AskTellDE:
         s = self._single
         if not 0 <= index < s["next"]:
             raise ValueError(f"index {index} has not been asked")
-        if not np.isnan(s["f"][index]):
+        if s["told"][index]:
             warnings.warn(f"value for index {index} told twice; using the last one", UserWarning)
         s["f"][index] = float(f)
-        if not np.isnan(s["f"]).any():
-            self._single = None
+        s["told"][index] = True
+        if s["told"].all():
             self.tell(s["f"])
 
-    # ------------------------------------------------------------------ results
+    # ------------------------------------------------------------------ results and state
 
     @property
     def best_x(self) -> np.ndarray:
+        """Best point found."""
         return np.asarray(self.core.stats.best_x)
 
     @property
     def best_f(self) -> float:
+        """Best objective value found."""
         return float(self.core.stats.best_f)
 
     @property
     def evaluations(self) -> int:
+        """Values told so far (= evaluations used)."""
         return int(self.core.stats.evaluations)
 
     def __getattr__(self, name: str) -> Any:
-        if name == "core":
+        # population, fitness, archive, memories, settings, ... from the core (read-only here)
+        if name.startswith("_") or name == "core":
             raise AttributeError(name)
-        return getattr(self.core, name)
+        try:
+            return getattr(self.core, name)
+        except AttributeError:
+            raise AttributeError(f"'AskTellDE' object has no attribute {name!r}") from None

@@ -14,7 +14,8 @@ from __future__ import annotations
 from importlib import metadata as _metadata
 
 from . import _core
-from ._core import (AdaptationCR, AdaptationF, BaseSampler, BoundCorrectionType, CrossoverType,
+from ._core import (AdaptationCR, AdaptationF, ArchiveContent, BaseSampler, BoundCorrectionType,
+                    CrossoverType,
                     Modules, MutationBase, MutationReference, OppositionalInitialization,
                     PbestSampling, PopulationReduction, Provenance, Settings)
 from ._settings import settings_from_dict, settings_to_dict
@@ -49,6 +50,8 @@ __all__ = (
     "settings_from_config", "config_from_settings", "irace",
     "Settings", "Modules", "Provenance",
     "BaseSampler", "OppositionalInitialization", "MutationBase", "MutationReference",
-    "PbestSampling", "CrossoverType", "BoundCorrectionType", "AdaptationF", "AdaptationCR",
-    "PopulationReduction",
+    "PbestSampling", "ArchiveContent", "CrossoverType", "BoundCorrectionType", "AdaptationF",
+    "AdaptationCR", "PopulationReduction",
 )
+
+del annotations  # from the __future__ import; not part of the API

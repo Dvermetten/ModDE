@@ -46,11 +46,12 @@ def preset_names() -> list[str]:
 
 
 def preset_settings(name: str, dim: int) -> dict[str, Any]:
-    """The settings (registry names, only non-defaults) of a preset for ``dim``."""
-    try:
-        preset = R.PRESETS[name]
-    except KeyError:
-        raise KeyError(f"unknown preset {name!r}; available: {preset_names()}") from None
+    """The settings (registry names, only non-defaults) of a preset for ``dim``.
+    Names are matched case-insensitively."""
+    by_lower = {key.lower(): key for key in R.PRESETS}
+    if str(name).lower() not in by_lower:
+        raise ValueError(f"unknown preset {name!r}; available: {preset_names()}")
+    preset = R.PRESETS[by_lower[str(name).lower()]]
     return dict(preset.settings(int(dim)))
 
 

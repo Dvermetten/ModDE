@@ -49,6 +49,7 @@ namespace modde
         Float curr_F = NaN, curr_CR = NaN, CS = 0, ED = 0;
         bool corrected = false;
         std::size_t corr_so_far = 0;
+        std::size_t nan_evaluations = 0; //!< objective values that were NaN (treated as +inf)
     };
 
     //! Complete runtime state of one optimizer (D-A6).
@@ -67,6 +68,7 @@ namespace modde
         Matrix U;               //!< trials before bound correction
         Matrix U_corrected;     //!< trials after bound correction
         Vector f_trial;         //!< fitness of the trials (+inf if not evaluated)
+        Index n_trials_evaluated = 0; //!< trials 0..n-1 were evaluated; the others never win selection
         std::vector<bool> corrected; //!< per trial: any coordinate corrected
         Vector CS, ED;               //!< per trial correction statistics
         std::vector<Indices> last_parents; //!< population parents used per donor (testing/analysis)
@@ -77,6 +79,7 @@ namespace modde
         SuccessRecord success;
         Stats stats;
         bool initialized = false;
+        bool stop_requested = false; //!< set from outside (e.g. the problem reached its target); ends the run
 
         explicit Parameters(const Settings &user_settings);
 

@@ -126,8 +126,8 @@ PARAMS: tuple[Param, ...] = (
     Param("dim", "settings", "int", "Search-space dimension. Taken from the problem when it is an ioh problem.",
           valid=(1, None)),
     Param("budget", "settings", "int",
-          "Maximum number of evaluations, counted by the problem (D-B3). Required in fmin.",
-          default=lambda d: 10_000 * d, default_doc="10 000·d (low-level API only)", valid=(1, None)),
+          "Maximum number of evaluations, counted by the problem (D-B3).",
+          default=lambda d: 10_000 * d, default_doc="10 000·d (fmin requires a budget)", valid=(1, None)),
     Param("lb", "settings", "vector", "Lower bounds. From the problem; required for plain callables (D-B2).",
           default_doc="from the problem"),
     Param("ub", "settings", "vector", "Upper bounds. From the problem; required for plain callables (D-B2).",
@@ -160,7 +160,7 @@ PARAMS: tuple[Param, ...] = (
           references=("tanabe2014",)),
     Param("lambda_min", "population_size", "int",
           "Final population size of the reduction schedule.",
-          default_doc="max(4, parents needed + 1)", derived=True, valid=(1, None),
+          default_doc="min(lambda0, max(4, parents needed + 1))", derived=True, valid=(1, None),
           active_when=(Condition("population_reduction", ("LINEAR",)),),
           references=("tanabe2014",)),
 
@@ -327,7 +327,11 @@ def n_parents_needed(settings: Mapping[str, Any]) -> int:
 
 def derive_defaults(settings: Mapping[str, Any]) -> dict[str, Any]:
     """DERIVED defaults (provenance ``DERIVED``) for the given settings."""
-    return {"lambda_min": max(4, n_parents_needed(settings) + 1)}
+    lambda0 = settings.get("lambda0")
+    lambda_min = max(4, n_parents_needed(settings) + 1)
+    if lambda0 is not None:
+        lambda_min = min(int(lambda0), lambda_min)  # a derived value never exceeds lambda0
+    return {"lambda_min": lambda_min}
 
 
 def is_active(param: Param, settings: Mapping[str, Any]) -> bool:

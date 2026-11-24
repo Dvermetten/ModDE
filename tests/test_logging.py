@@ -47,7 +47,7 @@ class Checker:
                 i = hit[0]
                 assert st.curr_F == core.F_used[i]
                 assert st.curr_CR == core.CR_used[i]
-                assert st.corrected == core.corrected[i]
+                assert st.corrected == core.corrected_mask[i]
                 self.kinds["trial"] += 1
             else:
                 O = core.opposites

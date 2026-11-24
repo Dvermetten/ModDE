@@ -4,6 +4,8 @@
 // (fmin, presets, ioh wrapping, ConfigSpace) is added in Phase 3 in Python.
 // Populations cross the boundary as n x d arrays (D-A9).
 
+#include <cmath>
+#include <limits>
 #include <string>
 
 #include <nanobind/eigen/dense.h>
@@ -42,6 +44,29 @@ namespace
     }
 
     RowMatrix to_rows(const Matrix &X) { return X.transpose(); }
+
+    void check_len(const Vector &v, Index n, const char *name)
+    {
+        if (v.size() != n)
+            throw std::invalid_argument(std::string(name) + " must have length " + std::to_string(n) + ", got " +
+                                        std::to_string(v.size()));
+    }
+
+    void check_shape(const RowMatrix &X, Index rows, Index cols, const char *name)
+    {
+        if (X.rows() != rows || X.cols() != cols)
+            throw std::invalid_argument(std::string(name) + " must have shape (" + std::to_string(rows) + ", " +
+                                        std::to_string(cols) + "), got (" + std::to_string(X.rows()) + ", " +
+                                        std::to_string(X.cols()) + ")");
+    }
+
+    Vector nan_as_inf(Vector f)
+    {
+        for (Index i = 0; i < f.size(); ++i)
+            if (std::isnan(f(i)))
+                f(i) = std::numeric_limits<Float>::infinity();
+        return f;
+    }
 
     Objective make_objective(nb::callable f, bool vectorized)
     {
@@ -197,7 +222,8 @@ NB_MODULE(_core, m)
         .def_ro("corrected", &Stats::corrected)
         .def_ro("CS", &Stats::CS)
         .def_ro("ED", &Stats::ED)
-        .def_ro("corr_so_far", &Stats::corr_so_far);
+        .def_ro("corr_so_far", &Stats::corr_so_far)
+        .def_ro("nan_evaluations", &Stats::nan_evaluations);
 
     // ---- optimizer --------------------------------------------------------------------
     using DE = ModularDE;
@@ -212,12 +238,14 @@ NB_MODULE(_core, m)
 
     nb::class_<DE>(m, "ModularDE")
         .def(nb::init<const Settings &>(), "settings"_a)
-        .def("initialize", with_objective(&DE::initialize), "f"_a, "vectorized"_a = false)
+        .def("initialize", with_objective(&DE::initialize), "f"_a, "vectorized"_a = false,
+             "Sample, evaluate and select the initial population.")
         .def("sample_parameters", &DE::sample_parameters)
         .def("mutate", &DE::mutate)
         .def("crossover", &DE::crossover)
         .def("correct_bounds", &DE::correct_bounds)
-        .def("evaluate", with_objective(&DE::evaluate), "f"_a, "vectorized"_a = false)
+        .def("evaluate", with_objective(&DE::evaluate), "f"_a, "vectorized"_a = false,
+             "Evaluate the corrected trials (at most the remaining budget; the others get +inf).")
         .def("select", &DE::select)
         .def("oppositional_generation", [](DE &de, nb::callable f, bool vectorized)
              { Objective o = make_objective(f, vectorized); return de.oppositional_generation(o); }, "f"_a, "vectorized"_a = false)
@@ -225,7 +253,8 @@ NB_MODULE(_core, m)
         .def("step", [](DE &de, nb::callable f, bool vectorized)
              { Objective o = make_objective(f, vectorized); return de.step(o); }, "f"_a, "vectorized"_a = false)
         .def("run", with_objective(&DE::run), "f"_a, "vectorized"_a = false)
-        .def("break_conditions", &DE::break_conditions)
+        .def("break_conditions", &DE::break_conditions,
+             "True if a termination condition holds (budget, target, max_generations, stop_requested).")
         // ask-tell building blocks (D-A12); n x d at the boundary
         .def("initial_candidates", [](DE &de) { return to_rows(de.initial_candidates()); },
              "Initial candidates (m x d) to evaluate; consumes the RNG like initialize().")
@@ -250,21 +279,46 @@ NB_MODULE(_core, m)
         .def_prop_rw("population", [](const DE &de) { return to_rows(de.p.pop.X); },
                      [](DE &de, const RowMatrix &X)
                      {
-                         if (X.rows() != de.p.lambda || X.cols() != de.p.d)
-                             throw std::invalid_argument("population must have shape (lambda, d)");
+                         check_shape(X, de.p.lambda, de.p.d, "population");
                          de.p.pop.X = X.transpose();
                      })
-        .def_prop_rw("fitness", [](const DE &de) { return de.p.pop.f; }, [](DE &de, const Vector &f) { de.p.pop.f = f; })
-        .def_prop_rw("F", [](const DE &de) { return de.p.pop.F; }, [](DE &de, const Vector &v) { de.p.pop.F = v; })
-        .def_prop_rw("CR", [](const DE &de) { return de.p.pop.CR; }, [](DE &de, const Vector &v) { de.p.pop.CR = v; })
-        .def_prop_rw("F_used", [](const DE &de) { return de.p.F_used; }, [](DE &de, const Vector &v) { de.p.F_used = v; })
-        .def_prop_rw("CR_used", [](const DE &de) { return de.p.CR_used; }, [](DE &de, const Vector &v) { de.p.CR_used = v; })
-        .def_prop_rw("donors", [](const DE &de) { return to_rows(de.p.V); }, [](DE &de, const RowMatrix &X) { de.p.V = X.transpose(); })
-        .def_prop_rw("trials", [](const DE &de) { return to_rows(de.p.U); }, [](DE &de, const RowMatrix &X) { de.p.U = X.transpose(); })
-        .def_prop_ro("trials_corrected", [](const DE &de) { return to_rows(de.p.U_corrected); })
-        .def_prop_rw("trial_fitness", [](const DE &de) { return de.p.f_trial; }, [](DE &de, const Vector &f) { de.p.f_trial = f; })
-        .def_prop_ro("corrected", [](const DE &de)
-                     { nb::list l; for (bool b : de.p.corrected) l.append(b); return l; })
+        .def_prop_rw("fitness", [](const DE &de) { return de.p.pop.f; },
+                     [](DE &de, const Vector &f) { check_len(f, de.p.lambda, "fitness"); de.p.pop.f = nan_as_inf(f); },
+                     "Objective values of the population (minimisation sign; NaN is stored as +inf).")
+        .def_prop_rw("F", [](const DE &de) { return de.p.pop.F; },
+                     [](DE &de, const Vector &v) { check_len(v, de.p.lambda, "F"); de.p.pop.F = v; },
+                     "Stored F of each individual (jDE; initially F0).")
+        .def_prop_rw("CR", [](const DE &de) { return de.p.pop.CR; },
+                     [](DE &de, const Vector &v) { check_len(v, de.p.lambda, "CR"); de.p.pop.CR = v; },
+                     "Stored CR of each individual (jDE; initially CR0).")
+        .def_prop_rw("F_used", [](const DE &de) { return de.p.F_used; },
+                     [](DE &de, const Vector &v) { check_len(v, de.p.lambda, "F_used"); de.p.F_used = v; },
+                     "F used by each individual in the current generation (after sample_parameters).")
+        .def_prop_rw("CR_used", [](const DE &de) { return de.p.CR_used; },
+                     [](DE &de, const Vector &v) { check_len(v, de.p.lambda, "CR_used"); de.p.CR_used = v; },
+                     "CR used by each individual in the current generation (after sample_parameters).")
+        .def_prop_rw("donors", [](const DE &de) { return to_rows(de.p.V); },
+                     [](DE &de, const RowMatrix &X) { check_shape(X, de.p.lambda, de.p.d, "donors"); de.p.V = X.transpose(); },
+                     "Donor vectors of the current generation, (lambda, d).")
+        .def_prop_rw("trials", [](const DE &de) { return to_rows(de.p.U); },
+                     [](DE &de, const RowMatrix &X) { check_shape(X, de.p.lambda, de.p.d, "trials"); de.p.U = X.transpose(); },
+                     "Trial vectors before bound correction, (lambda, d).")
+        .def_prop_ro("trials_corrected", [](const DE &de) { return to_rows(de.p.U_corrected); },
+                     "Trial vectors after bound correction (the evaluated points), (lambda, d).")
+        .def_prop_rw("trial_fitness", [](const DE &de) { return de.p.f_trial; },
+                     [](DE &de, const Vector &f)
+                     {
+                         check_len(f, de.p.lambda, "trial_fitness");
+                         de.p.f_trial = nan_as_inf(f);
+                         de.p.n_trials_evaluated = f.size(); // all values given count as evaluated
+                     },
+                     "Objective values of the corrected trials (+inf if not evaluated).")
+        .def_prop_ro("corrected_mask", [](const DE &de)
+                     { nb::list l; for (bool b : de.p.corrected) l.append(b); return l; },
+                     "Per trial of the current generation: whether any coordinate was corrected.")
+        .def_prop_rw("stop_requested", [](const DE &de) { return de.p.stop_requested; },
+                     [](DE &de, bool v) { de.p.stop_requested = v; },
+                     "Set to end the run at the next termination check (used for the ioh problem's target).")
         .def_prop_ro("last_parents", [](const DE &de) { return de.p.last_parents; })
         .def_prop_ro("archive", [](const DE &de)
                      {
@@ -273,8 +327,12 @@ NB_MODULE(_core, m)
                              A.row(i) = de.p.archive.members[static_cast<size_t>(i)].transpose();
                          return A; })
         .def_prop_ro("archive_capacity", [](const DE &de) { return de.p.archive_capacity(); })
-        .def_prop_rw("memory_F", [](const DE &de) { return de.p.memory.M_F; }, [](DE &de, const Vector &v) { de.p.memory.M_F = v; })
-        .def_prop_rw("memory_CR", [](const DE &de) { return de.p.memory.M_CR; }, [](DE &de, const Vector &v) { de.p.memory.M_CR = v; })
+        .def_prop_rw("memory_F", [](const DE &de) { return de.p.memory.M_F; },
+                     [](DE &de, const Vector &v) { check_len(v, de.p.memory.M_F.size(), "memory_F"); de.p.memory.M_F = v; },
+                     "SHADE F memory (memory_size slots).")
+        .def_prop_rw("memory_CR", [](const DE &de) { return de.p.memory.M_CR; },
+                     [](DE &de, const Vector &v) { check_len(v, de.p.memory.M_CR.size(), "memory_CR"); de.p.memory.M_CR = v; },
+                     "SHADE CR memory (memory_size slots; NaN marks an L-SHADE terminal slot).")
         .def_prop_ro("memory_index", [](const DE &de) { return de.p.memory.k; })
         .def_prop_ro("success", [](const DE &de)
                      {

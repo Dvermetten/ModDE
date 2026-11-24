@@ -45,6 +45,19 @@ namespace modde
 
     // ------------------------------------------------------------------ evaluation
 
+    namespace
+    {
+        //! NaN objective values are treated as +inf (spec/settings.md §2): they never win a
+        //! comparison and sort last, instead of freezing individuals or breaking the sorting.
+        Vector nan_to_inf(Vector f)
+        {
+            for (Index i = 0; i < f.size(); ++i)
+                if (std::isnan(f(i)))
+                    f(i) = INF;
+            return f;
+        }
+    } // namespace
+
     Index ModularDE::evaluable(Index n) const
     {
         return std::min<Index>(n, static_cast<Index>(p.remaining_budget()));
@@ -54,7 +67,9 @@ namespace modde
     {
         p.stats.evaluations += static_cast<std::size_t>(f.size());
         for (Index i = 0; i < f.size(); ++i)
-            if (f(i) < p.stats.best_f)
+            if (std::isnan(f(i)))
+                ++p.stats.nan_evaluations;
+            else if (f(i) < p.stats.best_f)
             {
                 p.stats.best_f = f(i);
                 p.stats.best_x = X.col(i);
@@ -79,7 +94,12 @@ namespace modde
                 before(i);
                 f(i) = objective.single ? objective.single(X.col(i)) : objective.batch(X.col(i))(0);
                 ++p.stats.evaluations; // counted one by one: per-evaluation statistics stay in sync
-                if (f(i) < p.stats.best_f)
+                if (std::isnan(f(i)))
+                {
+                    ++p.stats.nan_evaluations;
+                    f(i) = INF;
+                }
+                else if (f(i) < p.stats.best_f)
                 {
                     p.stats.best_f = f(i);
                     p.stats.best_x = X.col(i);
@@ -92,8 +112,8 @@ namespace modde
             if (fb.size() != count)
                 throw std::runtime_error("vectorised objective returned " + std::to_string(fb.size()) +
                                          " values for " + std::to_string(count) + " points");
-            f.head(count) = fb;
             record_evaluations(X.leftCols(count), fb);
+            f.head(count) = nan_to_inf(fb);
         }
         return f;
     }
@@ -135,8 +155,9 @@ namespace modde
         return candidates;
     }
 
-    void ModularDE::finish_initialization(const Matrix &candidates, const Vector &f)
+    void ModularDE::finish_initialization(const Matrix &candidates, const Vector &f_given)
     {
+        const Vector f = nan_to_inf(f_given);
         const auto &s = p.settings;
         const auto lambda0 = static_cast<Index>(*s.lambda0);
         if (f.size() != candidates.cols())
@@ -199,12 +220,14 @@ namespace modde
         if (f.size() > p.lambda)
             throw std::invalid_argument("more fitness values than trials");
         p.f_trial = Vector::Constant(p.lambda, INF);
-        p.f_trial.head(f.size()) = f;
+        p.f_trial.head(f.size()) = nan_to_inf(f);
+        p.n_trials_evaluated = f.size();
         record_evaluations(p.U_corrected.leftCols(f.size()), f);
     }
 
     void ModularDE::evaluate(Objective &objective)
     {
+        p.n_trials_evaluated = evaluable(p.lambda);
         p.f_trial = evaluate_points(p.U_corrected, objective,
                                     [&](Index i)
                                     {
@@ -230,7 +253,7 @@ namespace modde
         for (Index i = 0; i < n; ++i)
         {
             const Float ft = p.f_trial(i);
-            if (!(ft <= p.pop.f(i)))
+            if (i >= p.n_trials_evaluated || !(ft <= p.pop.f(i))) // unevaluated trials never win
                 continue;
             rec.W[static_cast<size_t>(i)] = true;
             if (ft < p.pop.f(i))
@@ -274,7 +297,7 @@ namespace modde
         if (fO_evaluated.size() > n)
             throw std::invalid_argument("more fitness values than opposite points");
         Vector fO = Vector::Constant(n, INF);
-        fO.head(fO_evaluated.size()) = fO_evaluated;
+        fO.head(fO_evaluated.size()) = nan_to_inf(fO_evaluated);
 
         // Best n of X u O; the stable sort keeps existing members first on ties.
         Population all;
@@ -346,7 +369,7 @@ namespace modde
     bool ModularDE::break_conditions() const
     {
         const auto &s = p.settings;
-        if (p.stats.evaluations >= *s.budget)
+        if (p.stop_requested || p.stats.evaluations >= *s.budget)
             return true;
         if (s.target && p.stats.best_f <= *s.target)
             return true;

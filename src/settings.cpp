@@ -67,6 +67,8 @@ namespace modde
             fail("lb and ub are required (they are taken from the problem for ioh problems)");
         if (static_cast<std::size_t>(s.lb->size()) != d || static_cast<std::size_t>(s.ub->size()) != d)
             fail("lb and ub must have length dim");
+        if (!s.lb->allFinite() || !s.ub->allFinite())
+            fail("lb and ub must be finite");
         if (!((s.ub->array() - s.lb->array()) > 0).all())
             fail("lb must be strictly smaller than ub in every dimension");
         mark("lb", true, Provenance::USER);
@@ -107,7 +109,8 @@ namespace modde
         {
             const bool was_set = s.lambda_min.has_value();
             if (!was_set)
-                s.lambda_min = std::max<std::size_t>(4, needed + 1);
+                // never above lambda0: a derived value must not cause an error (spec/population_size.md)
+                s.lambda_min = std::min<std::size_t>(*s.lambda0, std::max<std::size_t>(4, needed + 1));
             mark("lambda_min", was_set, Provenance::DERIVED);
         }
 
@@ -204,8 +207,14 @@ namespace modde
                 m.mutation_base == MutationBase::BEST
                     ? "mutation_n_comps = 0 with mutation_base = BEST and no mutation_reference: every donor is "
                       "the best individual, so the population collapses (interaction study: conflict)"
-                    : "mutation_n_comps = 0 without a mutation_reference: donors contain no difference vector "
-                      "and the search relies on crossover only (interaction study: worse than classic DE)");
+                : m.mutation_base == MutationBase::TARGET
+                    ? "mutation_n_comps = 0 with mutation_base = TARGET and no mutation_reference: every donor "
+                      "equals its target, so the population never changes"
+                    : "mutation_n_comps = 0 without a mutation_reference: donors are random population members "
+                      "without a difference vector, and the search only recombines existing points "
+                      "(interaction study: worse than classic DE)");
+        if (m.use_archive && *s.archive_rate == 0)
+            s.warnings.push_back("archive_rate = 0: the archive has capacity 0 and stays empty");
         if (m.mutation_use_weighted_F && m.mutation_reference == MutationReference::NONE)
             s.warnings.push_back("mutation_use_weighted_F has no effect when mutation_reference = NONE");
         if (s.initial_population &&

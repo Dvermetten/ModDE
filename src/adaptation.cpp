@@ -106,7 +106,13 @@ namespace modde
         if (!(m.shade_F() || m.shade_CR()) || p.success.S.empty())
             return;
         const auto &rec = p.success;
-        const Vector w = rec.delta_f / rec.delta_f.sum();
+        // Weights w = df / sum(df). Improvements of a parent with f = +inf have an infinite
+        // gain; they are left out (weight 0), or, if all gains are infinite, all weigh the same
+        // (spec/adaptation.md §2). This keeps NaN out of the memories.
+        const auto finite = rec.delta_f.array().isFinite();
+        Vector w = finite.any() ? Vector(finite.select(rec.delta_f.array(), 0.0).matrix())
+                                : Vector(Vector::Ones(rec.delta_f.size()));
+        w /= w.sum();
         auto &mem = p.memory;
 
         if (m.shade_F()) // weighted Lehmer mean (KI-20)

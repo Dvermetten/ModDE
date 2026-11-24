@@ -131,7 +131,7 @@ def test_preset_and_keyword_override():
 
 
 def test_unknown_preset():
-    with pytest.raises(KeyError, match="unknown preset"):
+    with pytest.raises(ValueError, match="unknown preset"):
         modde.preset_settings("NOPE", 3)
 
 
