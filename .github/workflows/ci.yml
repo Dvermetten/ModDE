@@ -36,8 +36,8 @@ jobs:
       - name: Run tests
         run: pytest
         env:
-          # platforms with a committed regression snapshot must not skip it
-          MODDE_REQUIRE_SNAPSHOT: ${{ matrix.os == 'windows-latest' && '1' || '' }}
+          # every CI platform has a committed regression snapshot; it must not be skipped
+          MODDE_REQUIRE_SNAPSHOT: "1"
 
       - name: Regression snapshot of this platform (artifact)
         if: always()
