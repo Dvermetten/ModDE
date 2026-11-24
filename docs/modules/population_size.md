@@ -21,10 +21,13 @@ $$
 If $\lambda_{\text{next}} < \lambda$, the worst individuals are removed (with
 their own F and CR), and the archive is trimmed to its new capacity. The
 schedule depends on the budget, so pass the real budget of your experiment:
-with a larger budget, the population shrinks more slowly.
+with a larger budget, the population shrinks more slowly. If the run ends
+earlier (target reached, `max_generations`), the population has not reached
+`lambda_min` yet.
 
 `lambda_min` defaults to the smallest population the mutation can work with
-(at least 4): every donor needs enough distinct random members.
+(at least 4, but never more than `lambda0`): every donor needs enough distinct
+random members.
 
 ## Example
 

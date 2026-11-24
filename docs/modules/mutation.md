@@ -20,10 +20,16 @@ $$
 - **Reference term** (`mutation_reference`, left out for `NONE`):
   $x^{\text{ref}}_i$ is a random member (`RAND`), the best (`BEST`) or a
   p-best individual (`PBEST`). Together with `mutation_base="TARGET"` this gives
-  the "current-to-X" strategies, e.g. JADE's current-to-pbest/1.
+  the "current-to-X" strategies, e.g. JADE's current-to-pbest/1. The term is
+  always relative to the **target** $x_i$, whatever the base vector: with
+  `mutation_base="RAND"` and `mutation_reference="BEST"` the donor is
+  $x_{r_0} + F(x_{\text{best}} - x_i) + \dots$, not the textbook DE/rand-to-best
+  ($x_{r_0} + F(x_{\text{best}} - x_{r_0})$).
 - **Difference vectors:** $n \ge 0$ terms, each with its own pair of random
-  members. With $n = 0$ there are none (useful only together with a reference
-  term).
+  members. With $n = 0$ there are none, which is useful only together with a
+  reference term: without one, a `TARGET` base never moves and a `BEST` base
+  collapses the population (you get a warning). With a `BEST` reference and
+  $n = 0$, the best individual's own donor is itself.
 - **Archive:** with `use_archive=True`, the second vector of the *first*
   difference term, $\tilde{x}_{r_2}$, is drawn from the population and the
   archive together ($P \cup A$), as in JADE. See
@@ -37,7 +43,8 @@ $i$. The best and p-best individuals need not be.
 The population is sorted by $f$, and $x^{\text{ref}}_i$ is drawn uniformly from
 the $\max(1, \operatorname{round}(p_i\lambda))$ best. `pbest_sampling` sets $p_i$:
 
-- `RANDOM` (SHADE): $p_i \sim U(2/\lambda,\ \text{pbest\_rate\_max})$, drawn per individual;
+- `RANDOM` (SHADE): $p_i \sim U(2/\lambda,\ \text{pbest\_rate\_max})$, drawn per individual
+  (if `pbest_rate_max` $< 2/\lambda$, $p_i = 2/\lambda$);
 - `FIXED` (JADE, L-SHADE): $p_i = $ `pbest_rate`.
 
 ### Weighted F (`mutation_use_weighted_F`, jSO)

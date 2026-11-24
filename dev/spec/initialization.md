@@ -24,7 +24,7 @@ value for any of them produces a warning (settings.md §1, step 5).
 | Option | Draws for `m_b` points in `[0,1]^d` |
 |---|---|
 | `UNIFORM` | `z_ij ~ U(0, 1)` |
-| `GAUSSIAN` | `z_ij ~ N(0.5, 1/6)`, **redrawn until `z_ij ∈ [0, 1]`** (truncated normal; KI-9 fixed) |
+| `GAUSSIAN` | `z_ij ~ N(0.5, 1/6)` (standard deviation 1/6), **redrawn until `z_ij ∈ [0, 1]`** (truncated normal; KI-9 fixed) |
 | `SOBOL` | scrambled Sobol sequence, seeded from the optimizer RNG, first `m_b` points |
 | `HALTON` | scrambled Halton sequence, seeded from the optimizer RNG, first `m_b` points |
 | `LHS` | Latin hypercube: for each dimension, a random permutation `π_j` of `0…m_b−1`, and `z_ij = (π_j(i) + U(0,1)) / m_b` |
@@ -50,7 +50,7 @@ The points stay inside the bounds for any `φ ∈ [0, 1]`.
 
 ## 4. Evaluation and selection of the initial population
 
-1. Evaluate the candidates in order, at most the remaining budget (resolution guarantees `budget ≥ λ0`). Unevaluated candidates are dropped.
+1. Evaluate the candidates in order, at most the remaining budget (resolution checks that the budget covers them, settings.md §1; if the problem already had evaluations, fewer may remain). Unevaluated candidates get `f = +∞` and are kept only if there are not enough evaluated ones.
 2. Keep the `λ0` candidates with the lowest `f`. Ties are broken by candidate index (lower first).
 3. With oversampling and/or opposition, every evaluated candidate counts towards the budget (KI-4 fixed: 0.0.4 evaluated only `λ0`).
 

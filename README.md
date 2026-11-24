@@ -9,7 +9,7 @@ configurations of the same algorithm.
 - **Fast:** the algorithm runs in C++; the interface is Python.
 - **Faithful:** every module follows its paper, and the presets are validated against independent implementations and published results.
 - **Configurable:** every module and parameter is part of a configuration space for algorithm configuration (ConfigSpace, irace).
-- **Benchmark-ready:** built on [IOHexperimenter](https://iohprofiler.github.io/): any function becomes an ioh problem, so logging for IOHanalyzer, including modde's internal state, works out of the box.
+- **Benchmark-ready:** built on [IOHexperimenter](https://iohprofiler.github.io/): any function becomes an ioh problem, so ioh loggers record runs for IOHanalyzer, including modde's internal state (F, CR, bound corrections, ...).
 
 **Documentation:** https://dvermetten.github.io/ModDE/
 

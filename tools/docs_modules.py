@@ -121,7 +121,8 @@ def _presets_block(R, base: str) -> str:
     for name, preset in R.PRESETS.items():
         s0, s1 = preset.settings(d0), preset.settings(d1)
         refs = "; ".join(_params._ref_link(r, R, base) for r in preset.references)
-        lines += ["", f"## `{name}`", "", _params.public(preset.doc) + ("" if preset.exact else " **Approximation.**"), ""]
+        lines += ["", f"## `{name}`", "", _params.public(preset.doc) + ("" if preset.exact or "approximation" in preset.doc.lower()
+                                      else " **Approximation.**"), ""]
         if refs:
             lines += [f"Reference: {refs}.", ""]
         if preset.notes:

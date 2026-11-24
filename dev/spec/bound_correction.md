@@ -14,7 +14,7 @@ all other coordinates are left untouched. For a violating coordinate, let
 | `NONE` | `y` (unchanged; infeasible points are evaluated as-is, D-B7) | – |
 | `SATURATE` (default) | `b` | – |
 | `UNIF_RESAMPLE` | `U(0, 1)` | 1 |
-| `COTN` | `\|b − \|z\|\|` with `z ~ N(0, 1/3)`, **redrawn until the result is in `[0, 1]`** (KI-17 fixed) | ≥ 1 |
+| `COTN` | `\|b − \|z\|\|` with `z ~ N(0, 1/3)` (standard deviation 1/3), **redrawn until the result is in `[0, 1]`** (KI-17 fixed) | ≥ 1 |
 | `TOROIDAL` | `y − ⌊y⌋` | – |
 | `MIRROR` | `\|y − ⌊y⌋ − (⌊y⌋ mod 2)\|` (repeated reflection) | – |
 | `HVB` | `α·b + (1 − α)·τ_ij`, with `α = hvb_alpha`. `α = 0.5`: midpoint between bound and parent, as in SHADE/L-SHADE | – |

@@ -7,7 +7,7 @@ For each `i` (minimisation):
 
 `x_i ← u'_i` and `f_i ← f(u'_i)` if `f(u'_i) ≤ f_i` (ties go to the trial), otherwise unchanged.
 
-Unevaluated trials have `f = +∞` (settings.md §2), so they never win.
+Unevaluated trials (beyond the budget) never win, even against a parent with `f = +∞`; evaluated trials with `f = +∞` (or NaN, treated as +∞) tie with an infinite parent and win (settings.md §2). When all values are equal (a plateau), every trial wins, but `S` is empty, so SHADE memories and the archive are not updated.
 
 ## 2. Success record `R`
 Fixed at selection time, so later reordering cannot misalign it (KI-7):

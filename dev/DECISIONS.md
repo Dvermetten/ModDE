@@ -226,6 +226,7 @@ custom functions. Suites include BBOB, CEC2013, CEC2022, PBO, ….
 - **Context:** ioh problems carry `optimization_type`. 0.0.4 assumes minimisation.
 - **Recommendation:** sign-flip internally when `optimization_type == MAX`. Report values in the original sign.
 - **Status:** DECIDED (2026-11-19): sign flip for ioh problems with `optimization_type == MAX`; `best_f` in the original sign.
+- **Amendment (2026-11-24, pre-release review):** *every* user-facing value is in the problem's sign: `best_f`, `fitness`, `trial_fitness`, `target` and `initial_fitness` (`target` was compared in the internal sign, so a maximisation target never stopped the run). Complete core `Settings` passed directly stay in the minimisation sign. `AskTellDE` minimises only (tell `-f`).
 
 ### D-B11 🟠 ioh as a hard or optional dependency
 - **Recommendation:** keep it as a hard dependency (it is light and the main use case), but the core never imports it, so it can become optional later.
@@ -441,6 +442,7 @@ add_sigma, add_learning_rates)`:
 | 2026-11-20 | Regression snapshot compared with tolerance (last-bit differences between builds). | D-A13 |
 | 2026-11-23 | New module `archive_content` (PARENTS / TRIALS); second exception to D-A17. | D-D15 |
 | 2026-11-23 | macOS wheels (arm64 + x86_64) and macOS CI before 1.0. | D-A18 |
+| 2026-11-24 | Pre-release review (author-approved fixes): NaN objective values = +inf with a warning; infinite SHADE gains get weight 0; ioh's final target ends the generation (core `stop_requested`); maximisation values in the problem's sign; writes to the optimizer state are forwarded to the core with shape checks; `settings=` cannot be combined with other settings, nor `preset` with `config`; unevaluated trials never win; derived `lambda_min <= lambda0`; finite bounds required. Spec updated (settings, adaptation, population size, crossover, opposition, selection). | D-B10, D-D1, D-A12 |
 | 2026-11-24 | Random permutations by explicit Fisher-Yates instead of `std::shuffle` (its algorithm changed between MSVC releases: Windows CI failed on HALTON/LHS). The standard distributions stay (FR-4). | D-A13 |
 | 2026-11-19 | All samplers kept; double precision; no parallelisation in core. | D-A14, D-A15, D-A16 |
 | 2026-11-19 | No new modules in v1; scope extension becomes Workstream 4 / Phase 6. | D-A17 |

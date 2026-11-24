@@ -26,7 +26,7 @@ Memories `M_F[0…H−1]` and `M_CR[0…H−1]`, with `H = memory_size`, initial
 
   In both cases, if `F̃_i ≤ 0`, redraw it (SHADE: with a new `r_i` for F only; SHADE_MODIFIED: from the same distribution). Then `F̃_i ← min(F̃_i, 1)`.
 
-**`adapt()` (memory update):** if `S ≠ ∅`, with weights `w = Δf / ΣΔf`:
+**`adapt()` (memory update):** if `S ≠ ∅`, with weights `w = Δf / ΣΔf`. An improvement of a parent with `f = +∞` has `Δf = +∞`; such improvements get weight 0 (if all gains are infinite, all get equal weight), so the memories never become NaN:
 - `M_F[k] ← Σ w·S_F² / Σ w·S_F` (**weighted Lehmer mean**, KI-20; for both SHADE and SHADE_MODIFIED);
 - `M_CR[k]`:
   - `SHADE`: `Σ w·S_CR` (weighted arithmetic mean);
@@ -58,4 +58,4 @@ When individuals are removed (population_size.md) or reordered (oppositional
 generation), their stored `F_i, CR_i` move with them. The memories are not affected.
 
 ## Random draws
-SHADE: `r_i`, one normal and one or more Cauchy draws per individual. jDE: two uniforms per adapted parameter per individual.
+SHADE: `r_i`, one normal (none for a terminal CR slot) and one or more Cauchy draws per individual (each redraw of F also draws a new slot). jDE: per adapted parameter and individual one uniform, plus a second one only if the first is below τ.

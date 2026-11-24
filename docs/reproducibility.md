@@ -15,7 +15,9 @@ version.**
   [migration guide](migration.md)).
 
 Set the seed with `seed=...`. Without it, a random seed is drawn and stored in
-`optimizer.settings.seed`, so any run can be repeated afterwards.
+`optimizer.settings.seed`, so any run can be repeated afterwards:
+`modde.settings_to_dict(optimizer.settings, user_only=True)` returns the
+settings (including the seed) that reproduce it.
 
 The ask-tell interface follows exactly the same trajectory as `run()` for the
 same seed and settings.

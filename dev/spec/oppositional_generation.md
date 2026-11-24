@@ -8,7 +8,7 @@ jump if `ρ < oppositional_jump_rate` (default 0.3, as in ODE).
 
 **Jump:**
 1. Per dimension, take the bounds of the current population: `a_j = min_i x_ij` and `b_j = max_i x_ij` (KI-6 fixed: 0.0.4 took them per individual).
-2. Opposite points `x̆_i = a + b − x_i` for all `i`. They lie inside `[a, b] ⊆ [lb, ub]`, so no bound correction is needed.
+2. Opposite points `x̆_i = a + b − x_i` for all `i`. They lie inside `[a, b]`, the population's range, so they are never corrected. With `bound_correction = NONE` the population (and therefore `[a, b]`) can extend beyond `[lb, ub]`.
 3. Evaluate them in index order, at most the remaining budget. Unevaluated points get `f = +∞`.
 4. From `X ∪ X̆`, keep the `λ` points with the lowest `f`. On ties, the existing population member wins, then the lower index.
 5. A kept opposite point `x̆_i` **inherits `F_i, CR_i`** from `x_i`.

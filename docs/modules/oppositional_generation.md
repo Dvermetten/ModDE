@@ -12,7 +12,8 @@ ODE):
 1. Take the per-dimension range of the current population,
    $a_j = \min_i x_{ij}$ and $b_j = \max_i x_{ij}$.
 2. Compute the opposite points $\breve{x}_i = a + b - x_i$. They lie inside the
-   population's range, so no bound correction is needed.
+   population's range, so they are not bound-corrected (with
+   `bound_correction="NONE"` that range can extend beyond the bounds).
 3. Evaluate them (they count towards the budget).
 4. Keep the $\lambda$ best of $X \cup \breve{X}$; on ties the current member wins.
    A surviving opposite point inherits $F_i$ and $CR_i$ of the point it mirrors.

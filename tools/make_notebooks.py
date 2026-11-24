@@ -184,8 +184,9 @@ print("warning:", caught[0].message)
     md("""
 ## Presets
 
-Popular DE variants are available by name. `exact=False` marks approximations
-(components of the original paper that are not available as modules).
+Popular DE variants are available by name. Some are approximations (components
+of the original paper are not available as modules); the
+[Presets](../presets.md) page marks them and lists what is missing.
 """),
     code("""
 print(modde.preset_names())
@@ -296,6 +297,18 @@ while not at.stop:
     index, x = at.ask_one()
     at.tell_one(index, sphere(x))
 print("best:", at.best_f)
+"""),
+    md("""
+## Good to know
+
+- Near the end of the budget, `ask()` returns fewer points than the population
+  size, so that the budget is never exceeded.
+- With oppositional generation, a batch can consist of opposite points; they
+  are evaluated and told like any other batch.
+- `AskTellDE` minimises. To maximise, tell `-f`.
+- NaN values are treated as +inf (worse than any number), with a warning.
+- Once the run is finished, `stop` is true and `ask()` raises `StopIteration`.
+- Use either `ask`/`tell` or `ask_one`/`tell_one` for a batch.
 """),
 ]
 

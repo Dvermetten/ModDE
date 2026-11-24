@@ -42,8 +42,9 @@ modde.fmin(sphere, budget=5000, dim=10, lb=-5, ub=5, preset="L-SHADE")
 !!! tip "Your function becomes an ioh problem"
     A plain function is wrapped with [IOHexperimenter](https://iohprofiler.github.io/)
     automatically. The problem counts the evaluations, so the budget can never be
-    exceeded, and attaching an ioh logger gives you IOHanalyzer-ready output,
-    including modde's internal state. See the [Quickstart notebook](notebooks/01_quickstart.ipynb).
+    exceeded, and attaching an ioh logger gives you IOHanalyzer-ready output.
+    It can also record modde's internal state per evaluation (with
+    `track_evaluations=True`). See the [Quickstart notebook](notebooks/01_quickstart.ipynb).
 
 ## Where to go next
 

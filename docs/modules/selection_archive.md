@@ -9,7 +9,9 @@ $$
 x_i \leftarrow u_i \quad\text{if } f(u_i) \le f(x_i).
 $$
 
-Ties go to the trial, which helps on plateaus. At selection, modde records the
+Ties go to the trial, which helps on plateaus. Trials that were not evaluated
+(because the budget ran out) never replace their target. NaN objective values
+count as $+\infty$. At selection, modde records the
 **strict improvements** $S = \{i : f(u_i) < f(x_i)\}$ together with their
 $F_i$, $CR_i$ and improvement $\Delta f_i$. SHADE-type adaptation learns from
 this record, and the archive is filled from it. (jDE keeps a new F/CR whenever
@@ -38,8 +40,8 @@ together.
 The published CEC 2014 results of L-SHADE were produced with code that archives
 the trial vectors. That code converges faster in the middle of a run. modde's
 `L-SHADE` preset follows the paper; add `archive_content="TRIALS"` to reproduce
-the code. Both are validated against independent implementations
-(see *Validation* in the development notes).
+the code. Both are validated against independent implementations and the
+published results (see [Validation](../validation.md)).
 
 ## Example
 

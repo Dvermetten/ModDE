@@ -1,6 +1,6 @@
 # Validation
 
-How do we know that modde does what this documentation says? Four layers of
+How do we know that modde does what this documentation says? Five layers of
 checks, from single operators to whole algorithms against published results.
 
 ## 1. Tests against the specification
@@ -17,8 +17,9 @@ snapshot. They run on Windows, Linux and macOS for every change.
 
 For every evaluation (initial population, trials, oppositional jumps), the
 logged `curr_F`, `curr_CR`, `corrected`, `CS` and `ED` belong to the individual
-being evaluated, both with per-point and with vectorised evaluation. A full ioh
-log has exactly one row per evaluation.
+being evaluated (with `track_evaluations=True`, which evaluates one point at a
+time). A full ioh log has exactly one row per evaluation, and the evaluation
+counts equal the budget with per-point, vectorised and ask-tell evaluation.
 
 ## 3. Module interactions
 

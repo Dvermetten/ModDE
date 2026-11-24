@@ -24,7 +24,7 @@ are filled with these values, and the archive starts empty.
 | Option | Points in $[0,1]^d$ |
 |---|---|
 | `UNIFORM` | independent $U(0, 1)$ coordinates |
-| `GAUSSIAN` | $N(0.5, 1/6)$ per coordinate, redrawn until inside $[0, 1]$ (truncated normal) |
+| `GAUSSIAN` | normal with mean 0.5 and standard deviation 1/6 per coordinate, redrawn until inside $[0, 1]$ (truncated normal) |
 | `SOBOL` | scrambled Sobol sequence (Joe & Kuo direction numbers, random digital shift); at most 1111 dimensions |
 | `HALTON` | scrambled Halton sequence (random digit permutation per dimension) |
 | `LHS` | Latin hypercube: each dimension is split into $m_b$ strata, one point per stratum, strata permuted at random |

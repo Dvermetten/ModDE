@@ -31,6 +31,11 @@ it rotation-invariant. With $C = \operatorname{cov}(X) = B \Lambda B^\top$:
 3. rotate back: $u_i = B u'_i$.
 
 With $\lambda \le d$ the covariance is singular; the decomposition still works.
+The eigenvectors are ordered by increasing eigenvalue, which decides which
+coordinates are "consecutive" for exponential crossover.
+
+With $d = 1$, both binomial and exponential crossover always take the donor
+coordinate, so CR (and its adaptation) has no effect.
 
 ## Example
 

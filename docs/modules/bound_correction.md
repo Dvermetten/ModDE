@@ -17,7 +17,7 @@ coordinate of the target (parent) $x_i$. The corrected value $y'$ is:
 | `SATURATE` (default) | $b$: the coordinate is set to the bound |
 | `NONE` | $y$: infeasible points are evaluated as they are |
 | `UNIF_RESAMPLE` | $U(0, 1)$ |
-| `COTN` | $\lvert b - \lvert z\rvert \rvert$ with $z \sim N(0, 1/3)$, redrawn until inside $[0, 1]$ |
+| `COTN` | $\lvert b - \lvert z\rvert \rvert$ with $z$ normal (mean 0, standard deviation 1/3), redrawn until inside $[0, 1]$ |
 | `TOROIDAL` | $y - \lfloor y \rfloor$ (wrap around) |
 | `MIRROR` | reflection at the bounds, repeated until inside |
 | `HVB` | $\alpha b + (1 - \alpha)\tau$ with $\alpha = $ `hvb_alpha`; $\alpha = 0.5$ is the midpoint between bound and parent used by SHADE and L-SHADE |

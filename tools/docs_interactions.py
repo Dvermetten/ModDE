@@ -10,7 +10,8 @@ CLASS_TEXT = {
     "incompatible": "the combination fails (error)",
     "no effect": "one of the two options has no effect in combination with the other (identical runs)",
     "conflict": "together they perform significantly worse than their separate effects predict",
-    "synergy": "together they perform significantly better than their separate effects predict",
+    "synergy": "together they perform significantly better than their separate effects predict "
+               "(relative to that prediction, not necessarily good in absolute terms)",
     "mixed": "significantly better on some problems and worse on others",
     "compatible": "no significant interaction: the effects simply add up",
 }

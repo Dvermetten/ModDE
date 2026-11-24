@@ -25,6 +25,8 @@ Before crossover:
 4. Rotate back: `u_i = B u'_i`.
 
 Notes:
+- The eigenvectors are ordered by ascending eigenvalue (Eigen's `SelfAdjointEigenSolver`); their signs are not normalised. The order decides which coordinates are "consecutive" for `EXP`. With equal eigenvalues the basis is not unique, so results depend on the solver.
+- With `λ < 2` the covariance is undefined and the rotation is skipped (plain crossover).
 - With `λ ≤ d`, `C` is singular. The eigendecomposition still exists, and the zero-eigenvalue directions are an arbitrary orthonormal completion. This is acceptable, but noted for the interaction study.
 - ⚠️ README open point 4: the paper may apply this only with some probability, and/or on a subset of the population (to verify).
 

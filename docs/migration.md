@@ -50,9 +50,10 @@ The main differences:
   or `modde.ModularDE(f, budget=..., dim=..., lb=..., ub=...)`.
 - **Internal state** is available directly: `opt.curr_F` instead of
   `opt.parameters.stats.curr_F`, `opt.population` (an `(n, d)` array) instead of
-  `opt.parameters.population` (`(d, n)`). The wrapper class that 0.0.4 needed
-  for logging internal state with ioh is no longer necessary; see the
-  [benchmarking tutorial](notebooks/04_benchmarking.ipynb).
+  `opt.parameters.population` (`(d, n)`). An ioh logger can watch the optimizer
+  directly (`logger.watch(opt, ["curr_F"])`); only `ioh.Experiment`, which
+  creates a new run per problem, still needs a small adapter class (shown in the
+  [benchmarking tutorial](notebooks/04_benchmarking.ipynb)).
 - **Ask-tell:** `modde.AskTellDE` asks and tells whole generations (or single
   points with `ask_one` / `tell_one`); see the [ask-tell notebook](notebooks/03_ask_tell.ipynb).
 
@@ -65,12 +66,12 @@ The main differences:
 | `lpsr=True` | `population_reduction="LINEAR"` (and `lambda_min`) |
 | `archive_size` (was always overwritten) | `archive_rate` (capacity relative to the population size) |
 | `pbest_value=None` | `pbest_sampling="RANDOM"` with `pbest_rate_max` |
-| `pbest_value=p` | `pbest_sampling="FIXED"` with `pbest_rate=p` |
+| `pbest_value=p` | **different behaviour:** 0.0.4 drew $p_i \sim U(0, p)$ per individual. JADE's fixed p is `pbest_sampling="FIXED"` with `pbest_rate=p`; the closest to the old behaviour is `pbest_sampling="RANDOM"` with `pbest_rate_max=p` (lower end $2/\lambda$) |
 | `oppositional_generation_probability=p` | `oppositional_generation=True` with `oppositional_jump_rate=p` |
 | `oppositional_initialization=True` | `oppositional_initialization="OPPOSITE"` (or `"QUASI_OPPOSITE"`) |
 | `base_sampler="LHC"` | `base_sampler="LHS"` |
 | `init_stats=True` | `track_evaluations=True` |
-| `initialize_custom_pop` / `initialize_custom_population()` | `initial_population` (and optionally `initial_fitness`) |
+| `inialize_custom_pop` (sic) / `initialize_custom_population()` | `initial_population` (and optionally `initial_fitness`) |
 | `memory_size` (default 100) | `memory_size` (default 6) |
 | lowercase options (`"shade"`, `"jDE"`) | UPPERCASE (`"SHADE"`, `"JDE"`); strings are matched case-insensitively, so old spellings still work |
 
@@ -80,8 +81,8 @@ New settings that were hard-coded constants in 0.0.4: `hvb_alpha`,
 New modules: `archive_content`, `adaptation_method_CR="LSHADE"`,
 `oppositional_initialization="QUASI_OPPOSITE"`.
 
-Unknown or misspelled settings now raise an error instead of being ignored, and
-a setting that has no effect with the chosen modules gives a warning.
+Unknown or misspelled settings now raise an error (old names get a hint to the
+new one), and a setting that has no effect with the chosen modules gives a warning.
 
 ## Behaviour changes
 
@@ -91,7 +92,7 @@ a *Changes from 0.0.4* section with details.
 
 **Problem and budget**
 
-- The bounds are taken from the problem (0.0.4 always used $[-5, 5]$).
+- The bounds are taken from the problem (0.0.4 ignored the problem's bounds and used `lb`/`ub` settings that defaulted to $[-5, 5]$).
 - The initial population counts towards the budget, so budget-based schedules (population reduction, jSO limits, weighted F) end exactly at the budget.
 - The default population size is $10d$ for every configuration (0.0.4 switched to $18d$ when `lpsr` was on).
 

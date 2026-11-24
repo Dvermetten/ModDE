@@ -21,13 +21,15 @@ initialised with `F0` and `CR0`. Per individual a slot $r_i$ is drawn
 uniformly, and
 
 - $CR_i = \operatorname{clip}_{[0,1]}\big(N(M_{CR}[r_i],\ \text{shade\_scale\_CR})\big)$;
-- $F_i \sim \operatorname{Cauchy}(M_F[r_i],\ \text{shade\_scale\_F})$, redrawn while
-  $F_i \le 0$, then truncated to $F_i \le 1$. `SHADE_MODIFIED` uses the mean of
+- $F_i \sim \operatorname{Cauchy}(M_F[r_i],\ \text{shade\_scale\_F})$; while
+  $F_i \le 0$ it is redrawn, each time with a new slot $r_i$ (for F only); then it
+  is truncated to $F_i \le 1$. `SHADE_MODIFIED` uses the mean of
   all memory slots as location instead of slot $r_i$.
 
 After selection, if there were improvements, one memory slot $k$ (cycling
 through the memory) is overwritten with weighted means of the successful values,
-with weights $w_j = \Delta f_j / \sum \Delta f$:
+with weights $w_j = \Delta f_j / \sum \Delta f$ (improvements of a parent with
+$f = +\infty$, e.g. a penalty value, have an infinite gain and get weight 0):
 
 $$
 M_F[k] = \frac{\sum w_j F_j^2}{\sum w_j F_j} \quad\text{(Lehmer mean)},\qquad
@@ -68,7 +70,8 @@ x, f, *_ = modde.fmin(sphere, budget=5000, dim=10, lb=-5, ub=5,
 ```
 
 With an ioh logger, `curr_F` and `curr_CR` (the values used for the individual
-just evaluated) and `F_memory_mean` can be logged; see the
+just evaluated; needs `track_evaluations=True`) and `F_memory_mean` can be
+logged; see [tracked attributes](../concepts.md#tracked-attributes) and the
 [tracking tutorial](../notebooks/05_tracking.ipynb).
 
 ## Options and parameters
