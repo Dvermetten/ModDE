@@ -69,6 +69,8 @@ The same seed gives the same result with the same build on the same machine.
 module option on BBOB with a stored snapshot per platform, with a small
 tolerance for last-bit differences between compilers and CPUs. If a change
 alters results on purpose, regenerate the snapshot and say so in the changelog.
+CI uploads a freshly generated snapshot for each platform as a workflow artifact
+(`regression-snapshot-<os>`), which is how the Linux and macOS snapshots are made.
 
 ## Reporting a bug
 

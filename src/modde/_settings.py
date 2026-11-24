@@ -127,6 +127,10 @@ def settings_to_dict(settings: _core.Settings, user_only: bool = False) -> dict[
     (``settings_from_dict(dim, **d)`` or ``ModularDE(problem, **d)``) without
     turning defaults into explicit values (which could trigger "no effect"
     warnings). ``dim`` is never included.
+
+    Values are as stored in the core, i.e. in minimisation sign. For an optimizer
+    on a maximisation problem use ``opt.settings_dict()``, which converts ``target``
+    and ``initial_fitness`` back to the problem's sign.
     """
     out: dict[str, Any] = {}
     provenance = dict(settings.provenance) if settings.resolved else {}

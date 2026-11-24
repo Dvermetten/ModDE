@@ -14,6 +14,8 @@ Measured with 1-4 ulp noise on every evaluation: at most 4 mismatches per case.
 A different seed (a stand-in for a real behaviour change): at least 20 per case.
 """
 import json
+import math
+import os
 import warnings
 from pathlib import Path
 
@@ -29,6 +31,9 @@ MAX_MISMATCH = 6
 @pytest.fixture(scope="module")
 def snapshot():
     if not SNAPSHOT.exists():
+        if os.environ.get("MODDE_REQUIRE_SNAPSHOT"):
+            pytest.fail(f"no regression snapshot for platform {platform_key()} (required in CI); generate "
+                        "it with tools/make_regression_snapshot.py on this platform")
         pytest.skip(f"no regression snapshot for platform {platform_key()}")
     return json.loads(SNAPSHOT.read_text(encoding="utf-8"))
 
@@ -38,8 +43,9 @@ def test_snapshot_covers_all_cases(snapshot):
 
 
 def _mismatches(got, expected):
+    """Functions whose result differs; a non-finite result (NaN, inf) always counts."""
     return [(fid, e, g) for fid, (e, g) in enumerate(zip(expected, got), start=1)
-            if abs(g - e) > RTOL * max(1.0, abs(e))]
+            if not math.isfinite(g) or abs(g - e) > RTOL * max(1.0, abs(e))]
 
 
 @pytest.mark.parametrize("name", list(CASES))

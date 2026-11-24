@@ -50,8 +50,7 @@ A rewrite of modde with a C++ core. See [Migrating from 0.0.4](migration.md).
 - Clear errors: unknown settings (with hints for 0.0.4 names), wrong types,
   conflicting arguments (`settings` together with other settings, `preset`
   together with `config`); warnings for settings that have no effect.
-- `settings_to_dict(opt.settings, user_only=True)` gives the settings that
-  reproduce a run.
+- `opt.settings_dict(user_only=True)` gives the settings that reproduce a run.
 
 **Documentation and validation**
 

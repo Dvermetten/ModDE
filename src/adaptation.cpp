@@ -109,9 +109,11 @@ namespace modde
         // Weights w = df / sum(df). Improvements of a parent with f = +inf have an infinite
         // gain; they are left out (weight 0), or, if all gains are infinite, all weigh the same
         // (spec/adaptation.md §2). This keeps NaN out of the memories.
+        // Finite gains are divided by their maximum first, so that their sum cannot overflow.
         const auto finite = rec.delta_f.array().isFinite();
         Vector w = finite.any() ? Vector(finite.select(rec.delta_f.array(), 0.0).matrix())
                                 : Vector(Vector::Ones(rec.delta_f.size()));
+        w /= w.maxCoeff();
         w /= w.sum();
         auto &mem = p.memory;
 

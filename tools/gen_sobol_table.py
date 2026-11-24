@@ -21,8 +21,16 @@ def main(path: str, max_dim: int = 1111) -> None:
             if d > max_dim:
                 break
             m = [int(x) for x in parts[3:]]
-            assert len(m) == s
+            if len(m) != s:
+                raise ValueError(f"dimension {d}: expected {s} direction numbers, got {len(m)}")
             rows.append((d, s, a, m))
+
+    # The C++ sampler trusts max_dim: every dimension 2..max_dim must be present, in order.
+    dims = [r[0] for r in rows]
+    if dims != list(range(2, max_dim + 1)):
+        missing = sorted(set(range(2, max_dim + 1)) - set(dims))
+        raise ValueError(f"the input does not contain dimensions 2..{max_dim} contiguously "
+                         f"(missing: {missing[:10]}{' ...' if len(missing) > 10 else ''})")
 
     s_vals = ", ".join(str(r[1]) for r in rows)
     a_vals = ", ".join(str(r[2]) for r in rows)

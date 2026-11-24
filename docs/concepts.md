@@ -53,15 +53,18 @@ def sphere(x):
     return float(np.sum(x ** 2))
 
 opt = modde.ModularDE(sphere, budget=1000, dim=5, lb=-5, ub=5, preset="SHADE")
-everything = modde.settings_to_dict(opt.settings)                # every value, incl. defaults and the seed
-mine = modde.settings_to_dict(opt.settings, user_only=True)      # what was set explicitly, plus the seed
+everything = opt.settings_dict()                                  # every value, incl. defaults and the seed
+mine = opt.settings_dict(user_only=True)                          # what was set explicitly, plus the seed
 print(mine)
 print(opt.settings.warnings)                                     # the warnings issued at creation
 
 again = modde.ModularDE(sphere, dim=5, **mine)                     # the same run again (incl. bounds, budget, seed)
 ```
 
-`opt.settings` returns a copy: changing it has no effect on the optimizer.
+`opt.settings` returns a copy of the core settings: changing it has no effect on
+the optimizer. `opt.settings_dict()` gives the same values as keyword arguments, in
+the problem's sign (for core `Settings` objects, `modde.settings_to_dict` does the
+same in the optimizer's minimisation sign).
 
 ## One generation
 

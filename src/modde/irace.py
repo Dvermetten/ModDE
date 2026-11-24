@@ -124,7 +124,10 @@ def config_from_irace(arguments: str | Iterable[str], cs: ConfigurationSpace) ->
                 raise ValueError(f"{name}: {raw!r} is not one of {[_label(c) for c in hp.choices]}")
             values[name] = matches[0]
         elif type(hp).__name__.endswith("IntegerHyperparameter"):
-            values[name] = int(float(raw))
+            number = float(raw)
+            if not number.is_integer():
+                raise ValueError(f"{name}: {raw!r} is not an integer")
+            values[name] = int(number)
         else:
             values[name] = float(raw)
     # parameters irace did not pass are inactive; fill defaults, then deactivate

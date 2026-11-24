@@ -309,3 +309,42 @@ def test_ask_one_state_is_cleared_by_tell():
     at.tell([sphere(x) for x in X])
     i, x = at.ask_one()
     assert i == 0 and not any(np.allclose(x, y) for y in X)
+
+
+# ---------------------------------------------------------------- PR #8 review (Copilot)
+
+
+def test_huge_finite_gains_keep_memories_finite():
+    de = _core.ModularDE(settings_from_dict(3, lb=-5, ub=5, seed=1, lambda0=6, use_archive=False,
+                                            adaptation_method_F="SHADE", adaptation_method_CR="SHADE"))
+    de.initialize(sphere)
+    de.fitness = np.full(6, 1.7e308)          # gains of ~1.7e308 each: their sum overflows
+    de.sample_parameters(); de.mutate(); de.crossover(); de.correct_bounds()
+    de.trial_fitness = np.zeros(6)
+    de.select()
+    de.adapt()
+    assert np.isfinite(de.memory_F).all() and np.isfinite(de.memory_CR).all()
+
+
+def test_settings_dict_replays_maximisation_runs():
+    X = np.array([[1.0, 1.0], [0.1, 0.1], [2.0, 2.0], [3.0, 0.0]])
+    f = np.array([-2.0, -0.02, -8.0, -9.0])
+    opt = modde.ModularDE(max_problem(), budget=400, lambda0=4, initial_population=X, initial_fitness=f,
+                          target=-1e-3, seed=3)
+    values = opt.settings_dict(user_only=True)
+    assert values["target"] == -1e-3 and np.allclose(values["initial_fitness"], f)
+    again = modde.ModularDE(max_problem(), **values)
+    assert again.core.settings.target == opt.core.settings.target
+    np.testing.assert_array_equal(again.core.settings.initial_fitness, opt.core.settings.initial_fitness)
+
+
+def test_irace_rejects_fractional_integers():
+    cs = modde.get_configspace(3)
+    with pytest.raises(ValueError, match="not an integer"):
+        modde.irace.config_from_irace("--lambda0 12.9", cs)
+
+
+def test_regression_comparison_rejects_non_finite_results():
+    from test_regression import _mismatches
+    assert len(_mismatches([float("nan")] * 3, [1.0, 2.0, 3.0])) == 3
+    assert len(_mismatches([float("inf"), 2.0, 3.0], [1.0, 2.0, 3.0])) == 1

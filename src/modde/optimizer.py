@@ -10,7 +10,7 @@ import numpy as np
 from . import _core
 from ._common import (TrackedMixin, as_int, check_settings_alone, collect_values, emit_warnings,
                       warn_nan, writable_core_properties)
-from ._settings import _MODULE_FIELDS, settings_from_dict
+from ._settings import _MODULE_FIELDS, settings_from_dict, settings_to_dict
 
 _wrap_counter = itertools.count()
 _CORE_WRITABLE = writable_core_properties()
@@ -284,6 +284,21 @@ class ModularDE(TrackedMixin):
     def trial_fitness(self) -> np.ndarray:
         """Objective values of the current trials (in the problem's sign; ±inf if not evaluated)."""
         return self._sign * np.asarray(self.core.trial_fitness)
+
+    def settings_dict(self, user_only: bool = False) -> dict[str, Any]:
+        """The settings of this run as keyword arguments, in the problem's sign.
+
+        ``user_only=True`` gives what was set explicitly plus the seed;
+        ``ModularDE(problem, **opt.settings_dict(user_only=True))`` repeats the run.
+        Unlike ``settings_to_dict(opt.settings)``, ``target`` and ``initial_fitness``
+        are converted back to the problem's sign for maximisation problems.
+        """
+        values = settings_to_dict(self.core.settings, user_only=user_only)
+        if self._sign < 0:
+            for name in ("target", "initial_fitness"):
+                if values.get(name) is not None:
+                    values[name] = -np.asarray(values[name], dtype=float) if name == "initial_fitness"                         else -float(values[name])
+        return values
 
     # ------------------------------------------------------------------ results
 

@@ -35,6 +35,19 @@ jobs:
 
       - name: Run tests
         run: pytest
+        env:
+          # platforms with a committed regression snapshot must not skip it
+          MODDE_REQUIRE_SNAPSHOT: ${{ matrix.os == 'windows-latest' && '1' || '' }}
+
+      - name: Regression snapshot of this platform (artifact)
+        if: always()
+        run: python tools/make_regression_snapshot.py --out regression-snapshot
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: regression-snapshot-${{ matrix.os }}
+          path: regression-snapshot/*.json
 
   irace-format:
     name: irace reads the exported files (D-C10)

@@ -24,12 +24,18 @@ from regression_cases import CASES, platform_key, run_case  # noqa: E402
 
 
 def main() -> None:
+    import argparse
+
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--out", help="directory to write to (default: tests/regression)")
+    args = ap.parse_args()
     warnings.filterwarnings("ignore")
     data = {name: [run_case(settings, fid) for fid in range(1, 25)] for name, settings in CASES.items()}
-    out = ROOT / "tests" / "regression" / f"snapshot_{platform_key()}.json"
+    folder = Path(args.out) if args.out else ROOT / "tests" / "regression"
+    out = folder / f"snapshot_{platform_key()}.json"
     out.parent.mkdir(exist_ok=True)
     out.write_text(json.dumps(data, indent=1), encoding="utf-8")
-    print(f"wrote {out.relative_to(ROOT)} ({len(data)} cases x 24 functions)")
+    print(f"wrote {out} ({len(data)} cases x 24 functions)")
 
 
 if __name__ == "__main__":
