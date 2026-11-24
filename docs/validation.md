@@ -64,6 +64,17 @@ archive, the independent reference implementation behaves exactly like modde;
 with the code's archive, it reproduces the published runs. modde therefore
 follows the paper by default and offers the code's behaviour as
 [`archive_content="TRIALS"`](modules/selection_archive.md#what-enters-the-archive-archive_content).
+With that option, modde's L-SHADE reproduces the published runs:
+
+Checkpoints (14 per function, 30 functions) at which modde differs significantly from the published runs:
+
+| d | `archive_content="PARENTS"` (paper, default) | `archive_content="TRIALS"` (authors' code) |
+|---|---|---|
+| 10 | 47 of 420 | 4 of 420 |
+| 30 | 81 of 420 | 16 of 420 |
+| 50 | 78 of 420 | 17 of 420 |
+
+(Mann-Whitney test per function and checkpoint, Holm-corrected; 51 runs each.)
 
 The `jSO-like` preset is an approximation of jSO and does worse than the
 published jSO results on CEC 2017; its [notes](presets.md#jso-like) list the

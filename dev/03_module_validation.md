@@ -293,6 +293,20 @@ So modde behaves exactly like the paper-faithful reference, and the archive deta
 whole anytime gap to the published data. **The L-SHADE preset is validated as an implementation of the
 paper** (D-D14). Whether to offer the code's archive variant as an option is open (D-D15).
 
+**Follow-up (2026-11-24): modde with `archive_content = "TRIALS"` (D-D15 decided (b)).** The same protocol
+(51 runs, all 30 functions, fresh run of modde's L-SHADE preset with the option), against the published data:
+
+| d | `PARENTS` (default): final + / = / −; anytime cells different | `TRIALS`: final + / = / −; anytime cells different |
+|---|---|---|
+| 10 | 1 / 24 / 5; 47 of 420 | 2 / 24 / 4; **4 of 420** (F22, F23) |
+| 30 | 3 / 21 / 6; 81 of 420 | 1 / 28 / 1; **16 of 420** |
+| 50 | 6 / 21 / 3; 78 of 420 | 2 / 26 / 2; **17 of 420** |
+
+The anytime gap disappears (mean log10 ratio of median errors at 5–50 % of the budget: +0.13 → +0.01/+0.02).
+The few remaining cells are concentrated on F10 (shifted Schwefel), F23 and a handful of others, with no
+direction. With `TRIALS`, modde reproduces the published L-SHADE runs. Script: `trials_analysis.py`
+(→ `reports/trials_check.txt`).
+
 **jSO-like is an approximation, as documented**, and does worse than jSO. Reading jSO's code shows four
 missing mechanisms rather than the two noted in the preset: the memory slot fixed at 0.9, the linearly
 decreasing p (0.25 → 0.125), **averaging each new memory value with the old one** (`(Lehmer + old)/2`)
